@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus ground demo</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0d0f; overflow: hidden; font: 12px ui-monospace, Menlo, monospace; color: #e8e4da; }
+  #view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #hud { position: fixed; left: 12px; top: 10px; text-shadow: 0 0 3px #000; white-space: pre; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="hud"></div>
+<script type="module">
+// Standalone look-dev for src/campus/{ground,vegetation}.js on Saltline's renderer + material system.
+// Params: ?cam=x,y,z,lx,ly,lz  ?q=low|medium|high  ?nograss  ?notrees. Click to fly: WASD, mouse, Shift fast.
+import { Vector3 } from 'three';
+import './src/game/ns.js';
+import { BM, su, UM } from './src/game/common.js';
+import { ov } from './src/game/render.js';
+import { lv } from './src/game/mats.js';
+import { buildGround, withPaths } from './src/campus/ground.js';
+import { buildGrass, buildTrees } from './src/campus/vegetation.js';
+
+const params = Object.fromEntries(new URLSearchParams(location.search));
+const base = import.meta.env.BASE_URL;
+const [zone, extra] = await Promise.all([
+  fetch(base + 'campus/purdue-mall.json').then((r) => r.json()),
+  fetch(base + 'campus/mall-paths.json').then((r) => r.json()),
+]);
+const z = withPaths(zone, extra);
+
+const G = { params, events: BM(), rng: su(4207), time: { t: 0, dt: 0, frame: 0, real: 0 }, quality: UM(params.q || 'high') };
+G.render = await ov(G);
+Object.assign(G, { renderer: G.render.renderer, scene: G.render.scene, camera: G.render.camera });
+G.mats = await lv(G);
+window.__G = G;
+
+const ground = buildGround(z, G.mats, { aniso: Math.min(8, G.renderer.capabilities.getMaxAnisotropy()) });
+const grass = buildGrass(z);
+const trees = buildTrees(z);
+G.scene.add(ground);
+if (!('nograss' in params)) G.scene.add(grass);
+if (!('notrees' in params)) G.scene.add(trees);
+
+// default view: lawn at eye height looking along a footway (Purdue Mall)
+const cam = (params.cam ?? '-12,1.7,-130,10,1.2,-175').split(',').map(Number);
+const pos = new Vector3(cam[0], cam[1], cam[2]);
+const look = new Vector3(cam[3], cam[4], cam[5]);
+let yaw = Math.atan2(look.x - pos.x, look.z - pos.z), pitch = Math.atan2(look.y - pos.y, Math.hypot(look.x - pos.x, look.z - pos.z));
+window.__setCam = (x, y, zz, lx, ly, lz) => { pos.set(x, y, zz); yaw = Math.atan2(lx - x, lz - zz); pitch = Math.atan2(ly - y, Math.hypot(lx - x, lz - zz)); };
+
+const keys = new Set();
+addEventListener('keydown', (e) => keys.add(e.code));
+addEventListener('keyup', (e) => keys.delete(e.code));
+const view = document.getElementById('view');
+view.addEventListener('click', () => view.requestPointerLock?.());
+addEventListener('mousemove', (e) => {
+  if (document.pointerLockElement !== view) return;
+  yaw -= e.movementX * 0.002; pitch = Math.max(-1.4, Math.min(1.4, pitch - e.movementY * 0.002));
+});
+
+trees.update(G.camera);
+await G.render.onLevelReady();
+
+const hud = document.getElementById('hud');
+const ft = [];
+let last = performance.now(), hudT = 0;
+window.__ft = { n: 0, times: ft };
+function tick(now) {
+  const dt = Math.min(0.1, (now - last) / 1000);
+  last = now;
+  ft.push(dt * 1000); if (ft.length > 600) ft.shift(); window.__ft.n++;
+  const f = new Vector3(Math.sin(yaw), 0, Math.cos(yaw)), s = new Vector3(f.z, 0, -f.x);
+  const v = (keys.has('ShiftLeft') ? 18 : 4.5) * dt;
+  if (keys.has('KeyW')) pos.addScaledVector(f, v);
+  if (keys.has('KeyS')) pos.addScaledVector(f, -v);
+  if (keys.has('KeyA')) pos.addScaledVector(s, v);
+  if (keys.has('KeyD')) pos.addScaledVector(s, -v);
+  G.time.t += dt; G.time.dt = dt; G.time.frame++;
+  const c = G.camera;
+  c.position.copy(pos);
+  c.lookAt(pos.x + Math.sin(yaw) * Math.cos(pitch), pos.y + Math.sin(pitch), pos.z + Math.cos(yaw) * Math.cos(pitch));
+  c.updateMatrixWorld(true);
+  grass.update(c, G.time.t);
+  trees.update(c);
+  G.mats.update?.(dt);
+  G.render.frame(dt);
+  hudT += dt;
+  if (hudT > 0.5) {
+    hudT = 0;
+    const st = G.render.stats();
+    const avg = ft.reduce((a, b) => a + b, 0) / ft.length;
+    hud.textContent = `${(1000 / avg).toFixed(0)} fps  tris ${st.tris}  calls ${st.calls}\ntrees near/mid/far ${trees.stats.near}/${trees.stats.mid}/${trees.stats.far}`;
+  }
+  window.__frames = (window.__frames | 0) + 1;
+  requestAnimationFrame(tick);
+}
+window.__ready = true;
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

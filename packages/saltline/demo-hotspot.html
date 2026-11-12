@@ -8,7 +8,7 @@ import { Z0 } from './src/game/common.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 // ?h=elliott|memorial-mall  &cam=x,y,z,tx,ty,tz (local metres)  &fov=60  &w=640&hh=640 (viewport)  &far=1 (force the far LOD)
 const q = new URLSearchParams(location.search), which = q.get('h') || 'elliott';
-const mods = { elliott: () => import('./src/campus/hotspots/elliott.js'), 'memorial-mall': () => import('./src/campus/hotspots/memorial-mall.js') };
+const mods = { elliott: () => import('./src/campus/hotspots/elliott.js'), 'memorial-mall': () => import('./src/campus/hotspots/memorial-mall.js'), union: () => import('./src/campus/hotspots/union.js') };
 const cam6 = (q.get('cam') || '-40,40,-20,-80,10,-70').split(',').map(Number), VW = +(q.get('w') || innerWidth), VH = +(q.get('hh') || innerHeight);
 const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 r.setSize(VW, VH); r.setPixelRatio(1); r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = 0.75; r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -26,7 +26,7 @@ const ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600).rotateX(-Math.
 ground.receiveShadow = true; ground.position.set(tx, -0.02, tz); scene.add(ground);
 const mod = await mods[which]();
 const hs = await mod.build({}, {});
-scene.add(hs.group);
+scene.add(hs.group); window.__hs = hs; window.__hsRoot = hs.group; // for tools/hotspot-holes.mjs
 const cam = new THREE.PerspectiveCamera(+(q.get('fov') || 60), VW / VH, 0.1, 1500);
 cam.position.set(cx, cam6[1], cz); cam.lookAt(tx, ty, tz);
 let n = 0;

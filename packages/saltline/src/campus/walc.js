@@ -28,8 +28,13 @@ const SPECS = [
     photo: { map: 'south-bulge.jpg', sW: 10.1, y0: 2.6, yH: 13.8 } },
   { id: 'south-long', status: 'partly measured (2017 frame, oblique)', match: (e) => e.nz > 0.9 && e.mz > 27.5 && e.mz < 28.6 && e.L > 30, from: 'w', pitch: 3.3, w: 1.4, e0: 1.6,
     mull: false, frame: 'dark', belt: [5.4, 5.85], plinth: 0, rows: [{ ya: 7.9, yb: 10.5, pc: 2, pr: 3 }, { ya: 12.7, yb: 15.2, pc: 2, pr: 3 }] },
-  { id: 'north', status: 'COPIED, not measured (south-long layout, mirrored in z so x positions are kept)', of: 'south-long', match: (e) => e.nz < -0.9 && e.mz < -50 && e.L > 40, from: 'e', pitch: 3.3, w: 1.4, e0: 1.6,
-    mull: false, frame: 'dark', belt: [5.4, 5.85], plinth: 0, rows: [{ ya: 7.9, yb: 10.5, pc: 2, pr: 3 }, { ya: 12.7, yb: 15.2, pc: 2, pr: 3 }] },
+  // north and east: no photo of these faces, so the best measured face (west-pavilion, rectified 2021 frame) is duplicated: same 5.4 m bay pitch, 3.5 m bays, three rows, belt, plinth, mullions and rectified brick tile
+  { id: 'north', status: 'COPIED from west-pavilion (measured), repeated at its 5.4 m pitch along the 58.7 m face', of: 'west-pavilion', match: (e) => e.nz < -0.9 && e.mz < -50 && e.L > 40, from: 'w', pitch: 5.4, w: 3.5, e0: 2.2,
+    mull: true, frame: 'dark', belt: [5.7, 6.4], plinth: 0.9, rows: [{ ya: 1.15, yb: 5.65, pc: 4, pr: 3, tr: 4.15, ground: true }, { ya: 8.65, yb: 11.65, pc: 4, pr: 3 }, { ya: 13.9, yb: 16.65, pc: 4, pr: 3 }],
+    photo: { map: 'west-pavilion.jpg', sW: 21.6, y0: 0, yH: 17.4 } },
+  { id: 'east', status: 'COPIED from west-pavilion (measured): east faces of both pavilions (x 100, 17.2 m eave)', of: 'west-pavilion', match: (e) => e.nx > 0.9 && e.top > 17 && e.L > 6, from: 'n', pitch: 5.4, w: 3.5, e0: 2.2,
+    mull: true, frame: 'dark', belt: [5.7, 6.4], plinth: 0.9, rows: [{ ya: 1.15, yb: 5.65, pc: 4, pr: 3, tr: 4.15, ground: true }, { ya: 8.65, yb: 11.65, pc: 4, pr: 3 }, { ya: 13.9, yb: 16.65, pc: 4, pr: 3 }],
+    photo: { map: 'west-pavilion.jpg', sW: 21.6, y0: 0, yH: 17.4 } },
 ];
 const COL = { piers: [1.15, 7.35, 13.55, 19.75, 25.95], pw: 1.6, sill: 7.6, tr: 12.85, head: 15.6 }; // colonnade (west face): piers from the north end z=-26; the last bay (south) holds the entrance
 let seed = 7;

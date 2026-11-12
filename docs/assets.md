@@ -52,3 +52,16 @@ All files are in `packages/client/public/audio/` (about 0.5 MB of mono Ogg Vorbi
 | qubodup-click1.wav | ui-click, respawn, match start and end (pitched, echoed) | https://opengameart.org/content/button-click-sound-effect-cc0public-domain | CC0 | No |
 | windy_ambiance_0.ogg (24 s cut) | wind loop | https://opengameart.org/content/windy-ambient-noise | CC0 | No |
 | birds-isaiah658.ogg | birds loop | https://opengameart.org/content/ambient-bird-sounds | CC0 | No |
+
+## Candidates from the graphics research (not in the game yet)
+
+Used only in the prototype page (`docs/graphics-research.md`); the files are in the session scratchpad, not the repo. All are CC0, so no credit is needed. Poly Haven files come from `https://api.polyhaven.com/files/<id>`.
+
+| Asset | Would be used for | Source URL | Licence | Credit needed |
+|---|---|---|---|---|
+| service_pistol (16,650 tris for one pistol and its loaded magazine; 2K maps) | Pistol | https://polyhaven.com/a/service_pistol | CC0 | No |
+| bolt_action_rifle_7_62 (19,985 tris; 2K and 1K maps) | A future sniper rifle | https://polyhaven.com/a/bolt_action_rifle_7_62 | CC0 | No |
+| studio_small_08 HDRI (512 px used) | Weapon reflections | https://polyhaven.com/a/studio_small_08 | CC0 | No |
+| herringbone_pavement (1K, colour warmed toward red) | Plaza pavers | https://polyhaven.com/a/herringbone_pavement | CC0 | No |
+| clay_roof_tiles_02 (1K) | Clay tile hip roofs | https://polyhaven.com/a/clay_roof_tiles_02 | CC0 | No |
+| Concrete012 (1K) | Limestone (brightened, joints drawn in), concrete bands | https://ambientcg.com/view?id=Concrete012 | CC0 | No |

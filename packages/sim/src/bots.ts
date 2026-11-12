@@ -101,6 +101,7 @@ export class BotBrain {
   private readonly mode: MatchConfig['mode'];
   private readonly zone: ZoneData;
 
+  private players: readonly PlayerState[] = [];
   private path: Point[] = [];
   private pathIdx = 0;
   private goal: Point | null = null;
@@ -163,6 +164,7 @@ export class BotBrain {
   ): PlayerInput {
     const dt = TICK_DT;
     const p = this.params;
+    this.players = players;
     if (!self.alive) {
       this.wasAlive = false;
       return this.idle(tick, self);
@@ -236,7 +238,7 @@ export class BotBrain {
         this.lastSeen = null;
         const wp = this.follow(self, time, () => this.pickPatrolGoal(self));
         moveDir = wp;
-        sprint = false;
+        sprint = this.path.length - this.pathIdx > 6; // jog long legs, walk the last stretch
         faceDir = wp;
         if (self.ammo[self.weapon] < WEAPONS[self.weapon].mag * 0.5) input.reload = true;
         break;
@@ -553,6 +555,29 @@ export class BotBrain {
   private pickPatrolGoal(self: PlayerState): Point {
     const nodes = this.nav.nodes;
     const here = this.nav.nearest(self.pos.x, self.pos.z);
+    // Sight is short on a 300 m zone, so most patrols head for the nearest enemy's area.
+    let near: PlayerState | undefined;
+    let nd2 = Infinity;
+    for (const q of this.players) {
+      if (!q.alive || !this.isEnemy(self, q)) continue;
+      const d = (q.pos.x - self.pos.x) ** 2 + (q.pos.z - self.pos.z) ** 2;
+      if (d * (q.isBot ? 1 : 0.1) < nd2) [near, nd2] = [q, d * (q.isBot ? 1 : 0.1)]; // humans draw bots
+    }
+    const hunt =
+      near &&
+      Math.hypot(near.pos.x - self.pos.x, near.pos.z - self.pos.z) > 20 &&
+      this.rng.next() < 0.75
+        ? near
+        : undefined;
+    if (hunt) {
+      const ok = nodes.filter(
+        (n) =>
+          Math.hypot(n.x - hunt.pos.x, n.z - hunt.pos.z) < 25 &&
+          (here < 0 || this.nav.component[n.id] === this.nav.component[here]),
+      );
+      const n = ok[Math.floor(this.rng.next() * ok.length)];
+      if (n) return { x: n.x, z: n.z };
+    }
     for (let i = 0; i < 8; i++) {
       const nd = nodes[Math.floor(this.rng.next() * nodes.length)];
       if (!nd) break;

@@ -251,6 +251,8 @@ export class ZoneCollision {
         }
       }
     }
+    // Flat ground at y = 0 (known-gaps 9); shortcut: replace with a heightfield march once the zone has terrain.
+    if (dy < -1e-9 && origin.y > 0) consider(-origin.y / dy, 0, 1, 0, 'ground');
     return best;
   }
 }

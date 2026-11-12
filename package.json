@@ -5,6 +5,7 @@
   "packageManager": "pnpm@12.18.0",
   "scripts": {
     "dev": "pnpm --filter @folktown/client dev",
+    "saltline": "pnpm --filter @folktown/saltline dev",
     "build": "pnpm -r build",
     "bench": "node tools/bench.mjs",
     "shoot": "node tools/shoot.mjs",

@@ -69,6 +69,26 @@ export class Batch {
     this.idx.push(first, first + 1, first + 2, first, first + 2, first + 3);
   }
 
+  get triangleCount() {
+    return this.idx.length / 3;
+  }
+
+  /** Triangle a,b,c facing (b-a) x (c-a). Horizontal faces get world-plane UVs, others local ones. */
+  tri(a: Vec3, b: Vec3, c: Vec3, tile = 1) {
+    const e1: Vec3 = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+    const n = norm(cross(e1, [c[0] - a[0], c[1] - a[1], c[2] - a[2]]));
+    const t1 = norm(e1);
+    const t2 = cross(n, t1);
+    const flat = Math.abs(n[1]) > 0.9;
+    const ids = [a, b, c].map((p) => {
+      const d: Vec3 = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];
+      const u = flat ? p[0] : d[0] * t1[0] + d[1] * t1[1] + d[2] * t1[2];
+      const v = flat ? p[2] : d[0] * t2[0] + d[1] * t2[1] + d[2] * t2[2];
+      return this.vert(p, n, u / tile, v / tile);
+    });
+    this.idx.push(ids[0] as number, ids[1] as number, ids[2] as number);
+  }
+
   /** Axis-aligned box from min to max corner. */
   box(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number, tile = 1) {
     const dx = x1 - x0;

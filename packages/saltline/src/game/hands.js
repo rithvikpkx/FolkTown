@@ -2,6 +2,7 @@ import { Vector3 as K, Quaternion as St, Matrix4 as Je, BufferGeometry as pt, Bu
 import * as ut from 'three';
 import { Ey, di, Cu, l0, T1, t0, Eh, nn, xs, jl, er, mn, vs, ly, M5, tn, LE, d0, Kl, Th, P1, cy, Fr, Jl, qE, My, _h, Un, vy, Za, FE, tr, Sh, h5, ra, z1, wn, Ot, tc, TE, M1, ME, l5, Au, ft, Tu, bh, dn, Ru, yh, h0, oy, kn, sy, Eu, Nn, Mt, b0, Q0, m0, Su, $a, Fs, Zl, wh, It, _E, pn, iy, Xn, oa, CE, en, sa, ry } from './weapon.js';
 import { ar } from './ns.js';
+import { attachModel } from '../weapons/models.js';
 import { ik, ao } from './render.js';
 import { Ro, Ia, u0, ev, Is, j0, Hn } from './common.js';
 import { st, at, jP } from './fx.js';
@@ -1550,6 +1551,7 @@ __late_fx.sr(sr); __late_audio.sr(sr); __late_weapon.bs(bs);
       id: "rifle",
       name: wn.name,
       root: r,
+      magGroup: c,
       flash: d,
       muzzle: wn.muzzle,
       eject: wn.eject,
@@ -3149,6 +3151,7 @@ __late_props.sl(sl);
       x = zS(d),
       v = { rifle: m, pistol: x },
       y = [m, x];
+    for (let B of y) attachModel(B, B.id, Ro);
     for (let B of y)
       (B.root.traverse((X) => {
         X.layers.set(Ro);

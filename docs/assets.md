@@ -109,3 +109,43 @@ Both are gitignored and not part of any shipped build until cleared.
 | data/raw/purdue-historic-buildings.geojson | Names/years cross-check only (not shipped) | Purdue ArcGIS layer, via research folder | Unknown; Purdue says 3DEP viewer is unrestricted, this layer not stated | needs-clearance |
 
 - reference/purdue-photos/memorial-union-3d-model-screenshot.png: owner-supplied screenshot of the Purdue Memorial Union SketchUp/3D Warehouse model (https://3dwarehouse.sketchup.com/model/1982888bb4c06bc2b4250b90e6223188). Reference only; licence needs-clearance.
+## Facade photo textures (v2-photo-textures)
+
+Rectified from real photographs by `tools/make-facade-textures.py` (quad corners picked by eye). Output in `packages/saltline/public/campus/walk/tex/`, described by `packages/saltline/public/campus/walk/facades.json`, proof sheet `docs/img/v2-textures.jpg`. Mapillary API search (about 48 images within the pilot area, all 2020-2021 plus a few 2024) found NO usable image of any WALC face and only distant, tree-occluded views of the Bell Tower.
+
+| Asset | Used for | Source URL | Licence | Credit needed |
+|---|---|---|---|---|
+| bell-shaft.jpg, bell-clock-stage.jpg, mat-brick-red.jpg, mat-limestone-cream.jpg | Bell Tower shaft and clock stage, red brick and cream stone patches | https://commons.wikimedia.org/wiki/File:Purdue_Bell_Tower_Purdue_University_2016_01.jpg (Julian Herzog) | CC BY 4.0 | Yes: "Julian Herzog, CC BY 4.0, via Wikimedia Commons" |
+| mat-brick-dark.jpg, mat-limestone-ashlar.jpg | Dark brick and ashlar limestone patches (from Elliott Hall of Music, not WALC or Bell Tower) | Mapillary image 750908235597635, 2020-10-31, user kennystier (Graph API, token not committed) | CC BY-SA 4.0 (Mapillary); `needs-clearance` for share-alike | Yes: "kennystier, CC BY-SA 4.0, via Mapillary" |
+| walc-wall-paired-windows.jpg, walc-wall-tall-slits.jpg, mat-glass-window.jpg | WALC brick wall looks (one corner, compass faces unknown, 800 px source so soft) | https://www.purdue.edu/uns/images/2018/plant-wilmeth-now2LO.jpg (Purdue Today, 2018); copy in reference/purdue-photos | `needs-clearance` (Purdue University photo, rights unknown) | Unknown |
+
+## Bell Tower references (v2-belltower; measured only, not shipped, except bell-shaft.jpg via facades.json)
+Wikimedia Commons: Purdue_Bell_Tower_Purdue_University_2016_01.jpg (Julian Herzog, CC BY 4.0); Purdue_BellTower_1.jpg (PD); Purdue_University_belltower.jpg (PD); Purdue_BellTowerTimeCapsule.jpg (PD; plaque text reproduced procedurally); Purdue_Bell_Tower_night.JPG (CC BY-SA 3.0); Purdue_BellTower.jpg (CC BY-SA 3.0); 2122_px_-_Bell_Tower_Purdue_University_Fall_2006.JPG (CC BY 3.0).
+## v2-environment (walk scene)
+
+| File | Use | Source | Licence | needs-clearance |
+|---|---|---|---|---|
+| public/campus/walk/concrete-{albedo,normal}.jpg (2K, concrete_pavement) | Plaza and walk paving, ground.js | https://polyhaven.com/a/concrete_pavement | CC0 | No |
+| public/campus/walk/dirt-albedo.jpg (2K, park_dirt) | Worn desire paths | https://polyhaven.com/a/park_dirt | CC0 | No |
+| public/campus/walk/leaves-albedo.jpg (2K, leafy_grass) | Fallen-leaf litter | https://polyhaven.com/a/leafy_grass | CC0 | No |
+| public/campus/env/sky/qwantani_{mid_morning,noon,late_afternoon,sunset}_puresky.jpg, kloofendal_overcast_puresky.jpg | Sky dome and image-based light (?tod=); 2K HDRI converted offline to tonemapped sRGB jpg | https://polyhaven.com/a/qwantani_mid_morning_puresky and siblings, https://polyhaven.com/a/kloofendal_overcast_puresky | CC0 | No |
+
+Ortho georeference fit lives in pilot/ortho.json (fit). Trees, shrubs, grasses, furniture, road paint, curbs are generated in code (src/campus/env/, ground.js decals).
+
+- reference/purdue-photos/walc-design-render-aerial.png: architect design render of WALC and the Bell Tower plaza, from the Purdue Active Learning site (owner-supplied screenshot, 12 Nov 2026). Design reference only, not for use as a texture; licence needs-clearance.
+- Sketchfab "Purdue University Bell Tower" (uid 37db7dfc51c347849b8e5975d8a89812, Olivia Bultinck, CC Attribution, downloadable, 21,656 faces, stylised recreation, published 2026-07-16): candidate asset; not yet downloaded (needs owner login). Purdue Memorial Union (3D Warehouse 1982888bb4c06bc2b4250b90e6223188) and EveryPoint Purdue scans collection: candidates for later zones; campusmapper.com and cadmapper.com: reference/tools only.
+
+## v3-plaza
+| File | Use | Source | Licence | needs-clearance |
+|---|---|---|---|---|
+| public/campus/walk/brick-{albedo,normal,rough}.jpg (2K, red_brick_pavers) | WALC plaza brick paving, env/plaza.js (anti-tiled in shader) | https://polyhaven.com/a/red_brick_pavers | CC0 | No |
+- public/campus/walk/belltower-scan.json + belltower-scan-{0,1}.webp: Sketchfab "Purdue University Bell Tower" by Olivia Bultinck, CC BY 4.0, https://sketchfab.com/3d-models/purdue-university-bell-tower-37db7dfc51c347849b8e5975d8a89812 (original in reference/models/, 20,844 tris, 87 meshes). Converted by tools/glb-to-web.mjs, loaded by src/campus/env/belltower-scan.js behind ?tower=scan (default is the code tower). Attribution is shown in the walk hint when ?tower=scan; keep it wherever the scan ships. Not needs-clearance (CC BY credit only).
+
+## v4-walc-streetview
+Google Street View Static API frames bought/downloaded by the owner with their own key (owner states usage rights); raw 640x640 jpgs stay in data/raw/streetview/ (gitignored, not committed). Credit text from the manifest. **All needs-clearance.**
+| File | Use | Source | Credit | needs-clearance |
+|---|---|---|---|---|
+| packages/saltline/public/campus/walk/walc/west-pavilion.jpg, colonnade.jpg, brick-tile.jpg, limestone-tile.jpg | Rectified/colour-corrected albedo of the south pavilion west face; colonnade reference (not mapped); seamless brick strip tile; limestone grain/colour tile (all derived from pano CAoSF0NJSE0wb2dLRUlDQWdJQzZzNVRTbWdF, 2021-09, heading 90) | Google Street View, pano CAoSF0NJSE0wb2dLRUlDQWdJQzZzNVRTbWdF | Google, © Kaho Sakaue | Yes |
+| packages/saltline/public/campus/walk/walc/south-bulge.jpg | Rectified albedo of the south bulge face (pano _2SMIzURFlvLO3vHwJQjiA, 2017-09, heading 0) | Google Street View, pano _2SMIzURFlvLO3vHwJQjiA | © 2026 Google | Yes |
+| (measurements only) pano CAoSFENJSE0wb2dLRUlDQWdJQzZzNVF5, 2021-09 | all four headings are INTERIOR (STEAM Commons, Au Bon Pain): no east-face exterior coverage; used for nothing | Google Street View | Google, © Kaho Sakaue | Yes |
+Tools: tools/walc-rectify.py (rectify + colour correction), tools/walc-sidebyside.py. Roof tile: no roof is visible in any frame (only dark soffits), colour unchanged from the Purdue design render; north face of WALC: COPIED from the south long wall (layout, mirrored in z so x positions are kept), not measured, no photo. Bell tower frames (bell-tower/) not used here (belltower.js is other work).

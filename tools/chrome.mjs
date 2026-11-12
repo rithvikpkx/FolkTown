@@ -10,6 +10,12 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const dist = join(root, 'packages/client/dist');
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
 export const poses = JSON.parse(readFileSync(join(root, 'tools/poses.json'), 'utf8'));
+// Poses named mall-* are cameras over the Purdue Mall zone in play.html; the rest are the plaza test scene.
+export function usePose(name, pose) {
+  if (name.startsWith('mall-'))
+    process.env.PAGE = `play.html?zone=purdue-mall&cam=${pose.join(',')}`;
+  else delete process.env.PAGE;
+}
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export function requireDist() {

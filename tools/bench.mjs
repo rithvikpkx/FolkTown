@@ -1,12 +1,16 @@
 import { execSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
-import { poses, requireDist, sleep, withPage } from './chrome.mjs';
+import { poses, requireDist, sleep, usePose, withPage } from './chrome.mjs';
 import { fpsStats } from './stats.ts';
 
 execSync('npx -y pnpm@12.18.0 --filter @folktown/client build', { stdio: 'ignore' });
 requireDist();
 const rows = ['| pose | median fps | 1% low fps | GPU |', '|---|---|---|---|'];
+// optional filter: node tools/bench.mjs mall-  (only poses whose name starts with it)
+const only = process.argv[2] ?? '';
 for (const [name, pose] of Object.entries(poses)) {
+  if (!name.startsWith(only)) continue;
+  usePose(name, pose);
   const r = await withPage(pose, { uncapped: true }, async ({ ev }) => {
     for (let i = 0; i < 40 && !(await ev('window.__ft?.n > 0')); i++) await sleep(250);
     if (!(await ev('window.__ft?.n > 0')))

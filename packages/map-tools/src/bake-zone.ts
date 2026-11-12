@@ -12,6 +12,12 @@ export interface BakeOptions {
   /** Required free distance between a nav node (and every nav edge) and any solid, metres. */
   clearance: number;
   spawnsPerTeam: number;
+  /** Rectangular zone [minX, maxX, minZ, maxZ]; overrides centre/size when set. */
+  bounds?: [number, number, number, number];
+  /** Landmark positions (campus metres). `walc` and similar name a building id instead. */
+  landmarks?: { bellTower?: Pt; fountain?: Pt; walc?: string };
+  /** Buildings missing from campus.json (failed OSM relations), added as simple footprints. */
+  extraBuildings?: { id: string; name: string; height: number; outer: Pt[] }[];
   /** Storey height and fallback building height, metres. */
   levelHeight: number;
   defaultHeight: number;
@@ -52,6 +58,11 @@ function area(poly: Pt[]): number {
     a += xj * zi - xi * zj;
   }
   return a / 2;
+}
+
+function ringCentroid(poly: Pt[]): Pt {
+  const n = poly.length;
+  return [poly.reduce((a, p) => a + p[0], 0) / n, poly.reduce((a, p) => a + p[1], 0) / n];
 }
 
 function pointInPoly(poly: Pt[], x: number, z: number): boolean {
@@ -197,17 +208,29 @@ class Obstacles {
 export function bakeZone(campus: Campus, opts: BakeOptions = ENGINEERING_MALL): ZoneData {
   const o = opts;
   const half = o.size / 2;
-  const minX = o.centre[0] - half;
-  const maxX = o.centre[0] + half;
-  const minZ = o.centre[1] - half;
-  const maxZ = o.centre[1] + half;
+  const [minX, maxX, minZ, maxZ] = o.bounds ?? [
+    o.centre[0] - half,
+    o.centre[0] + half,
+    o.centre[1] - half,
+    o.centre[1] + half,
+  ];
+  const cx = (minX + maxX) / 2;
+  const cz = (minZ + maxZ) / 2;
 
   // Buildings: outer rings clipped to the box. Courtyard holes are not emitted as separate
   // colliders: a hole is enclosed by its building, so the outer solid already keeps players out
   // of it, and nothing is reachable inside (known-gaps row 10).
   const colliders: ColliderData[] = [];
   const obstacles = new Obstacles();
-  for (const b of campus.buildings) {
+  const extra = (o.extraBuildings ?? []).map((e) => ({
+    id: e.id,
+    name: e.name,
+    outer: e.outer,
+    holes: [],
+    tags: {},
+    heightLidar: e.height,
+  }));
+  for (const b of [...campus.buildings, ...extra]) {
     let ring = clipRect(b.outer, minX, maxX, minZ, maxZ);
     if (ring.length < 3 || Math.abs(area(ring)) < MIN_AREA) continue;
     ring = ring.map(([x, z]) => [r2(x), r2(z)] as Pt);
@@ -231,12 +254,13 @@ export function bakeZone(campus: Campus, opts: BakeOptions = ENGINEERING_MALL): 
 
   // Nav grid on free cells, inset from the box edge.
   const inset = o.clearance + 1;
-  const cols = Math.floor((o.size - 2 * inset) / o.navSpacing) + 1;
-  const gx0 = o.centre[0] - ((cols - 1) * o.navSpacing) / 2;
-  const gz0 = o.centre[1] - ((cols - 1) * o.navSpacing) / 2;
-  const cellNode = new Int32Array(cols * cols).fill(-1);
+  const cols = Math.floor((maxX - minX - 2 * inset) / o.navSpacing) + 1;
+  const rows = Math.floor((maxZ - minZ - 2 * inset) / o.navSpacing) + 1;
+  const gx0 = cx - ((cols - 1) * o.navSpacing) / 2;
+  const gz0 = cz - ((rows - 1) * o.navSpacing) / 2;
+  const cellNode = new Int32Array(cols * rows).fill(-1);
   const raw: Pt[] = [];
-  for (let j = 0; j < cols; j++) {
+  for (let j = 0; j < rows; j++) {
     for (let i = 0; i < cols; i++) {
       const x = r2(gx0 + i * o.navSpacing);
       const z = r2(gz0 + j * o.navSpacing);
@@ -246,7 +270,7 @@ export function bakeZone(campus: Campus, opts: BakeOptions = ENGINEERING_MALL): 
     }
   }
   const rawEdges: [number, number][] = [];
-  for (let j = 0; j < cols; j++) {
+  for (let j = 0; j < rows; j++) {
     for (let i = 0; i < cols; i++) {
       const a = cellNode[j * cols + i] as number;
       if (a < 0) continue;
@@ -258,7 +282,7 @@ export function bakeZone(campus: Campus, opts: BakeOptions = ENGINEERING_MALL): 
       ] as const) {
         const ni = i + di;
         const nj = j + dj;
-        if (ni < 0 || ni >= cols || nj >= cols) continue;
+        if (ni < 0 || ni >= cols || nj >= rows) continue;
         const b = cellNode[nj * cols + ni] as number;
         if (b < 0) continue;
         if (obstacles.segmentClear(raw[a] as Pt, raw[b] as Pt, o.clearance)) rawEdges.push([a, b]);
@@ -306,16 +330,19 @@ export function bakeZone(campus: Campus, opts: BakeOptions = ENGINEERING_MALL): 
 
   // Spawns: farthest-point sampling over nav nodes in an annulus around the centre. Team 0 takes
   // the north half (z < centre), team 1 the south half, so the teams start on opposite sides.
-  const [cx, cz] = o.centre;
+  const hw = (maxX - minX) / 2;
+  const hh = (maxZ - minZ) / 2;
+  // Normalised radius: 0 at the centre, 1 at the edge midpoints (equals d / half for a square).
+  const rad = (n: NavNode): number => Math.hypot((n.x - cx) / hw, (n.z - cz) / hh);
   const spawns: SpawnData[] = [];
   const pick = (team: Team): void => {
     const pool = nodes.filter((n) => {
-      const d = Math.hypot(n.x - cx, n.z - cz);
-      return d >= half * 0.3 && d <= half * 0.9 && (team === 0 ? n.z < cz : n.z >= cz);
+      const d = rad(n);
+      return d >= 0.3 && d <= 0.9 && (team === 0 ? n.z < cz : n.z >= cz);
     });
     const chosen: NavNode[] = [];
     const first = pool.reduce<NavNode | undefined>(
-      (a, n) => (!a || Math.hypot(n.x - cx, n.z - cz) > Math.hypot(a.x - cx, a.z - cz) ? n : a),
+      (a, n) => (!a || rad(n) > rad(a) ? n : a),
       undefined,
     );
     if (first) chosen.push(first);
@@ -341,13 +368,42 @@ export function bakeZone(campus: Campus, opts: BakeOptions = ENGINEERING_MALL): 
   pick(0);
   pick(1);
 
+  let landmarks: ZoneData['landmarks'];
+  if (o.landmarks) {
+    landmarks = {};
+    const lm = o.landmarks;
+    if (lm.bellTower) {
+      const [bx, bz] = lm.bellTower;
+      const own = colliders.find((c) => {
+        const [qx, qz] = ringCentroid(c.poly);
+        return Math.hypot(qx - bx, qz - bz) < 8;
+      });
+      landmarks.bellTower = { x: bx, z: bz, ...(own ? { id: own.id } : {}) };
+    }
+    if (lm.fountain) landmarks.fountain = { x: lm.fountain[0], z: lm.fountain[1] };
+    const w = lm.walc ? colliders.find((c) => c.id === lm.walc) : undefined;
+    if (lm.walc && !w) throw new Error(`landmark building ${lm.walc} is not inside the zone`);
+    if (w) {
+      const [wx, wz] = ringCentroid(w.poly);
+      landmarks.walc = { id: w.id, x: r2(wx), z: r2(wz) };
+    }
+  }
+
   return {
     name: o.name,
     bounds: { minX, maxX, minZ, maxZ },
-    ground: { x0: minX, z0: minZ, cell: o.size, cols: 2, rows: 2, heights: [0, 0, 0, 0] },
+    ground: {
+      x0: minX,
+      z0: minZ,
+      cell: Math.max(maxX - minX, maxZ - minZ),
+      cols: 2,
+      rows: 2,
+      heights: [0, 0, 0, 0],
+    },
     colliders,
     props,
     spawns,
     nav: { nodes, edges },
+    ...(landmarks ? { landmarks } : {}),
   };
 }

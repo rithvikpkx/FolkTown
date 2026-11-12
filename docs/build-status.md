@@ -56,7 +56,7 @@ The client never adds rules; if it needs one, it notes it in the cloud subsectio
 
 ### Cloud track status
 
-Cloud lock: 2026-11-12T11:40:00Z
+Cloud lock: free
 
 - First cloud session starts 11:40 UTC.
 

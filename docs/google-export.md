@@ -24,6 +24,7 @@ Local tools that pull data around the MVP area (Purdue Mall, 500 x 500 m: x -200
 Flags:
 
 - `map:tiles`: `--detail coarse|fine` (default fine = descend to the finest tiles; coarse stops at geometricError 20 m), `--error <metres>` (explicit threshold, wins over `--detail`), `--max-requests <n>` (default 3000, aborts before downloading if the plan exceeds it), `--dry-run`, `--out <dir>`, `--base <url>` (test against a mock server). Concurrency is fixed at 4; failed requests retry with exponential backoff; existing files are skipped, so re-running resumes.
+- `--zone mall-union` (both `map:tiles` and `map:tiles:convert`): MVP box plus Memorial Mall and the Purdue Student Union (x -200..320, z -350..365; `ZONE_BBOX` in `math.ts`). Default stays `MVP_BBOX`. Dry run: 763 glb tiles, 1,544 requests. Street View targets now include `memorial-union` and `memorial-mall`. Sample renders: `docs/img/google/`.
 - `map:tiles:convert`: `--raw <dir>`, `--out <dir>`, `--ground <metres>` (override the automatic ground level).
 - `map:streetview`: `--yes` (required to download), `--max-images <n>` (default 300), `--size 640x640`, `--dry-run`, `--out <dir>`.
 

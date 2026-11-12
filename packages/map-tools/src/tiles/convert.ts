@@ -11,7 +11,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import { pointInRing } from '../geo.ts';
 import type { Campus } from '../types.ts';
 import { parseArgs, REPO } from './env.ts';
-import { applyPoint, type Bbox, enu, type Mat4, MVP_BBOX, mat4Mul, type V3 } from './math.ts';
+import { applyPoint, type Bbox, enu, type Mat4, MVP_BBOX, mat4Mul, zoneBbox, type V3 } from './math.ts';
 
 // glTF is Y-up, 3D Tiles are Z-up: (x, y, z) -> (x, -z, y)
 const Y2Z: Mat4 = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1];
@@ -249,6 +249,7 @@ export async function runConvert(o: {
   outDir: string;
   campusPath: string;
   ground?: number;
+  bbox?: Bbox;
 }) {
   const manifest = JSON.parse(readFileSync(join(o.rawDir, 'manifest.json'), 'utf8')) as {
     tiles: { file: string; transform: number[]; bytes: number }[];
@@ -269,7 +270,7 @@ export async function runConvert(o: {
     writeFileSync(join(tileDir, t.file), out);
     report.push({ file: t.file, triangles, bytes: out.length });
   }
-  const b = MVP_BBOX;
+  const b = o.bbox ?? MVP_BBOX;
   // Ground = 5th percentile of the top-down surface heights (assumes the Bell Tower base is y = 0).
   const probe = rasterise(sink, b, 0);
   const vals = Array.from(probe.z)
@@ -340,6 +341,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     outDir: typeof a.out === 'string' ? a.out : `${REPO}data/google`,
     campusPath: `${REPO}data/campus.json`,
     ground: a.ground ? Number(a.ground) : undefined,
+    bbox: zoneBbox(a.zone),
   }).then(
     (s) => console.log(JSON.stringify(s, null, 1)),
     (e) => {

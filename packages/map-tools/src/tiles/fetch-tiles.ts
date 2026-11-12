@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { pool, RequestCap, TileClient } from './client.ts';
 import { getKey, parseArgs, REPO, redact } from './env.ts';
-import { type Bbox, type BoundingVolume, MVP_BBOX } from './math.ts';
+import { type Bbox, type BoundingVolume, MVP_BBOX, zoneBbox } from './math.ts';
 import { type Selected, type TileNode, traverse } from './traverse.ts';
 
 export const DEFAULT_BASE = 'https://tile.googleapis.com/v1/3dtiles/root.json';
@@ -139,6 +139,7 @@ async function main() {
     maxError,
     maxRequests: a['max-requests'] ? Number(a['max-requests']) : 3000,
     dryRun: !!a['dry-run'],
+    bbox: zoneBbox(a.zone),
   });
   console.log(JSON.stringify(r.summary, null, 1));
   if (r.manifest) {

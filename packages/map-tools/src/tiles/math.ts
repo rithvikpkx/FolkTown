@@ -68,6 +68,17 @@ export const MVP_BBOX: Bbox = {
   umax: 600,
 };
 
+/** Named alternative boxes (`--zone <name>`); the default stays MVP_BBOX. mall-union: MVP box + Memorial Mall (x -60..16, z 154..339) + Purdue Student Union (x 196..296, z 197..305) + ~25 m margin. */
+export const ZONE_BBOX: Record<string, Bbox> = {
+  'mall-union': { xmin: -200, xmax: 320, zmin: -350, zmax: 365, umin: -400, umax: 600 },
+};
+export function zoneBbox(name: string | true | undefined): Bbox {
+  if (name === undefined) return MVP_BBOX;
+  const b = typeof name === 'string' ? ZONE_BBOX[name] : undefined;
+  if (!b) throw new Error(`unknown --zone, known: ${Object.keys(ZONE_BBOX).join(', ')}`);
+  return b;
+}
+
 export function bboxLatLon(b: Bbox) {
   const [north, west] = unproject(b.xmin, b.zmin);
   const [south, east] = unproject(b.xmax, b.zmax);

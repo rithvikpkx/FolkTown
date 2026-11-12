@@ -19,6 +19,8 @@ export const TARGETS: [slug: string, match: RegExp][] = [
   ['stanley-coulter', /Stanley Coulter/],
   ['psychological-sciences', /\(PSYC\)/],
   ['elliott-hall-of-music', /\(ELLT\)/],
+  ['memorial-union', /Purdue Student Union/], // OSM name for Purdue Memorial Union
+  ['memorial-mall', /^Memorial Mall$/], // a grass area, not a building
 ];
 const USD_PER_IMAGE = 0.007; // list price at time of writing; check the current Street View Static pricing.
 
@@ -92,7 +94,7 @@ export async function runStreetview(o: {
 }) {
   const base = o.base ?? 'https://maps.googleapis.com/maps/api/streetview';
   const shots = TARGETS.flatMap(([slug, re]) => {
-    const b = o.campus.buildings
+    const b = [...o.campus.buildings, ...o.campus.grass]
       .filter((x) => x.name && re.test(x.name))
       .sort((a, c) => c.outer.length - a.outer.length)[0];
     return b ? cameraShots(slug, b.outer) : [];

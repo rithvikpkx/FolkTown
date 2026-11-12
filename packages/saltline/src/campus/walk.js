@@ -4,7 +4,7 @@
 // Pilot data: ortho.jpg is blended into the ground beyond ~7 m (ground.js opts.ortho); LiDAR roof shapes/plant boxes of WALC from data/pilot/roofs.json.
 import { BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, SRGBColorSpace, TextureLoader, LinearMipmapLinearFilter, Vector3 } from 'three';
 import { fetchZone, buildCampus } from './index.js';
-import STYLES from './building-styles.json';
+import { buildWalc } from './walc.js';
 import roofs from '../../../../data/pilot/roofs.json';
 
 export const BOX = { minX: -50, maxX: 160, minZ: -70, maxZ: 50 }; // inside the ortho (x -50..190, z -200..50)
@@ -35,18 +35,6 @@ function clipPath(pts) {
 }
 
 const inBox = (x, z) => x > BOX.minX && x < BOX.maxX && z > BOX.minZ && z < BOX.maxZ;
-
-// WALC from the photo: deep red-brown brick, cream stone bands and window frames, three storeys, dark hipped roof with deep eaves.
-function walcStyles() {
-  const S = JSON.parse(JSON.stringify(STYLES));
-  Object.assign(S.buildings['way/508846031'], {
-    wall: { mat: 'brick', color: '#f2b09a', scale: 2 }, trim: { mat: 'concrete', color: '#e3d8bd' },
-    frame: { mat: 'aluminium', color: '#e9dfc4' }, glass: '#58707f',
-    floorH: 5.6, bay: 3.4, winW: 2.2, winH: 3.6, sill: 0.9, panes: [3, 2],
-    cornice: { h: 0.5, out: 0.45 }, roof: { type: 'eave', mat: 'steel_dark', color: '#2f3237', eave: 1.6, rise: 4.6, inset: 9 },
-  });
-  return S;
-}
 
 function loadOrtho() {
   return fetch(BASE + 'pilot/ortho.json').then((r) => r.json()).then((j) => {
@@ -105,16 +93,9 @@ export async function buildWalk(G) {
     spawns: [{ x: 8, z: 0, yaw: -Math.PI / 2, team: 0 }],
   };
   const ortho = await loadOrtho();
-  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho }, grass: { step: 0.17, far: 14 }, facades: { styles: walcStyles() } };
+  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho }, grass: { step: 0.17, far: 14 }, facades: { skip: [KEEP[1]] } };
   const level = await buildCampus(G, z);
-  // LiDAR plant boxes on the WALC roof
-  const mech = G.mats.get('steel_dark', { triplanar: true, color: 0x9a9a98 });
-  for (const b of walc.plantBoxes) {
-    const m = new Mesh(new BoxGeometry(b.x1 - b.x0, b.h, b.z1 - b.z0), mech);
-    m.position.set((b.x0 + b.x1) / 2, b.baseH + b.h / 2, (b.z0 + b.z1) / 2);
-    m.castShadow = m.receiveShadow = true;
-    level.root.add(m);
-  }
+  level.root.add(await buildWalc(G, colliders.find((c) => c.id === KEEP[1]).poly)); // code-generated WALC (walc.js); facades.js skips it
   level.root.add(furniture(G, paths));
   // collision shapes: building polygons, tower plinth, tree trunks
   G.walkSolids = [

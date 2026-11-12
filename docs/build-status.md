@@ -68,6 +68,8 @@ Cloud lock: free
 
 ### Local track status
 
+- **Cloud client session (12 November):** the owner is away, so a one-off cloud session owns `packages/client` and `tools/` and writes under "Cloud client status" below. Local sessions must not start until it has set `Client lock: free` there.
+
 - **WP4 effects chain merged** (~130k tokens, Sonnet). `packages/client/src/render/`: `createRenderer(canvas, scene, camera, opts)` -> `{render(dt), setPreset, setEnabled, resize, invalidateShadow, state, webgl}`. Presets `?q=low|medium|high` (default medium, 1.2 MP), `?fx=0` or F toggles the chain, dynamic scale 0.6-1.0, start-up self test with fallbacks. Static shadow map once; `high` refreshes every second frame. `pnpm bench` on M1 (test boxes scene): median 263 fps, 1% low 185-192. Known gaps 6, 7.
 - **WP8 footprint facades merged** (~106k tokens, Sonnet). `packages/client/src/facade/`: `new Batches()`, `buildFacade(B, {outer, holes?}, height, FacadeStyle)`, `buildLowDetail(B, fp, height, {wall})` (Tier 3); `glassMaterial()` fake-room shader. Test page `/facades.html` (`packages/client/vite.config.ts` has both inputs). Batch gained `tri()` and `triangleCount`. Real buildings cost 13k-21k triangles detailed vs 34-70 Tier 3: use Tier 3 beyond ~150 m. Known gap 8 (no entrances, gables only on rectangles).
 - **WP3 textures, WP10 Bell Tower, WP11 Engineering Fountain merged** (~82k, ~58k, ~51k tokens, Sonnet). `makeMaterials(renderer.webgl)` gives the material table; `buildPlaza` in `scene.ts`. Landmarks in `packages/client/src/landmarks/`: `buildBellTower(scene, mats, at)` (48.8 m, grey cap not verdigris, known-gaps 12), `buildFountain(mats, cx, cz)` (stylised, 40 m south of origin, known-gaps 11). Poses `belltower`, `fountain`. Neither checked against reference photos.
@@ -75,6 +77,10 @@ Cloud lock: free
 - **Deploy:** fixed 12 November (deployment login off, production now serves the latest `mvp`); owner confirmed the Bell Tower and fountain render at folktown.vercel.app.
 - **Next (local):** render the cloud's baked zone when it lands (WP9), then the client side of Stage 2 against the `sim` contract (input to `sim`, rifle and hands, ADS, HUD, bot rendering, menus). A reference-based pass on the Bell Tower and fountain can go before or after.
 - Stage 0 note: the "prototype plaza" check is met by WP3's plaza test scene, not a full port of the prototype plaza (sensible default; the real Zone supersedes it).
+
+### Cloud client status
+
+Client lock: free
 
 Work package numbers are from section 8 of the plan.
 

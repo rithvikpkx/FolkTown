@@ -4,7 +4,7 @@
 
 FolkTown is a Purdue-themed first-person shooter that runs in a browser tab. The West Lafayette campus is the map, and the first goal is that walking around it feels like the real campus. Gunplay, multiplayer for up to 16 players, single-player with bots, vehicles and a living campus are built on top of that, in stages.
 
-Everything is generated in code: no model files, no image files. The target machine is a MacBook Air M1 with 16 GB, with a floor of 45 fps at 1× resolution.
+Assets come first, code second (owner decision, 12 November 2026): look for pre-made, licensed (CC0 or CC-BY) glTF models and textures before generating anything; generate in code only what no asset can be found for. Record each asset's source and licence in `docs/assets.md`. The target machine is a MacBook Air M1 with 16 GB, with a floor of 45 fps at 1× resolution.
 
 ## What this repository is
 

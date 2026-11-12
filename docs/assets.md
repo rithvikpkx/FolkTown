@@ -130,3 +130,6 @@ Wikimedia Commons: Purdue_Bell_Tower_Purdue_University_2016_01.jpg (Julian Herzo
 | public/campus/env/sky/qwantani_{mid_morning,noon,late_afternoon,sunset}_puresky.jpg, kloofendal_overcast_puresky.jpg | Sky dome and image-based light (?tod=); 2K HDRI converted offline to tonemapped sRGB jpg | https://polyhaven.com/a/qwantani_mid_morning_puresky and siblings, https://polyhaven.com/a/kloofendal_overcast_puresky | CC0 | No |
 
 Ortho georeference fit lives in pilot/ortho.json (fit). Trees, shrubs, grasses, furniture, road paint, curbs are generated in code (src/campus/env/, ground.js decals).
+
+- reference/purdue-photos/walc-design-render-aerial.png: architect design render of WALC and the Bell Tower plaza, from the Purdue Active Learning site (owner-supplied screenshot, 12 Nov 2026). Design reference only, not for use as a texture; licence needs-clearance.
+- Sketchfab "Purdue University Bell Tower" (uid 37db7dfc51c347849b8e5975d8a89812, Olivia Bultinck, CC Attribution, downloadable, 21,656 faces, stylised recreation, published 2026-07-16): candidate asset; not yet downloaded (needs owner login). Purdue Memorial Union (3D Warehouse 1982888bb4c06bc2b4250b90e6223188) and EveryPoint Purdue scans collection: candidates for later zones; campusmapper.com and cadmapper.com: reference/tools only.

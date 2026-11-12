@@ -3,6 +3,7 @@ import * as ut from 'three';
 import { cv, lv, v_ } from './mats.js';
 import { Av, Pg } from './level.js';
 import { buildCampus } from '../campus/index.js';
+import { buildWalk, walkInput, walkPlayer, walkQuality } from '../campus/walk.js';
 import { zv, dt, Iv } from './backdrop.js';
 import { Lv, Vg } from './ground.js';
 import { Wv, f1 } from './fx.js';
@@ -55,6 +56,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
   }
   export async function cL() {
     let n = Object.fromEntries(new URLSearchParams(location.search)),
+      __w = (import.meta.env.VITE_WALK && n.walk == null && (n.walk = "1"), n.walk === "0" ? delete n.walk : n.walk && (n.noaudio = "1")),
       e = !!n.bench || location.hash === "#bench";
     e && ((n.noaudio = "1"), (n.autostart = "1"));
     let t = {
@@ -63,7 +65,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
       events: BM(),
       rng: su(+(n.seed || 4207)),
       time: { t: 0, dt: 0, frame: 0, real: 0 },
-      quality: UM(n.q || (n.shot ? "test" : "")),
+      quality: n.walk ? walkQuality(UM(n.q || "ultra")) : UM(n.q || (n.shot ? "test" : "")),
     };
     window.__G = t;
     let i = n.show && mT[n.show] ? n.show : null;
@@ -101,7 +103,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
       await r("mats", "materials", () => lv(t)),
       (t.physics = v_(t)),
       (t.props = fv(t)),
-      (t.input = i ? fL() : gE(t)),
+      (t.input = n.walk ? walkInput() : i ? fL() : gE(t)),
       i)
     ) {
       let p = ns(new w0(80, 80).rotateX(-Math.PI / 2), t.mats.get("concrete"), { cast: !1 });
@@ -148,7 +150,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
     } else {
       if (
         (await fa("Stacking containers", 0.34),
-        await r("level", "level", () => (n.level === "harbour" ? Pg(t) : buildCampus(t)), !0),
+        await r("level", "level", () => (n.walk ? buildWalk(t) : n.level === "harbour" ? Pg(t) : buildCampus(t)), !0),
         await fa("Raising the cranes", 0.5),
         await r("backdrop", "backdrop", () => (n.level === "harbour" ? Iv(t) : Sr.backdrop())),
         await fa("Flooding the apron", 0.58),
@@ -160,21 +162,21 @@ __late_audio.vT(vT); __late_audio.gT(gT);
       }
       (t.physics.build(),
         await fa("Loading tracers and smoke", 0.66),
-        await r("fx", "fx", () => f1(t)),
+        await r("fx", "fx", () => (n.walk ? Sr.fx() : f1(t))),
         await r("audio", "audio", () => (n.noaudio ? Sr.audio() : cE(t))),
-        (t.player = xE(t)),
-        (t.combat = ey(t)));
+        (t.player = n.walk ? walkPlayer(t) : xE(t)),
+        (t.combat = n.walk ? {} : ey(t)));
       try {
-        t.explosives = yE(t);
+        t.explosives = n.walk ? { items: [], reset() {}, update() {} } : yE(t);
       } catch (p) {
         (console.error("[boot] explosives failed: " + ((p && p.stack) || p)), (t.explosives = { items: [], reset() {}, update() {} }));
       }
       (await fa("Checking the rifle", 0.74),
-        await r("weapon", "weapon", () => I5(t)),
+        await r("weapon", "weapon", () => (n.walk ? Sr.weapon() : I5(t))),
         await fa("Waking the Harbormaster", 0.82),
-        await r("enemies", "enemies", () => W5(t)),
-        await r("hud", "hud", () => sT(t)),
-        (t.game = pT(t)));
+        await r("enemies", "enemies", () => (n.walk ? Sr.enemies() : W5(t))),
+        await r("hud", "hud", () => (n.walk ? Sr.hud() : sT(t))),
+        (t.game = n.walk ? t.game : pT(t)));
     }
     await fa("Waiting for first light", 0.92);
     try {

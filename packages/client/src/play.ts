@@ -8,6 +8,7 @@ import {
 } from '@folktown/shared';
 import { Vector3 } from 'three';
 import zoneJson from '../../../data/zones/engineering-mall.json';
+import { AudioSystem } from './audio/audio';
 import { cameraPose } from './game/camera';
 import { Figures } from './game/figures';
 import { Hud } from './game/hud';
@@ -24,6 +25,7 @@ import { needsMenu, showMenu } from './ui/menu';
 import { buildZone } from './zone/build';
 
 const q = new URLSearchParams(location.search);
+const snd = new AudioSystem();
 const canvas = document.createElement('canvas');
 document.body.appendChild(canvas);
 const { scene, camera } = createScene(innerWidth / innerHeight);
@@ -86,7 +88,12 @@ function startGame() {
   overlay.textContent =
     'Click to play. WASD move, mouse aim, LMB fire, RMB aim down sights, R reload, 1-3 weapons, Shift sprint, C crouch';
   document.body.appendChild(overlay);
-  overlay.addEventListener('click', () => canvas.requestPointerLock());
+  let started = false;
+  overlay.addEventListener('click', () => {
+    if (!started) snd.play('match-start');
+    started = true;
+    canvas.requestPointerLock();
+  });
   attachInput(canvas, input, (locked) => {
     overlay.style.display = locked ? 'none' : 'flex';
   });
@@ -113,14 +120,17 @@ function startGame() {
     const events = session.drainEvents();
     for (const h of hooks) h(events);
     hud.onEvents(events);
+    snd.onEvents(events, PLAYER_ID);
     const eye = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
     for (const i of impactsFor(
       events,
       zone,
       (o, d, m) => session.match.collision.raycast(o, d, m),
       eye,
-    ))
+    )) {
       marks.add(i.x, i.y, i.z, i.nx, i.ny, i.nz);
+      snd.impact(i);
+    }
     if (events.some((e) => e.type === 'shot' && e.shooter === PLAYER_ID)) viewModel.fired();
 
     const me = session.player;
@@ -132,6 +142,7 @@ function startGame() {
     const pose = cameraPose(me, pos, input);
     camera.position.set(pose.x, pose.y, pose.z);
     camera.rotation.set(pose.pitch, pose.yaw, 0, 'YXZ');
+    snd.frame(dt, pose, pose.yaw, session.match.playerList, me, locked && input.fire);
     figures.update(session.match.playerList, (p) => session.lerpPos(p), PLAYER_ID);
     lodT -= dt;
     if (lodT <= 0) {

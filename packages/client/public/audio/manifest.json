@@ -1,0 +1,27 @@
+{
+  "master": 0.8,
+  "cullDistance": 80,
+  "sounds": {
+    "rifle-shot": { "files": ["rifle-shot.ogg"], "volume": 0.8, "pitch": 0.04, "maxVoices": 6 },
+    "pistol-shot": { "files": ["pistol-shot.ogg"], "volume": 0.8, "pitch": 0.04, "maxVoices": 4 },
+    "shotgun-shot": { "files": ["shotgun-shot.ogg"], "volume": 0.9, "pitch": 0.04, "maxVoices": 3 },
+    "rifle-reload": { "files": ["rifle-reload.ogg"], "volume": 0.6, "maxVoices": 1 },
+    "pistol-reload": { "files": ["pistol-reload.ogg"], "volume": 0.6, "maxVoices": 1 },
+    "shotgun-reload": { "files": ["shotgun-reload.ogg"], "volume": 0.6, "maxVoices": 1 },
+    "dry-fire": { "files": ["dry-fire.ogg"], "volume": 0.6, "pitch": 0.05, "maxVoices": 1 },
+    "switch": { "files": ["dry-fire.ogg"], "volume": 0.4, "rate": 0.7, "maxVoices": 1 },
+    "impact-concrete": { "files": ["impact-concrete.ogg"], "volume": 0.5, "pitch": 0.15, "maxVoices": 6 },
+    "impact-dirt": { "files": ["impact-dirt.ogg"], "volume": 0.5, "pitch": 0.15, "maxVoices": 6 },
+    "step": { "files": ["step1.ogg", "step2.ogg", "step3.ogg", "step4.ogg"], "volume": 0.5, "pitch": 0.1, "maxVoices": 6 },
+    "hit-tick": { "files": ["hit-tick.ogg"], "volume": 0.6, "pitch": 0.05, "maxVoices": 3 },
+    "headshot": { "files": ["headshot.ogg"], "volume": 0.8, "maxVoices": 2 },
+    "hurt": { "files": ["hurt.ogg"], "volume": 0.8, "pitch": 0.08, "maxVoices": 2 },
+    "death": { "files": ["death.ogg"], "volume": 0.9, "maxVoices": 1 },
+    "respawn": { "files": ["respawn.ogg"], "volume": 0.7, "maxVoices": 1 },
+    "match-start": { "files": ["respawn.ogg"], "volume": 0.8, "rate": 0.8, "maxVoices": 1 },
+    "match-end": { "files": ["respawn.ogg"], "volume": 0.8, "rate": 0.55, "maxVoices": 1 },
+    "ui-click": { "files": ["ui-click.ogg"], "volume": 0.7, "maxVoices": 2 },
+    "wind": { "files": ["wind.ogg"], "volume": 0.35, "loop": true, "maxVoices": 1 },
+    "birds": { "files": ["birds.ogg"], "volume": 0.18, "loop": true, "maxVoices": 1 }
+  }
+}

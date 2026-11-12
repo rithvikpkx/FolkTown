@@ -5,14 +5,16 @@ The handoff file. Update it at the end of every work package, so a session that 
 ## Where things stand (12 November 2026)
 
 - Planning is finished. All decisions are in `docs/decisions.md`; the plan is `docs/implementation-plan.md`.
-- No game code exists yet.
-- The docs are committed on the branch `docs/design-import`. `main` has only the initial commit.
+- `main` holds the docs (fast-forwarded from `docs/design-import`).
+- **Work package 1 is done** on branch `wp1-skeleton`: pnpm workspace with `packages/client` and `tools/` (empty until WP5); `client` opens to a blank Three.js scene.
+- Pinned: pnpm 12.18.0, TypeScript 7.0.2, Vite 8.3.8, Vitest 5.1.0, Biome 2.6.7, Three.js 0.187.0.
+- Commands from the root: `pnpm dev`, `pnpm build`, `pnpm test`, `pnpm lint` (Biome plus `tsc` per package).
+- Tooling notes: the shell lazy-loads nvm, so in scripts call pnpm as `npx -y pnpm@12.18.0`. Biome skips `*.md` because it rewrites the doc tables. pnpm 12 refuses very new releases; it listed Biome in `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`.
 
-## Next: on the word "start"
+## Next
 
-1. Fast-forward `main` to `docs/design-import`.
-2. **Work package 1, repository skeleton,** done by the main session, not a subagent: it is small and everything else needs it. Pin current stable versions of pnpm, TypeScript, Vite, Vitest, Biome and Three.js.
-3. Then two tracks in parallel, one subagent each, at most two running at once.
+1. Review and merge `wp1-skeleton`.
+2. Then two tracks in parallel, one subagent each, at most two running at once.
 
 | Track | Packages, in order | Touches |
 |---|---|---|

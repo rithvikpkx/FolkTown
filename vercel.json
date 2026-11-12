@@ -1,5 +1,5 @@
 {
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter @folktown/client build",
-  "outputDirectory": "packages/client/dist"
+  "buildCommand": "pnpm --filter @folktown/saltline build",
+  "outputDirectory": "packages/saltline/dist"
 }

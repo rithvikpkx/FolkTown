@@ -1,4 +1,11 @@
-import type { GameEvent, MatchConfig, MatchState, ZoneData } from '@folktown/shared';
+import {
+  type GameEvent,
+  type MatchConfig,
+  type MatchState,
+  WEAPONS,
+  type WeaponId,
+  type ZoneData,
+} from '@folktown/shared';
 import { Vector3 } from 'three';
 import zoneJson from '../../../data/zones/engineering-mall.json';
 import { cameraPose } from './game/camera';
@@ -85,7 +92,13 @@ function startGame() {
   });
 
   const hooks: ((events: GameEvent[]) => void)[] = [];
-  (window as unknown as { __game: unknown }).__game = { session, input, hooks };
+  (window as unknown as { __game: unknown }).__game = { session, input, hooks, viewModel };
+  // ?gun=rifle&variant=flat&ads=1 previews a gun (offsets can be tuned live through __game.viewModel)
+  const gun = q.get('gun');
+  if (gun && gun in WEAPONS) {
+    session.player.weapon = gun as WeaponId;
+    input.ads = q.get('ads') === '1';
+  }
 
   let last = performance.now();
   let lodT = 0;

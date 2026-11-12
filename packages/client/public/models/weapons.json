@@ -1,0 +1,108 @@
+{
+  "rifle": {
+    "variant": "m4a1",
+    "variants": {
+      "m4a1": {
+        "url": "models/Rifle_M4A1_CC0.glb",
+        "scale": 1,
+        "rotation": [0, 0, 0],
+        "offset": [0, -0.03, -0.263],
+        "muzzle": [0, 0, -0.8],
+        "flash": [0, 0, -0.84],
+        "hip": [0.2, -0.22, -0.36],
+        "ads": [0, -0.05, -0.5],
+        "adsFov": 52,
+        "parts": {
+          "magazine": "Magazine",
+          "bolt": "Charging_Handle"
+        },
+        "assets-notes": "Free CC0 Guns and Explosives Pack by 3dmodelscc0, https://3dmodelscc0.itch.io/free-cc0-guns-explosives-pack, CC0 (tagged CC0 and Public Domain on the page). Converted FBX to GLB (FBX2glTF), 1024px JPEG maps, normal map green flipped for glTF."
+      },
+      "ak47": {
+        "url": "models/Rifle_AK47_CC0.glb",
+        "scale": 0.84,
+        "rotation": [0, 180, 0],
+        "offset": [0, 0, -0.195],
+        "muzzle": [0, 0, -0.8],
+        "flash": [0, 0, -0.84],
+        "hip": [0.2, -0.22, -0.36],
+        "ads": [0, -0.064, -0.5],
+        "adsFov": 52,
+        "assets-notes": "Classic Weapons Pack by Stein Games, https://stein-indie.itch.io/classic-weapons-pack, CC0 (licence stated on the page and in the zip). Converted FBX to GLB (FBX2glTF), skin and bullet meshes stripped, 1024px JPEG base colour, normal and ORM maps."
+      },
+      "flat": {
+        "url": "models/Rifle_Assault_West.glb",
+        "scale": 1.287,
+        "rotation": [0, 0, 0],
+        "offset": [0, -0.057, -0.364],
+        "muzzle": [0, 0, -0.8],
+        "flash": [0, 0, -0.84],
+        "hip": [0.2, -0.22, -0.36],
+        "ads": [0, -0.064, -0.5],
+        "adsFov": 52,
+        "assets-notes": "Flat Guns West by Pichuliru, https://opengameart.org/content/cc0-flat-guns-west, CC0, low-poly, own materials (previous default, kept as an alternate)."
+      }
+    }
+  },
+  "pistol": {
+    "variant": "m1911",
+    "variants": {
+      "m1911": {
+        "url": "models/Pistol_1911_CC0.glb",
+        "scale": 1,
+        "rotation": [0, 180, 0],
+        "offset": [0, -0.06, -0.036],
+        "muzzle": [0, 0.0, -0.22],
+        "flash": [0, 0.0, -0.26],
+        "hip": [0.18, -0.2, -0.34],
+        "ads": [0, -0.035, -0.42],
+        "adsFov": 62,
+        "assets-notes": "Classic Weapons Pack by Stein Games, https://stein-indie.itch.io/classic-weapons-pack, CC0 (licence stated on the page and in the zip). Converted FBX to GLB (FBX2glTF), skin and bullet meshes stripped, 1024px JPEG base colour, normal and ORM maps."
+      },
+      "flat": {
+        "url": "models/Pistol_Full_West.glb",
+        "scale": 1.086,
+        "rotation": [0, 0, 0],
+        "offset": [0, -0.0127, -0.069],
+        "muzzle": [0, 0, -0.22],
+        "flash": [0, 0.02, -0.26],
+        "hip": [0.18, -0.2, -0.34],
+        "ads": [0, -0.06, -0.42],
+        "adsFov": 62,
+        "assets-notes": "Flat Guns West by Pichuliru, https://opengameart.org/content/cc0-flat-guns-west, CC0, low-poly, own materials (previous default, kept as an alternate)."
+      }
+    }
+  },
+  "shotgun": {
+    "variant": "pump",
+    "variants": {
+      "pump": {
+        "url": "models/Shotgun_Pump_CC0.glb",
+        "scale": 0.85,
+        "rotation": [0, 0, 0],
+        "offset": [0, 0, 0],
+        "muzzle": [0, 0, -0.86],
+        "flash": [0, 0, -0.9],
+        "hip": [0.2, -0.22, -0.36],
+        "ads": [0, -0.05, -0.5],
+        "adsFov": 60,
+        "parts": {
+          "pump": "Fore_Stock"
+        },
+        "assets-notes": "Free CC0 Guns and Explosives Pack by 3dmodelscc0, https://3dmodelscc0.itch.io/free-cc0-guns-explosives-pack, CC0 (tagged CC0 and Public Domain on the page). Converted FBX to GLB (FBX2glTF), 1024px JPEG maps, normal map green flipped for glTF."
+      },
+      "flat": {
+        "url": "models/Shotgun_Pump_West.glb",
+        "scale": 1.66,
+        "rotation": [0, 0, 0],
+        "offset": [0, -0.049, -0.395],
+        "muzzle": [0, 0, -0.86],
+        "flash": [0, 0, -0.9],
+        "hip": [0.2, -0.22, -0.36],
+        "ads": [0, -0.064, -0.5],
+        "adsFov": 60,
+        "assets-notes": "Flat Guns West by Pichuliru, https://opengameart.org/content/cc0-flat-guns-west, CC0, low-poly, own materials (previous default, kept as an alternate)."
+      }
+    }
+  }
+}

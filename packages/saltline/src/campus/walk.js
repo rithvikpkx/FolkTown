@@ -1,0 +1,198 @@
+// ?walk=1 prototype: Bell Tower (origin) + WALC (~70,-2) + the land between, walk-only, to judge visual fidelity.
+// Hooks: boot.js (quality/input/level/player/game swaps when params.walk) and campus/index.js (G.walk options).
+// Reuses buildCampus (ground, grass, trees, facades, Bell Tower, sun-follow); everything else (weapons, bots, HUD, menus) is stubbed in boot.
+// Pilot data: ortho.jpg is blended into the ground beyond ~7 m (ground.js opts.ortho); LiDAR roof shapes/plant boxes of WALC from data/pilot/roofs.json.
+import { BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, SRGBColorSpace, TextureLoader, LinearMipmapLinearFilter, Vector3 } from 'three';
+import { fetchZone, buildCampus } from './index.js';
+import STYLES from './building-styles.json';
+import roofs from '../../../../data/pilot/roofs.json';
+
+export const BOX = { minX: -50, maxX: 160, minZ: -70, maxZ: 50 }; // inside the ortho (x -50..190, z -200..50)
+const KEEP = ['way/301837711', 'way/508846031']; // Bell Tower, WALC: every other building is clipped
+const BASE = import.meta.env.BASE_URL + 'campus/';
+const EYE = 1.7, R = 0.4;
+
+export const walkQuality = (q) => ({ ...q, shadow: 6144, tex: 2048, ao: true, bloom: true, msaa: 4, scale: 1 });
+
+// Liang-Barsky: clip a polyline to the box, returns sub-polylines
+function clipPath(pts) {
+  const out = []; let cur = [];
+  const { minX, maxX, minZ, maxZ } = BOX;
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const [x0, z0] = pts[i], [x1, z1] = pts[i + 1], dx = x1 - x0, dz = z1 - z0;
+    let t0 = 0, t1 = 1, ok = true;
+    for (const [p, q] of [[-dx, x0 - minX], [dx, maxX - x0], [-dz, z0 - minZ], [dz, maxZ - z0]]) {
+      if (p === 0) { if (q < 0) ok = false; } else { const r = q / p; if (p < 0) t0 = Math.max(t0, r); else t1 = Math.min(t1, r); }
+    }
+    if (!ok || t0 > t1) { if (cur.length > 1) out.push(cur); cur = []; continue; }
+    const a = [x0 + t0 * dx, z0 + t0 * dz], b = [x0 + t1 * dx, z0 + t1 * dz];
+    if (!cur.length || t0 > 0) { if (cur.length > 1) out.push(cur); cur = [a]; }
+    cur.push(b);
+    if (t1 < 1) { out.push(cur); cur = []; }
+  }
+  if (cur.length > 1) out.push(cur);
+  return out;
+}
+
+const inBox = (x, z) => x > BOX.minX && x < BOX.maxX && z > BOX.minZ && z < BOX.maxZ;
+
+// WALC from the photo: deep red-brown brick, cream stone bands and window frames, three storeys, dark hipped roof with deep eaves.
+function walcStyles() {
+  const S = JSON.parse(JSON.stringify(STYLES));
+  Object.assign(S.buildings['way/508846031'], {
+    wall: { mat: 'brick', color: '#f2b09a', scale: 2 }, trim: { mat: 'concrete', color: '#e3d8bd' },
+    frame: { mat: 'aluminium', color: '#e9dfc4' }, glass: '#58707f',
+    floorH: 5.6, bay: 3.4, winW: 2.2, winH: 3.6, sill: 0.9, panes: [3, 2],
+    cornice: { h: 0.5, out: 0.45 }, roof: { type: 'eave', mat: 'steel_dark', color: '#2f3237', eave: 1.6, rise: 4.6, inset: 9 },
+  });
+  return S;
+}
+
+function loadOrtho() {
+  return fetch(BASE + 'pilot/ortho.json').then((r) => r.json()).then((j) => {
+    const t = new TextureLoader().load(BASE + 'pilot/' + j.image);
+    t.colorSpace = SRGBColorSpace; t.flipY = false; t.anisotropy = 8; t.minFilter = LinearMipmapLinearFilter;
+    const b = j.bounds;
+    return { texture: t, xMin: b.xMin, zMin: b.zMin, w: b.xMax - b.xMin, h: b.zMax - b.zMin };
+  }).catch(() => null); // pilot data absent: PBR ground only
+}
+
+// lamps and benches along the footways, a few metres off the path
+function furniture(G, paths) {
+  const g = new Group(), dark = G.mats.get('steel_dark'), wood = G.mats.get('wood') || dark;
+  const pole = new CylinderGeometry(0.06, 0.09, 4.2, 8).translate(0, 2.1, 0);
+  const head = new BoxGeometry(0.36, 0.5, 0.36).translate(0, 4.3, 0);
+  const lampMat = new MeshStandardMaterial({ color: 0xfff1d0, emissive: 0xffe2a8, emissiveIntensity: 0.6 });
+  const seat = new BoxGeometry(1.8, 0.07, 0.5).translate(0, 0.46, 0), back = new BoxGeometry(1.8, 0.5, 0.06).translate(0, 0.8, -0.24);
+  const leg = new BoxGeometry(0.08, 0.46, 0.45);
+  let n = 0;
+  for (const p of paths) {
+    if (!['footway', 'pedestrian', 'path', 'cycleway'].includes(p.hw)) continue;
+    let acc = 0, side = 1;
+    for (let i = 0; i + 1 < p.points.length; i++) {
+      const [x0, z0] = p.points[i], [x1, z1] = p.points[i + 1], L = Math.hypot(x1 - x0, z1 - z0);
+      for (let s = 0; s < L; s += 2) {
+        acc += 2;
+        if (acc < 28) continue;
+        acc = 0; side = -side; n++;
+        const t = s / L, x = x0 + (x1 - x0) * t, z = z0 + (z1 - z0) * t, nx = -(z1 - z0) / L, nz = (x1 - x0) / L, off = 2.6 * side;
+        const px = x + nx * off, pz = z + nz * off;
+        if (!inBox(px, pz) || Math.hypot(px, pz) < 8) continue;
+        const grp = new Group(); grp.position.set(px, 0, pz);
+        if (n % 3) { grp.add(new Mesh(pole, dark), new Mesh(head, lampMat)); }
+        else { // bench facing the path
+          grp.rotation.y = Math.atan2(-nx * side, -nz * side);
+          grp.add(new Mesh(seat, wood), new Mesh(back, wood), new Mesh(leg, dark).translateX(-0.8), new Mesh(leg, dark).translateX(0.8));
+        }
+        grp.traverse((o) => { if (o.isMesh) { o.castShadow = o.material !== lampMat; o.receiveShadow = true; } });
+        g.add(grp);
+      }
+    }
+  }
+  return g;
+}
+
+export async function buildWalk(G) {
+  const zone = await fetchZone('purdue-mall');
+  const paths = (await (await fetch(BASE + 'mall-paths.json')).json()).paths
+    .flatMap((p) => clipPath(p.points).map((points) => ({ ...p, points })));
+  const walc = roofs.buildings.find((b) => b.id === 'way/508846031');
+  const colliders = zone.colliders.filter((c) => KEEP.includes(c.id)).map((c) => (c.id === KEEP[1] ? { ...c, topY: walc.eaveH } : c));
+  const z = {
+    ...zone, bounds: BOX, colliders, paths,
+    props: zone.props.filter((t) => inBox(t.x, t.z)),
+    landmarks: { bellTower: zone.landmarks.bellTower }, // no fountain
+    spawns: [{ x: 8, z: 0, yaw: -Math.PI / 2, team: 0 }],
+  };
+  const ortho = await loadOrtho();
+  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho }, grass: { step: 0.17, far: 14 }, facades: { styles: walcStyles() } };
+  const level = await buildCampus(G, z);
+  // LiDAR plant boxes on the WALC roof
+  const mech = G.mats.get('steel_dark', { triplanar: true, color: 0x9a9a98 });
+  for (const b of walc.plantBoxes) {
+    const m = new Mesh(new BoxGeometry(b.x1 - b.x0, b.h, b.z1 - b.z0), mech);
+    m.position.set((b.x0 + b.x1) / 2, b.baseH + b.h / 2, (b.z0 + b.z1) / 2);
+    m.castShadow = m.receiveShadow = true;
+    level.root.add(m);
+  }
+  level.root.add(furniture(G, paths));
+  // collision shapes: building polygons, tower plinth, tree trunks
+  G.walkSolids = [
+    ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),
+    [[-4.4, -4.4], [4.4, -4.4], [4.4, 4.4], [-4.4, 4.4]],
+  ];
+  G.walkTrees = z.props;
+  return level;
+}
+
+// push a circle out of a polygon (inside or within R of an edge)
+function pushOut(pos, poly) {
+  let inside = false, best = Infinity, bx = 0, bz = 0;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [ax, az] = poly[j], [cx, cz] = poly[i];
+    if ((az > pos.z) !== (cz > pos.z) && pos.x < ((cx - ax) * (pos.z - az)) / (cz - az) + ax) inside = !inside;
+    const dx = cx - ax, dz = cz - az, t = Math.max(0, Math.min(1, ((pos.x - ax) * dx + (pos.z - az) * dz) / (dx * dx + dz * dz || 1)));
+    const qx = ax + dx * t, qz = az + dz * t, d = Math.hypot(pos.x - qx, pos.z - qz);
+    if (d < best) { best = d; bx = qx; bz = qz; }
+  }
+  if (!inside && best >= R) return;
+  const d = best || 1e-6, k = inside ? -1 : 1; // inside: step to the nearest edge point, then R beyond it
+  const nx = (k * (pos.x - bx)) / d, nz = (k * (pos.z - bz)) / d;
+  pos.x = bx + nx * R; pos.z = bz + nz * R;
+}
+
+export function walkInput() {
+  const keys = new Set(), look = { dx: 0, dy: 0 };
+  const el = () => document.getElementById('view');
+  addEventListener('keydown', (e) => keys.add(e.code));
+  addEventListener('keyup', (e) => keys.delete(e.code));
+  addEventListener('blur', () => keys.clear());
+  addEventListener('mousemove', (e) => { if (document.pointerLockElement === el()) { look.dx += e.movementX; look.dy += e.movementY; } });
+  const hint = Object.assign(document.createElement('div'), { textContent: 'Click to look around  ·  WASD walk  ·  Shift run  ·  Space jump  ·  Esc releases the mouse' });
+  hint.style.cssText = 'position:absolute;left:50%;bottom:6%;transform:translateX(-50%);z-index:60;padding:8px 16px;border-radius:4px;background:rgba(0,0,0,.55);color:#eee;font:13px system-ui,sans-serif;pointer-events:none;transition:opacity 1.5s;white-space:nowrap';
+  document.getElementById('app').appendChild(hint);
+  const fade = () => (hint.style.opacity = 0);
+  setTimeout(fade, 14000);
+  document.addEventListener('pointerlockchange', () => document.pointerLockElement && setTimeout(fade, 3000));
+  addEventListener('mousedown', () => { try { el().requestPointerLock(); } catch {} });
+  return { keys, look, update() {}, endFrame() { look.dx = look.dy = 0; }, requestLock() {}, exitLock() {}, down: () => false, pressed: () => false };
+}
+
+export function walkPlayer(G) {
+  const p = {
+    pos: new Vector3(8, 0, 0), vel: new Vector3(), yaw: -Math.PI / 2, pitch: 0, health: 100, maxHealth: 100, alive: true, onGround: true,
+    sprinting: false, crouching: false, ads: 0, speed: 0, eye: new Vector3(8, EYE, 0), forward: new Vector3(1, 0, 0), enabled: true,
+    reset() {}, damage() {}, heal() {}, addRecoil() {}, addShake() {}, update() {},
+  };
+  const cam = G.camera;
+  cam.rotation.order = 'YXZ';
+  G.game = {
+    state: 'playing', start() {},
+    update(dt) {
+      const { keys, look } = G.input;
+      p.yaw -= look.dx * 0.0022; p.pitch = Math.max(-1.5, Math.min(1.5, p.pitch - look.dy * 0.0022));
+      const f = (keys.has('KeyW') ? 1 : 0) - (keys.has('KeyS') ? 1 : 0), r = (keys.has('KeyD') ? 1 : 0) - (keys.has('KeyA') ? 1 : 0);
+      p.sprinting = keys.has('ShiftLeft') || keys.has('ShiftRight');
+      const sp = (p.sprinting ? 7.2 : 3.9) / Math.hypot(f || 0, r || 0, 1e-9) * (f || r ? 1 : 0);
+      const s = Math.sin(p.yaw), c = Math.cos(p.yaw);
+      p.pos.x += (-s * f + c * r) * sp * dt; p.pos.z += (-c * f - s * r) * sp * dt;
+      p.speed = f || r ? sp / 1 : 0;
+      if (p.onGround && keys.has('Space')) { p.vel.y = 5; p.onGround = false; }
+      p.vel.y -= 14 * dt; p.pos.y += p.vel.y * dt;
+      if (p.pos.y <= 0) { p.pos.y = 0; p.vel.y = 0; p.onGround = true; }
+      for (let k = 0; k < 2; k++) {
+        for (const poly of G.walkSolids || []) pushOut(p.pos, poly);
+        for (const t of G.walkTrees || []) {
+          const dx = p.pos.x - t.x, dz = p.pos.z - t.z, d = Math.hypot(dx, dz), m = R + (t.radius || 0.3);
+          if (d < m) { p.pos.x = t.x + (dx / (d || 1)) * m; p.pos.z = t.z + (dz / (d || 1)) * m; }
+        }
+      }
+      p.pos.x = Math.max(BOX.minX + 0.5, Math.min(BOX.maxX - 0.5, p.pos.x));
+      p.pos.z = Math.max(BOX.minZ + 0.5, Math.min(BOX.maxZ - 0.5, p.pos.z));
+      p.eye.set(p.pos.x, p.pos.y + EYE, p.pos.z);
+      cam.position.copy(p.eye); cam.rotation.set(p.pitch, p.yaw, 0);
+      p.forward.set(-s, 0, -c);
+    },
+  };
+  return p;
+}

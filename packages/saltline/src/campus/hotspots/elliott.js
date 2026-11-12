@@ -80,6 +80,8 @@ export async function build(G, zone) {
     B.stone.q(f.P(s0, y0, 0), f.P(s0, y0, -dep), f.P(s0, y1, -dep), f.P(s0, y1, 0), 1, 1); B.stone.q(f.P(s1, y0, 0), f.P(s1, y0, -dep), f.P(s1, y1, -dep), f.P(s1, y1, 0), 1, 1);
     B.stone.q(f.P(s0, y1, 0), f.P(s1, y1, 0), f.P(s1, y1, -dep), f.P(s0, y1, -dep), 1, 1); B.stone.q(f.P(s0, y0, 0), f.P(s1, y0, 0), f.P(s1, y0, -dep), f.P(s0, y0, -dep), 1, 1);
     quad(B.stone, f, (s0 + s1) / 2 - 0.04, y0, (s0 + s1) / 2 + 0.04, y1, -dep + 0.02);
+    quad(B.stone, f, s0, (y0 + y1) / 2 - 0.04, s1, (y0 + y1) / 2 + 0.04, -dep + 0.02); // transom
+    for (const c of [s0 + 0.05, s1 - 0.25]) sillBox(f, c, y0 - 0.38, c + 0.2, y0 - 0.14, 0.12); // sill corbels
     sillBox(f, s0 - 0.12, y0 - 0.14, s1 + 0.12, y0, 0.16); sillBox(f, s0 - 0.1, y1, s1 + 0.1, y1 + 0.2, 0.1);
   };
 
@@ -90,7 +92,7 @@ export async function build(G, zone) {
   const WINS = [];
   for (const f of [faces.nw, faces.se]) {
     for (let q = 3; q < f.L - 2; q += 6.4) { if ((f === faces.nw && q > 19 && q < 38) || (f === faces.se && ((q > 29 && q < 47) || q < 14))) continue; WINS.push([f, q, 1.5, q + 1.3, 3.2, 0.3]); }
-    for (const q of f === faces.nw ? [6, 12, 44, 50] : [18, 24, 50, 54]) for (const [y0, y1] of [[7.4, 8.6], [10.0, 11.0], [13.0, 14.0]]) WINS.push([f, q, y0, q + 0.9, y1, 0.2]);
+    for (const q of [4, 10, 16, 22, 28, 34, 40, 46, 52].filter((x) => !(f === faces.nw && x > 19 && x < 37) && !(f === faces.se && x > 29 && x < 47))) for (const [y0, y1] of [[7.4, 8.6], [10.0, 11.0], [13.0, 14.0]]) WINS.push([f, q, y0, q + 0.9, y1, 0.2]);
   }
   for (const [f, a, b, c, d] of WINS) hole(f, a, b, c, d);
   hole(faces.nw, PN[0], 5.4, PN[1], 14.6); hole(faces.se, PS[0], 5.4, PS[1], 14.6); // portico recesses
@@ -98,7 +100,8 @@ export async function build(G, zone) {
     holey(B.stone, f, 0, PL, S.stone); holey(B.brick, f, PL, EAVE, S.brick); quad(F.stoneF, f, 0, 0, f.L, PL, 0, S.stone); quad(F.brickF, f, 0, PL, f.L, EAVE, 0, S.brick);
     // belt courses and frieze/cornice (m: Street View shows a string course at the basement top, one at ~half height and a deep cornice under the eave)
     for (const [y0, y1, o] of [[PL - 0.05, PL + 0.45, 0.2], [11.1, 11.6, 0.14], [15.6, 16.4, 0.15], [16.4, EAVE, 0.45]]) sillBox(f, 0, y0, f.L, y1, o);
-    for (let s = 0.4; s < f.L - 0.4; s += 0.55) sillBox(f, s, 15.15, s + 0.28, 15.6, 0.22); // dentils
+    for (let s = 1.6; s < f.L - 1; s += 3.2) sillBox(f, s, PL + 0.5, s + 0.35, 15.0, 0.07); // brick piers
+    for (let s = 0.4; s < f.L - 0.4; s += 0.55) { sillBox(f, s, 15.15, s + 0.28, 15.6, 0.22); sillBox(f, s, 10.6, s + 0.28, 11.05, 0.18); } // dentils under the cornice and the belt course
   }
   // roof: four trapezoids to the flat top + overhang soffit + fascia (closed, outer ring at EAVE - OV*TAN)
   const yo = EAVE - OV * TAN, inset = (TOP - yo) / TAN - OV;
@@ -110,7 +113,7 @@ export async function build(G, zone) {
     B.tile.q(a, b, c, d, 1, 1, [[0, 0], [w, 0], [w - off, hh], [off, hh]]); F.tileF.q(a, b, c, d, 1, 1, [[0, 0], [w, 0], [w - off, hh], [off, hh]]);
     const e0 = pt(hc[i], EAVE), e1 = pt(hc[j], EAVE), o0 = pt(out[i], yo), o1 = pt(out[j], yo);
     B.dark.q(e0, e1, o1, o0, 1, 1); B.dark.q(o0, o1, [o1[0], yo + 0.5, o1[2]], [o0[0], yo + 0.5, o0[2]], 1, 1); // soffit + fascia
-    for (let s = 0.45; s < w - 0.45; s += 0.9) { // raised tile seams every 0.9 m up the slope
+    for (let s = 0.15; s < w - 0.15; s += 0.3) { // raised tile seams every 0.3 m up the slope
       const t = s / w, base = [a[0] + (b[0] - a[0]) * t, a[1], a[2] + (b[2] - a[2]) * t], topP = [d[0] + (c[0] - d[0]) * t, TOP, d[2] + (c[2] - d[2]) * t];
       const nx = (-(b[2] - a[2]) / w) * 0.03, nz = ((b[0] - a[0]) / w) * 0.03;
       B.tile.q([base[0] - nx, base[1] + 0.04, base[2] - nz], [base[0] + nx, base[1] + 0.04, base[2] + nz], [topP[0] + nx, topP[1] + 0.04, topP[2] + nz], [topP[0] - nx, topP[1] + 0.04, topP[2] - nz], 0.2, 0.2);
@@ -126,7 +129,7 @@ export async function build(G, zone) {
     const tf = [face([T.u0, T.v0], [T.u1, T.v0], [0, -1]), face([T.u1, T.v0], [T.u1, T.v1], [1, 0]), face([T.u1, T.v1], [T.u0, T.v1], [0, 1]), face([T.u0, T.v1], [T.u0, T.v0], [-1, 0])];
     for (const f of tf) {
       quad(B.brick, f, 0, EAVE - 0.3, f.L, T.top, 0, S.brick); quad(F.brickF, f, 0, EAVE - 0.3, f.L, T.top, 0, S.brick);
-      sillBox(f, 0, T.top - 1.4, f.L, T.top - 0.9, 0.18); sillBox(f, 0, T.top - 0.9, f.L, T.top, 0.4); sillBox(f, 0, 23.0, f.L, 23.5, 0.14);
+      for (let q = 0.4; q < f.L - 0.4; q += 0.55) sillBox(f, q, T.top - 2.0, q + 0.28, T.top - 1.45, 0.2); sillBox(f, 0, T.top - 1.4, f.L, T.top - 0.9, 0.18); sillBox(f, 0, T.top - 0.9, f.L, T.top, 0.4); sillBox(f, 0, 23.0, f.L, 23.5, 0.14);
     }
     const tp = tc.map(([u, v]) => W(u, v)); fillPoly(B.dark, tp, T.top, 0.3); fillPoly(F.darkF, tp, T.top, 0.3);
   }
@@ -143,6 +146,7 @@ export async function build(G, zone) {
         const a2 = grow(a, 0.4), b2 = grow(b, 0.4);
         wall(B.stone, a2, b2, D.h - 0.5, D.h + 0.15, S.stone); B.stone.q([a2[0], D.h + 0.15, a2[1]], [b2[0], D.h + 0.15, b2[1]], [b[0], D.h + 0.15, b[1]], [a[0], D.h + 0.15, a[1]], 1, 1);
         B.stone.q([a[0], D.h - 0.5, a[1]], [b[0], D.h - 0.5, b[1]], [b2[0], D.h - 0.5, b2[1]], [a2[0], D.h - 0.5, a2[1]], 1, 1);
+        for (const t of [0.15, 0.4, 0.65, 0.9]) { const g = grow([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], 0.2); box(B.stone, g[0] - 0.12, D.h - 1.1, g[1] - 0.12, g[0] + 0.12, D.h - 0.55, g[1] + 0.12); } // dentils
         if (i % 2 === 0) wall(B.stone, grow(a, 0.3), grow([a[0] + (b[0] - a[0]) * 0.35, a[1] + (b[1] - a[1]) * 0.35], 0.3), 4.6, D.h - 1.3, 1);
         for (const [y0, y1] of [[6.2, 7.6], [9.2, 10.6]]) {
           const wa = grow([a[0] + (b[0] - a[0]) * 0.18, a[1] + (b[1] - a[1]) * 0.18], 0.04), wb = grow([a[0] + (b[0] - a[0]) * 0.62, a[1] + (b[1] - a[1]) * 0.62], 0.04);
@@ -190,7 +194,7 @@ export async function build(G, zone) {
   for (const b of Object.values(F)) if (b.p.length) far3.add(b.mesh());
   const group = new Group(); group.name = 'elliott'; group.add(near3, far3); far3.visible = false;
   // near/far swap at FAR m from the building centre, driven by the render camera (hysteresis 10 m)
-  const C = W(40, 30), pump = new Mesh(new BoxGeometry(0.01, 0.01, 0.01), new MeshBasicMaterial({ visible: false })); pump.frustumCulled = false;
+  const C = W(40, 30), pump = new Mesh(new BoxGeometry(0.01, 0.01, 0.01), new MeshBasicMaterial({ colorWrite: false, depthWrite: false })); pump.frustumCulled = false;
   pump.onBeforeRender = (r, sc, camera) => { const d = Math.hypot(camera.position.x - C[0], camera.position.z - C[1]), f = d > FAR + (far3.visible ? -10 : 0); far3.visible = f; near3.visible = !f; };
   group.add(pump);
   const tris = Object.values(B).reduce((s, b) => s + b.tris, 0), trisFar = Object.values(F).reduce((s, b) => s + b.tris, 0);

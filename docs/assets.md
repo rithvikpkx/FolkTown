@@ -149,3 +149,18 @@ Google Street View Static API frames bought/downloaded by the owner with their o
 | packages/saltline/public/campus/walk/walc/south-bulge.jpg | Rectified albedo of the south bulge face (pano _2SMIzURFlvLO3vHwJQjiA, 2017-09, heading 0) | Google Street View, pano _2SMIzURFlvLO3vHwJQjiA | © 2026 Google | Yes |
 | (measurements only) pano CAoSFENJSE0wb2dLRUlDQWdJQzZzNVF5, 2021-09 | all four headings are INTERIOR (STEAM Commons, Au Bon Pain): no east-face exterior coverage; used for nothing | Google Street View | Google, © Kaho Sakaue | Yes |
 Tools: tools/walc-rectify.py (rectify + colour correction), tools/walc-sidebyside.py. Roof tile: no roof is visible in any frame (only dark soffits), colour unchanged from the Purdue design render; north face of WALC: COPIED from the south long wall (layout, mirrored in z so x positions are kept), not measured, no photo. Bell tower frames (bell-tower/) not used here (belltower.js is other work).
+
+## v5 hotspots (v5-elliott-mall): Elliott Hall of Music, Memorial Mall
+
+Code-generated scenes `packages/saltline/src/campus/hotspots/{elliott,memorial-mall}.js` (no model files). Subsets of OSM data in `hotspots/data/*.json` via `tools/hotspot-data.py`.
+
+| File / data | Use | Source | Licence | Needs clearance |
+|---|---|---|---|---|
+| data/raw/streetview/elliott-hall-of-music: HwF9pEOA_GGsn7OmyaXn2A (2007-09), XvCOiCOdmYC3iN9U64hBJg (2019-08), gd8RfryM02nVN5eF4Kj7Sg (2019-08), all 4 headings | measurements only (plan, portico, belts, windows); side-by-side docs/img/v5-elliott-vs-ref.jpg | Google Street View Static API (owner key) | (c) 2026 Google | Yes |
+| data/raw/streetview/memorial-mall: edsyJrqna9EH1j_glWMayw (2019-08), eey-GRoIHUgaa9f9gm4QQw (2026-03), G1TnVsgNtp47PJz65TM4_g (2019-08), 4ZJB4xBsLSZSpd_pZk8Zzw (2019-08) | lamps, chain posts, hedge, walk/paver treatment; docs/img/v5-mall-vs-ref.jpg | Google Street View Static API (owner key) | (c) 2026 Google | Yes |
+| docs/img/google/elliott-*.jpg, mall-*.jpg, mall-area-topdown.png | massing, roof, tower/drum layout, path and canopy layout | Google Photorealistic 3D Tiles renders | (c) Google | Yes |
+| data/pilot/roofs.json (way/74151922), data/heights.json | roof planes (flat ~22.8 m, hip 33.7 deg), heights | USGS 3DEP lidar (see rows above) | public domain | No |
+| data/campus.json (Elliott footprint, Memorial Mall park/lawns/gardens/paths/trees) | footprints, paths, trees | OpenStreetMap contributors | ODbL | Attribution |
+| Not found | monuments on Memorial Mall: none in OSM or in the 5 frames, none drawn | | | |
+
+Note: the brief called Elliott circular/domed; the data show a rectangular hipped-roof hall with a half-round rotunda. Raw frames for memorial-mall were read from a sibling worktree (gitignored, not committed).

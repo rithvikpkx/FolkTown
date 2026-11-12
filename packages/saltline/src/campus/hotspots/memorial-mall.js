@@ -3,7 +3,7 @@
 // Species mix and canopy: env/trees.js (oak/maple/linden/locust/spruce/pear, seasonal via ?season=). Guessed: bench and lamp spacing; flower-bed planting colours.
 // Measured from Street View: black post lamps with a lantern head, bollards linked by chain along the drive, wide pale concrete walks with a brick-paver edge band, juniper hedge in the drive median.
 // No monuments are in the OSM data or visible in the 5 frames, so none are drawn (reported in docs/assets.md).
-import { Group, Mesh, MeshStandardMaterial, SphereGeometry, InstancedMesh, Matrix4, Color, Quaternion, Vector3 } from 'three';
+import { Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, SphereGeometry, InstancedMesh, Matrix4, Color, Quaternion, Vector3 } from 'three';
 import { buildWalkTrees } from '../env/trees.js';
 import { Buf, fillPoly, ribbon, std, tex, rng, inPoly, distPath } from './lib/common.js';
 import data from './data/mall.json';
@@ -19,7 +19,7 @@ const runs = (pts) => { const out = []; let cur = []; for (const p of pts) { if 
 
 export async function build(G, zone) {
   const POFF = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 };
-  const lawnM = std({ map: tex('walk/grass-albedo.jpg'), color: 0xb8c48a, roughness: 1, ...POFF }), walkM = std({ map: tex('walk/concrete-albedo.jpg'), color: 0xe0dacb, roughness: 0.95, ...POFF }),
+  const lawnM = std({ map: tex('walk/grass-albedo.jpg'), color: 0xe4f0b0, roughness: 1, ...POFF }), walkM = std({ color: 0xc8c4b8, roughness: 0.95, ...POFF }),
     roadM = std({ map: tex('walk/asphalt-albedo.jpg'), roughness: 0.95, ...POFF }), paverM = std({ map: tex('walk/pavers-albedo.jpg'), roughness: 0.9, ...POFF }),
     mulchM = std({ color: 0x4a3626, roughness: 1, ...POFF }), curbM = std({ color: 0xc4bfb2, roughness: 0.9 }), ironM = std({ color: 0x1b1c1e, roughness: 0.5, metalness: 0.6 }),
     woodM = std({ color: 0x7a5a38, roughness: 0.8 }), lampM = std({ color: 0xfff1d0, emissive: 0xffe2a8, emissiveIntensity: 0.5 });
@@ -86,7 +86,7 @@ export async function build(G, zone) {
   // ---- trees: OSM nodes, species from env/trees.js ----
   const treePts = data.trees.filter(([x, z]) => inBox(x, z) && !paths.some((p) => (p.kind === 'road') && distPath(x, z, p.points) < 3.5));
   const trees = buildWalkTrees({ trees: treePts.map(([x, z]) => ({ x, z })) });
-  const pump = new Mesh(new SphereGeometry(0.01), new MeshStandardMaterial({ visible: false })); pump.frustumCulled = false; pump.onBeforeRender = (r, s, camera) => trees.update(camera);
+  const pump = new Mesh(new SphereGeometry(0.01), new MeshBasicMaterial({ colorWrite: false, depthWrite: false })); pump.frustumCulled = false; pump.onBeforeRender = (r, s, camera) => trees.update(camera);
   group.add(trees, pump);
   for (const [x, z] of treePts) { const r = 0.45; solids.push([[x - r, z - r], [x + r, z - r], [x + r, z + r], [x - r, z + r]]); }
   const tris = [L, ML, WK, PV, RD, CB, IR, WD, LP].reduce((s, b) => s + b.tris, 0);

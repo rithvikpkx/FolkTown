@@ -9,39 +9,41 @@
   "h": "memorial-mall",
   "cam": "-130,70,120,-20,0,250",
   "fov": 60,
-  "size": 900
+  "size": 900,
+  "q": "&season=summer"
  },
  "ell-hwf-h180": {
   "h": "elliott",
   "lat": 40.42833930556982,
   "lon": -86.91498995106384,
   "heading": 180,
-  "dx": -6.5,
-  "dz": 1.2
+  "dx": -1.8,
+  "dz": -10
  },
  "ell-xvc-h0": {
   "h": "elliott",
   "lat": 40.42744275278161,
   "lon": -86.91498995106384,
   "heading": 0,
-  "dx": 10.7,
-  "dz": -9.1
+  "dx": 4.6,
+  "dz": 0
  },
  "ell-gd8-h90": {
   "h": "elliott",
   "lat": 40.42786009361702,
   "lon": -86.91557852775118,
   "heading": 90,
-  "dx": 7.8,
-  "dz": -13.8
+  "dx": -8,
+  "dz": -3
  },
  "mall-eey-h0": {
   "h": "memorial-mall",
   "lat": 40.424133897833954,
   "lon": -86.91437240666669,
   "heading": 0,
-  "dx": 0,
-  "dz": 0
+  "dx": -6,
+  "dz": 0,
+  "q": "&season=summer"
  },
  "mall-eds-h180": {
   "h": "memorial-mall",
@@ -49,6 +51,7 @@
   "lon": -86.91437240666669,
   "heading": 180,
   "dx": 0,
-  "dz": 0
+  "dz": 0,
+  "q": "&season=summer"
  }
 }

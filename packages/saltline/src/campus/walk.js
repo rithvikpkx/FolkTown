@@ -6,6 +6,7 @@ import { BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, SRGBC
 import { BELLTOWER_HALF } from './belltower.js';
 import { fetchZone, buildCampus } from './index.js';
 import { buildWalc } from './walc.js';
+import { buildContext } from './env/context.js';
 import { getDecals } from './ground.js';
 import { buildFurniture, buildUnderstory } from './env/furniture.js';
 import { vegMode } from './vegetation.js';
@@ -115,7 +116,10 @@ export async function buildWalk(G) {
     console.log('[walk] furniture', JSON.stringify(fur.counts));
   } catch (e) { console.error('[walk] furniture failed', e); level.root.add(furniture(G, paths)); }
   // collision shapes: building polygons, tower plinth, tree trunks
+  let ctx = { solids: [] };
+  if (!/[?&]ctx=0/.test(location.search)) try { ctx = buildContext(G, zone, level.root, { box: BOX, keep: KEEP, ortho }); console.log('[walk] context', JSON.stringify({ ...ctx, solids: ctx.solids.length })); } catch (e) { console.error('[walk] context failed', e); }
   G.walkSolids = [
+    ...ctx.solids,
     ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),
     [[-BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, BELLTOWER_HALF], [-BELLTOWER_HALF, BELLTOWER_HALF]],
   ];

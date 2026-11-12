@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import manifestJson from '../../public/models/weapons.json';
 import { validateManifest } from './weapon-assets';
 
-const files = Object.keys(import.meta.glob('../../public/models/*.glb', { query: '?url' }));
+const files = Object.keys(import.meta.glob('../../public/models/**/*', { query: '?url' }));
 const manifest = manifestJson as Record<string, any>;
 const ids = Object.keys(WEAPONS);
 
@@ -12,9 +12,13 @@ describe('weapon manifest', () => {
     expect(validateManifest(manifest, ids)).toEqual([]);
   });
   it('points at model files that exist and records source and licence', () => {
-    for (const e of Object.values(manifest) as { variants: Record<string, { url: string }> }[])
-      for (const v of Object.values(e.variants))
-        expect(files.includes(`../../public/${v.url}`)).toBe(true);
+    for (const e of Object.values(manifest) as {
+      variants: Record<string, { url: string; maps?: Record<string, Record<string, string>> }>;
+    }[])
+      for (const v of Object.values(e.variants)) {
+        for (const f of [v.url, ...Object.values(v.maps ?? {}).flatMap((t) => Object.values(t))])
+          expect(files.includes(`../../public/${f}`)).toBe(true);
+      }
   });
   it('rejects bad data', () => {
     const bad = structuredClone(manifest);

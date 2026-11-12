@@ -52,7 +52,12 @@ const load = (url: string, srgb: boolean, aniso: number) =>
 /** Loads every set in the manifest in parallel; sets the world tile size of the ones that succeed. */
 export async function loadTextureSets(renderer: WebGLRenderer) {
   const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  const out: Partial<Record<MaterialName, { map: Texture; normalMap: Texture; roughnessMap: Texture; aoMap?: Texture; tint?: number }>> = {};
+  const out: Partial<
+    Record<
+      MaterialName,
+      { map: Texture; normalMap: Texture; roughnessMap: Texture; aoMap?: Texture; tint?: number }
+    >
+  > = {};
   await Promise.all(
     MATERIAL_NAMES.map(async (n) => {
       const s = TEXTURE_SETS[n];
@@ -74,7 +79,10 @@ export async function loadTextureSets(renderer: WebGLRenderer) {
   return out;
 }
 
-export function applyTextureSet(m: MeshStandardMaterial, t: NonNullable<Awaited<ReturnType<typeof loadTextureSets>>[MaterialName]>) {
+export function applyTextureSet(
+  m: MeshStandardMaterial,
+  t: NonNullable<Awaited<ReturnType<typeof loadTextureSets>>[MaterialName]>,
+) {
   m.map = t.map;
   m.normalMap = t.normalMap;
   m.roughnessMap = t.roughnessMap;

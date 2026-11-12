@@ -4,14 +4,19 @@ import {
   Box3,
   type Camera,
   CanvasTexture,
+  DirectionalLight,
   DoubleSide,
   Group,
   type Material,
   Matrix4,
   Mesh,
   MeshBasicMaterial,
+  type MeshStandardMaterial,
   type Object3D,
   PlaneGeometry,
+  SRGBColorSpace,
+  type Texture,
+  TextureLoader,
   Vector3,
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -49,14 +54,15 @@ interface Part {
 }
 
 /** Swap the generated gun body for the manifest's model; the generated hands stay. On any failure the generated gun stays. */
-function loadModel(g: Group, v: WeaponVariant, pose: Pose, parts: Part[]) {
+function loadModel(g: Group, v: WeaponVariant, pose: Pose, parts: Part[], onFail: () => void) {
   const old = g.getObjectByName('model');
   if (old) g.remove(old);
   parts.length = 0;
   new GLTFLoader()
     .loadAsync(`${import.meta.env.BASE_URL}${v.url}`)
-    .then((gltf) => {
+    .then(async (gltf) => {
       const o = gltf.scene;
+      if (v.maps) await applyMaps(o, v.maps);
       const root = new Group();
       root.name = 'model';
       root.add(o);
@@ -78,7 +84,43 @@ function loadModel(g: Group, v: WeaponVariant, pose: Pose, parts: Part[]) {
       pose.fov = v.adsFov;
       g.add(root);
     })
-    .catch((e) => console.error(`weapon model ${v.url} failed, using generated gun`, e));
+    .catch((e) => {
+      console.error(`weapon model ${v.url} failed`, e);
+      onFail();
+    });
+}
+
+/** Lab-style PBR: colour, normal and ORM (occlusion, roughness, metal) files onto the named glTF materials. */
+async function applyMaps(o: Object3D, maps: NonNullable<WeaponVariant['maps']>) {
+  const tl = new TextureLoader();
+  const base = import.meta.env.BASE_URL;
+  const load = async (file: string, srgb: boolean) => {
+    const t: Texture = await tl.loadAsync(base + file);
+    t.flipY = false; // glTF convention
+    t.anisotropy = 8;
+    if (srgb) t.colorSpace = SRGBColorSpace;
+    return t;
+  };
+  const done = new Set<unknown>();
+  const jobs: Promise<void>[] = [];
+  o.traverse((c) => {
+    const m = (c as Mesh).material as MeshStandardMaterial | undefined;
+    const t = m && maps[m.name];
+    if (!m || !t || done.has(m)) return;
+    done.add(m);
+    jobs.push(
+      Promise.all([load(t.map, true), load(t.normal, false), load(t.orm, false)]).then(
+        ([a, n, r]) => {
+          m.map = a;
+          m.normalMap = n;
+          m.roughnessMap = m.metalnessMap = m.aoMap = r;
+          m.roughness = m.metalness = 1;
+          m.needsUpdate = true;
+        },
+      ),
+    );
+  });
+  await Promise.all(jobs);
 }
 
 /**
@@ -216,6 +258,13 @@ export class ViewModel {
       this.flashes.set(id, f);
       this.root.add(g);
     }
+    // Lab weapon rig (reference/photoreal-lab): warm key high left-front, cool fill low right, in camera space so the gun
+    // keeps the same modelling wherever the player looks. shortcut: three lights cannot be limited to the gun, so these also touch the world faintly (known-gaps), upgrade with a gun-only render pass.
+    const key = new DirectionalLight(0xfff0dc, 0.7);
+    key.position.set(-0.55, 1.0, 0.75);
+    const fill = new DirectionalLight(0xbcd0ff, 0.15);
+    fill.position.set(1, 0.5, -1);
+    for (const l of [key, fill]) this.root.add(l, l.target);
     camera.add(this.root);
     // ?variant=name previews that variant of every weapon that has it (tuning page)
     const want = new URLSearchParams(globalThis.location?.search).get('variant');
@@ -242,7 +291,10 @@ export class ViewModel {
     if (!v) return;
     const parts: Part[] = [];
     this.parts.set(id, parts);
-    loadModel(this.guns.get(id) as Group, v, this.poses.get(id) as Pose, parts);
+    const name = variant ?? e?.variant;
+    loadModel(this.guns.get(id) as Group, v, this.poses.get(id) as Pose, parts, () => {
+      if (v.fallback && v.fallback !== name) this.use(id, v.fallback);
+    });
   }
 
   /** Tuning aid: the loaded model's bounds in gun space ([min, max]) or null while it loads. */

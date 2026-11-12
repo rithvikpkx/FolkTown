@@ -32,6 +32,10 @@ export interface WeaponVariant {
   adsFov: number;
   /** Node names inside the model that animate. */
   parts?: PartNames;
+  /** Separate texture files (paths under the site base) per glTF material name, for models exported without textures. */
+  maps?: Record<string, { map: string; normal: string; orm: string }>;
+  /** Variant to load instead if this one's model or maps fail. */
+  fallback?: string;
   'assets-notes': string;
 }
 
@@ -69,6 +73,10 @@ export function validateManifest(m: unknown, ids: readonly string[]): string[] {
         errs.push(`${at}: adsFov`);
       if (typeof v['assets-notes'] !== 'string' || v['assets-notes'].length < 10)
         errs.push(`${at}: assets-notes (source and licence) missing`);
+      if (v.fallback !== undefined && !e.variants[v.fallback])
+        errs.push(`${at}: fallback "${v.fallback}" not in variants`);
+      for (const [mn, t] of Object.entries(v.maps ?? {}))
+        if (!t.map || !t.normal || !t.orm) errs.push(`${at}: maps.${mn} needs map, normal, orm`);
       for (const [p, n] of Object.entries(v.parts ?? {}))
         if (!PART_KEYS.includes(p) || typeof n !== 'string') errs.push(`${at}: parts.${p}`);
     }

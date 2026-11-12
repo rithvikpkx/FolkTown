@@ -120,3 +120,13 @@ Rectified from real photographs by `tools/make-facade-textures.py` (quad corners
 
 ## Bell Tower references (v2-belltower; measured only, not shipped, except bell-shaft.jpg via facades.json)
 Wikimedia Commons: Purdue_Bell_Tower_Purdue_University_2016_01.jpg (Julian Herzog, CC BY 4.0); Purdue_BellTower_1.jpg (PD); Purdue_University_belltower.jpg (PD); Purdue_BellTowerTimeCapsule.jpg (PD; plaque text reproduced procedurally); Purdue_Bell_Tower_night.JPG (CC BY-SA 3.0); Purdue_BellTower.jpg (CC BY-SA 3.0); 2122_px_-_Bell_Tower_Purdue_University_Fall_2006.JPG (CC BY 3.0).
+## v2-environment (walk scene)
+
+| File | Use | Source | Licence | needs-clearance |
+|---|---|---|---|---|
+| public/campus/walk/concrete-{albedo,normal}.jpg (2K, concrete_pavement) | Plaza and walk paving, ground.js | https://polyhaven.com/a/concrete_pavement | CC0 | No |
+| public/campus/walk/dirt-albedo.jpg (2K, park_dirt) | Worn desire paths | https://polyhaven.com/a/park_dirt | CC0 | No |
+| public/campus/walk/leaves-albedo.jpg (2K, leafy_grass) | Fallen-leaf litter | https://polyhaven.com/a/leafy_grass | CC0 | No |
+| public/campus/env/sky/qwantani_{mid_morning,noon,late_afternoon,sunset}_puresky.jpg, kloofendal_overcast_puresky.jpg | Sky dome and image-based light (?tod=); 2K HDRI converted offline to tonemapped sRGB jpg | https://polyhaven.com/a/qwantani_mid_morning_puresky and siblings, https://polyhaven.com/a/kloofendal_overcast_puresky | CC0 | No |
+
+Ortho georeference fit lives in pilot/ortho.json (fit). Trees, shrubs, grasses, furniture, road paint, curbs are generated in code (src/campus/env/, ground.js decals).

@@ -187,3 +187,16 @@ export function buildFountain(at = [0, 0, 0], mats) {
   };
   return { group, colliders, update, tris: Math.round(wt), height: 11.6 };
 }
+
+// Adapter for campus/index.js: place both landmarks from the zone records, add their collision, tick the water.
+export function build(G, zone, root) {
+  const L = zone.landmarks || {};
+  const items = [];
+  if (L.bellTower) items.push(buildBellTower([L.bellTower.x, 0, L.bellTower.z], G.mats));
+  if (L.fountain) items.push(buildFountain([L.fountain.x, 0, L.fountain.z], G.mats));
+  for (const it of items) {
+    root.add(it.group);
+    for (const c of it.colliders) G.physics.addBox(c.min, c.max, { surface: 'concrete', noNav: true });
+  }
+  (G.campusTick = G.campusTick || []).push((t) => items.forEach((it) => it.update(t)));
+}

@@ -196,6 +196,7 @@ export async function buildCampus(G, zone) {
     groundSurfaceAt: () => 'concrete',
     update() {
       follow();
+      if (G.campusTick) { const t = performance.now() / 1000; for (const f of G.campusTick) f(t); }
     },
   };
 }

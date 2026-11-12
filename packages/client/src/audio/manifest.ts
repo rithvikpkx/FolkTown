@@ -1,6 +1,9 @@
 /** One sound: the files to pick from, and how it is played. */
 export interface SoundDef {
+  /** Files to pick from. May be empty when `synth` names a recipe. */
   files: string[];
+  /** Id of a synthesised recipe (audio/synth.ts) to use instead of, or when missing, the files. */
+  synth?: string;
   volume: number;
   /** Base playback rate (1 = as recorded). */
   rate: number;
@@ -11,6 +14,8 @@ export interface SoundDef {
   loop: boolean;
 }
 export interface AudioManifest {
+  /** Which source wins for sounds that have both: recorded files (default) or synthesised recipes. */
+  backend: 'files' | 'synth';
   master: number;
   /** Positional sounds beyond this many metres are skipped. */
   cullDistance: number;
@@ -25,6 +30,7 @@ export function validateManifest(raw: unknown): { manifest: AudioManifest; error
   const errors: string[] = [];
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const manifest: AudioManifest = {
+    backend: r.backend === 'synth' ? 'synth' : 'files',
     master: num(r.master, 0.8, 0, 1),
     cullDistance: num(r.cullDistance, 80, 1, 1000),
     sounds: {},
@@ -33,12 +39,14 @@ export function validateManifest(raw: unknown): { manifest: AudioManifest; error
   for (const [id, v] of Object.entries(src)) {
     const s = (v && typeof v === 'object' ? v : {}) as Record<string, unknown>;
     const files = Array.isArray(s.files) ? s.files.filter((f) => typeof f === 'string' && f) : [];
-    if (!files.length) {
+    const synth = typeof s.synth === 'string' && s.synth ? s.synth : undefined;
+    if (!files.length && !synth) {
       errors.push(`sound "${id}": no files`);
       continue;
     }
     manifest.sounds[id] = {
       files: files as string[],
+      ...(synth ? { synth } : {}),
       volume: num(s.volume, 1, 0, 4),
       rate: num(s.rate, 1, 0.25, 4),
       pitch: num(s.pitch, 0, 0, 0.5),
@@ -67,4 +75,15 @@ export class VoiceLimiter {
       this.live.set(id, (this.live.get(id) ?? 1) - 1);
     };
   }
+}
+
+/** Which source plays a sound: 'synth' when asked for and a recipe exists, or when no file loaded. */
+export function pickSource(
+  backend: AudioManifest['backend'],
+  def: Pick<SoundDef, 'files' | 'synth'>,
+  hasRecipe: boolean,
+  fileLoaded: boolean,
+): 'synth' | 'file' | 'none' {
+  if (def.synth && hasRecipe && (backend === 'synth' || !fileLoaded)) return 'synth';
+  return fileLoaded ? 'file' : 'none';
 }

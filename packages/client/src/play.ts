@@ -2,6 +2,7 @@ import {
   type GameEvent,
   type MatchConfig,
   type MatchState,
+  WALK_SPEED,
   WEAPONS,
   type WeaponId,
   type ZoneData,
@@ -10,6 +11,7 @@ import { Vector3 } from 'three';
 import zoneJson from '../../../data/zones/engineering-mall.json';
 import { AudioSystem } from './audio/audio';
 import { cameraPose } from './game/camera';
+import { CameraFeel } from './game/feel';
 import { Figures } from './game/figures';
 import { Hud } from './game/hud';
 import { impactsFor } from './game/impacts';
@@ -77,8 +79,13 @@ function startGame() {
   const input = new InputState(session.player.yaw);
   const figures = new Figures(scene, config.mode === 'tdm');
   const viewModel = new ViewModel(mats, camera);
+  const feel = new CameraFeel();
   const marks = new ImpactMarks(scene);
-  const hud = new Hud(PLAYER_ID, (id) => session.match.getPlayer(id)?.name ?? `#${id}`);
+  const hud = new Hud(
+    PLAYER_ID,
+    (id) => session.match.getPlayer(id)?.name ?? `#${id}`,
+    (id) => session.match.getPlayer(id)?.pos,
+  );
   const ui = mountUi(zone, PLAYER_ID);
   const state = () => session.match.snapshot();
 
@@ -120,6 +127,7 @@ function startGame() {
     const events = session.drainEvents();
     for (const h of hooks) h(events);
     hud.onEvents(events);
+    feel.onEvents(events, PLAYER_ID);
     snd.onEvents(events, PLAYER_ID);
     figures.onEvents(events, PLAYER_ID);
     const eye = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
@@ -141,8 +149,23 @@ function startGame() {
       input.pitch = 0;
     }
     const pose = cameraPose(me, pos, input);
-    camera.position.set(pose.x, pose.y, pose.z);
-    camera.rotation.set(pose.pitch, pose.yaw, 0, 'YXZ');
+    const fe = feel.update(dt, {
+      speed: Math.hypot(me.vel.x, me.vel.z),
+      rightVel: me.vel.x * Math.cos(pose.yaw) - me.vel.z * Math.sin(pose.yaw),
+      vy: me.vel.y,
+      onGround: me.onGround,
+      sprinting: Math.hypot(me.vel.x, me.vel.z) > WALK_SPEED + 0.5 && me.onGround && !input.ads,
+      crouching: me.crouching,
+      alive: me.alive,
+      ads: input.ads ? 1 : 0,
+    });
+    viewModel.fovKick = fe.fov;
+    camera.position.set(
+      pose.x + Math.cos(pose.yaw) * fe.x,
+      pose.y + fe.y,
+      pose.z - Math.sin(pose.yaw) * fe.x,
+    );
+    camera.rotation.set(pose.pitch + fe.pitch, pose.yaw + fe.yaw, fe.roll, 'YXZ');
     snd.frame(dt, pose, pose.yaw, session.match.playerList, me, locked && input.fire);
     figures.update(session.match.playerList, (p) => session.lerpPos(p), PLAYER_ID, dt);
     lodT -= dt;

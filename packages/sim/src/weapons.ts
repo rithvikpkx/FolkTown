@@ -1,4 +1,5 @@
 import type { Vec3, WeaponDef } from '@folktown/shared';
+import { SPREAD_FULL_SPEED } from '@folktown/shared';
 
 /** Damage multiplier by distance: 1 inside falloffStart, linear to minDamageFraction at falloffEnd, flat beyond. */
 export function falloffFactor(def: WeaponDef, dist: number): number {
@@ -73,4 +74,22 @@ export function rayCylinder(
     t1 = Math.min(t1, Math.max(ta, tb));
   } else if (o.y < yLow || o.y > yHigh) return null;
   return t0 <= t1 ? t0 : null;
+}
+
+/**
+ * Cone half-angle for one shot (Saltline's model): hip/ADS base, plus movement spread that scales
+ * with horizontal speed (30% of it when aiming), plus an airborne penalty, minus a hip-only crouch
+ * bonus. `growth` multiplies the whole thing (the match's per-burst bloom).
+ */
+export function shotSpread(
+  def: WeaponDef,
+  s: { ads: boolean; speed: number; onGround: boolean; crouching: boolean; growth?: number },
+): number {
+  const k = Math.min(1, Math.max(0, s.speed / SPREAD_FULL_SPEED));
+  const a = s.ads ? 1 : 0;
+  const base = def.spreadHip + (def.spreadAds - def.spreadHip) * a;
+  const move = def.spreadMove * k * (1 - 0.7 * a);
+  const air = s.onGround ? 0 : def.spreadAir;
+  const crouch = s.crouching ? def.spreadCrouch * (1 - a) : 0;
+  return Math.max(0, base + move + air - crouch) * (s.growth ?? 1);
 }

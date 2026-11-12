@@ -1,7 +1,21 @@
 import type { PlayerInput, PlayerState } from '@folktown/shared';
-import { PLAYER_RADIUS, SPRINT_SPEED, TICK_DT, WALK_SPEED } from '@folktown/shared';
+import {
+  ACCEL_AIR,
+  ACCEL_GROUND,
+  ADS_SPEED,
+  BACKWARD_SPEED_FACTOR,
+  COYOTE_TIME,
+  DECEL_GROUND,
+  PLAYER_RADIUS,
+  SPREAD_FULL_SPEED,
+  SPRINT_SPEED,
+  TICK_DT,
+  WALK_SPEED,
+  WEAPONS,
+} from '@folktown/shared';
 import { describe, expect, it } from 'vitest';
 import { createPlayerState, makeSyntheticZone, stepController, ZoneCollision } from './index.ts';
+import { shotSpread } from './weapons.ts';
 
 const zone = new ZoneCollision(makeSyntheticZone());
 
@@ -77,8 +91,9 @@ describe('controller', () => {
   it('jumps onto the 1.2 m box', () => {
     const p = createPlayerState(1, 0, -4, 0, 9);
     run(p, {}, 3);
-    run(p, { moveZ: 1, jump: true, yaw: 0 }, 30);
-    run(p, {}, 60);
+    run(p, { moveZ: 1, yaw: 0 }, 8); // a running start: air control is weak
+    run(p, { moveZ: 1, jump: true, yaw: 0 }, 1);
+    run(p, {}, 90); // momentum carries the jump; hands off
     // Jump apex ~1.05 m puts the feet within the 0.5 m step of the 1.2 m top.
     expect(p.pos.y).toBeCloseTo(1.2, 3);
     expect(p.onGround).toBe(true);
@@ -107,11 +122,64 @@ describe('controller', () => {
     const w = createPlayerState(1, 0, 0, 0, 30);
     run(w, {}, 2);
     run(w, { moveZ: 1, yaw: 0 }, 60);
-    expect(30 - w.pos.z).toBeCloseTo(WALK_SPEED, 1);
+    expect(Math.hypot(w.vel.x, w.vel.z)).toBeCloseTo(WALK_SPEED, 3);
     const s = createPlayerState(2, 0, 0, 0, 30);
     run(s, {}, 2);
     run(s, { moveZ: 1, yaw: 0, sprint: true }, 60);
-    expect(30 - s.pos.z).toBeCloseTo(SPRINT_SPEED, 1);
+    expect(Math.hypot(s.vel.x, s.vel.z)).toBeCloseTo(SPRINT_SPEED, 3);
+  });
+
+  it('accelerates instead of snapping, and stops within a few ticks', () => {
+    const p = createPlayerState(1, 0, 0, 0, 30);
+    run(p, {}, 2);
+    run(p, { moveZ: 1, yaw: 0 }, 1);
+    const first = Math.hypot(p.vel.x, p.vel.z);
+    expect(first).toBeGreaterThan(0.3);
+    expect(first).toBeCloseTo(ACCEL_GROUND * TICK_DT, 3);
+    run(p, { moveZ: 1, yaw: 0 }, 7);
+    expect(Math.hypot(p.vel.x, p.vel.z)).toBe(WALK_SPEED); // 34 m/s2 reaches 4.5 in 8 ticks
+    run(p, {}, Math.ceil(WALK_SPEED / DECEL_GROUND / TICK_DT) + 1);
+    expect(Math.hypot(p.vel.x, p.vel.z)).toBe(0);
+  });
+
+  it('walks backwards slower, sprints only forward, and aiming caps speed', () => {
+    const back = createPlayerState(1, 0, 0, 0, 30);
+    run(back, { moveZ: -1, sprint: true, yaw: 0 }, 60);
+    expect(Math.hypot(back.vel.x, back.vel.z)).toBeCloseTo(WALK_SPEED * BACKWARD_SPEED_FACTOR, 3);
+    const strafe = createPlayerState(2, 0, 0, 0, 30);
+    run(strafe, { moveX: 1, moveZ: 0.6, sprint: true, yaw: 0 }, 60);
+    expect(Math.hypot(strafe.vel.x, strafe.vel.z)).toBeCloseTo(WALK_SPEED, 3);
+    const ads = createPlayerState(3, 0, 0, 0, 30);
+    run(ads, { moveZ: 1, sprint: true, ads: true, yaw: 0 }, 60);
+    expect(Math.hypot(ads.vel.x, ads.vel.z)).toBeCloseTo(ADS_SPEED, 3);
+  });
+
+  it('air steering is weak and momentum is kept with no input', () => {
+    const p = createPlayerState(1, 0, 0, 0, 30);
+    run(p, { moveZ: 1, yaw: 0 }, 30);
+    run(p, { moveZ: 1, jump: true, yaw: 0 }, 1);
+    expect(p.onGround).toBe(false);
+    const vz = p.vel.z;
+    run(p, {}, 20); // 1/3 s in the air, hands off
+    expect(Math.abs(p.vel.z)).toBeGreaterThan(Math.abs(vz) * 0.95);
+    run(p, { moveX: 1, yaw: 0 }, 6); // 0.1 s of full strafe adds at most ACCEL_AIR * 0.1
+    expect(p.vel.x).toBeLessThan(ACCEL_AIR * 0.1 + 1e-6);
+    expect(p.vel.x).toBeGreaterThan(0.5);
+  });
+
+  it('coyote time allows a late jump and the buffer allows an early one', () => {
+    const p = createPlayerState(1, 0, 0, 0, 30);
+    run(p, {}, 3);
+    // walk off nothing: simulate leaving the ground by hand
+    p.onGround = false;
+    p.coyote = COYOTE_TIME;
+    run(p, { jump: true }, 1);
+    expect(p.vel.y).toBeGreaterThan(5);
+    const q = createPlayerState(2, 0, 0, 0, 30);
+    q.pos.y = 0.1; // falling, press jump slightly before landing
+    run(q, { jump: true }, 1);
+    run(q, {}, 9);
+    expect(q.vel.y).toBeGreaterThan(0);
   });
 
   it('crouching slows the player and shrinks nothing it cannot undo under a roof', () => {
@@ -149,5 +217,34 @@ describe('raycast', () => {
     const tree = zone.raycast({ x: 0, y: 1, z: 0 }, { x: 0, y: 0, z: -1 }, 100);
     expect(tree?.id).toBe('prop:0');
     expect(tree?.t).toBeCloseTo(19.5, 5);
+  });
+});
+
+describe('shotSpread', () => {
+  const def = WEAPONS.rifle;
+  const still = { ads: false, speed: 0, onGround: true, crouching: false };
+  it('grows with speed and air, shrinks crouched and aiming', () => {
+    const base = shotSpread(def, still);
+    expect(base).toBe(def.spreadHip);
+    expect(shotSpread(def, { ...still, speed: SPREAD_FULL_SPEED })).toBeCloseTo(
+      def.spreadHip + def.spreadMove,
+    );
+    expect(shotSpread(def, { ...still, speed: 99 })).toBeCloseTo(def.spreadHip + def.spreadMove);
+    expect(shotSpread(def, { ...still, onGround: false })).toBeCloseTo(
+      def.spreadHip + def.spreadAir,
+    );
+    expect(shotSpread(def, { ...still, crouching: true })).toBeCloseTo(
+      def.spreadHip - def.spreadCrouch,
+    );
+    const ads = shotSpread(def, { ...still, ads: true });
+    expect(ads).toBeCloseTo(def.spreadAds);
+    // moving while aiming costs 30% of the hip movement penalty, and crouching no longer helps
+    expect(shotSpread(def, { ...still, ads: true, speed: SPREAD_FULL_SPEED })).toBeCloseTo(
+      def.spreadAds + def.spreadMove * 0.3,
+    );
+    expect(shotSpread(def, { ...still, ads: true, crouching: true })).toBeCloseTo(ads);
+  });
+  it('an empty weapon takes longer to reload than a tactical reload', () => {
+    for (const w of Object.values(WEAPONS)) expect(w.reloadTimeEmpty).toBeGreaterThan(w.reloadTime);
   });
 });

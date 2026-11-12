@@ -1,8 +1,15 @@
 import type { PlayerInput, PlayerState, Team } from '@folktown/shared';
 import {
-  AIR_CONTROL,
+  ACCEL_AIR,
+  ACCEL_GROUND,
+  ADS_SPEED,
+  AIR_DRIFT,
+  BACKWARD_SPEED_FACTOR,
+  COYOTE_TIME,
   CROUCH_SPEED,
+  DECEL_GROUND,
   GRAVITY,
+  JUMP_BUFFER,
   JUMP_SPEED,
   MAX_HEALTH,
   PLAYER_HEIGHT,
@@ -36,6 +43,8 @@ export function createPlayerState(
     yaw,
     pitch: 0,
     onGround: false,
+    coyote: 0,
+    jumpBuffer: 0,
     crouching: false,
     health: MAX_HEALTH,
     alive: true,
@@ -179,26 +188,43 @@ function substep(state: PlayerState, input: PlayerInput, col: ZoneCollision, dt:
   const cy = Math.cos(input.yaw);
   const wishX = mx * cy - mz * sy;
   const wishZ = -mx * sy - mz * cy;
-  const speed = state.crouching
-    ? CROUCH_SPEED
-    : input.sprint && input.moveZ > 0
-      ? SPRINT_SPEED
-      : WALK_SPEED;
+  // Sprint is forward-only (Saltline: forward > 0.55, strafe < 0.6) and drops when aiming.
+  const sprinting =
+    input.sprint && input.moveZ > 0.55 && Math.abs(input.moveX) < 0.6 && !state.crouching;
+  let speed = state.crouching ? CROUCH_SPEED : sprinting && !input.ads ? SPRINT_SPEED : WALK_SPEED;
+  if (input.ads) speed = Math.min(speed, ADS_SPEED);
+  if (input.moveZ < 0) speed *= 1 + (BACKWARD_SPEED_FACTOR - 1) * Math.min(1, -input.moveZ);
   const tx = wishX * speed;
   const tz = wishZ * speed;
-  if (state.onGround) {
-    vel.x = tx;
-    vel.z = tz;
+  const wishing = ml > 0.1;
+  // Move velocity toward the target at a fixed acceleration, snapping when within one step.
+  let accel: number;
+  if (state.onGround) accel = wishing ? ACCEL_GROUND : DECEL_GROUND;
+  else accel = wishing ? ACCEL_AIR : AIR_DRIFT;
+  let dvx = tx - vel.x;
+  let dvz = tz - vel.z;
+  // In the air with no input the target is "keep going": only drift toward zero slowly.
+  const step = accel * dt;
+  const dv = Math.hypot(dvx, dvz);
+  if (dv <= step || dv < 1e-6) {
+    if (state.onGround || wishing) {
+      vel.x = tx;
+      vel.z = tz;
+    }
   } else {
-    // Limited air control: blend toward the wish velocity.
-    const k = Math.min(1, AIR_CONTROL * 60 * dt);
-    vel.x += (tx - vel.x) * k;
-    vel.z += (tz - vel.z) * k;
+    dvx /= dv;
+    dvz /= dv;
+    vel.x += dvx * step;
+    vel.z += dvz * step;
   }
 
-  if (input.jump && state.onGround && !state.crouching) {
+  state.coyote = state.onGround ? COYOTE_TIME : Math.max(0, state.coyote - dt);
+  state.jumpBuffer = input.jump ? JUMP_BUFFER : Math.max(0, state.jumpBuffer - dt);
+  if (state.jumpBuffer > 0 && state.coyote > 0 && !state.crouching) {
     vel.y = JUMP_SPEED;
     state.onGround = false;
+    state.coyote = 0;
+    state.jumpBuffer = 0;
   }
 
   // Horizontal move, then push out of anything solid.

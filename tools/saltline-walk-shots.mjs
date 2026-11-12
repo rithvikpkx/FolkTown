@@ -11,9 +11,13 @@ const poses = {
   'walc-nw': '18,1.7,-78,62,10,-44',
   'walc-s': '40,1.7,58,75,10,26',
   'walc-w': '20,1.7,-12,50,8,-6',
+  'walc-aerial': '-4,48,44,66,6,-14', // high oblique from the south-west above the plaza, like the design render
+  'walc-bay': '27,1.7,-10,45,9,-10',
 };
 mkdirSync(new URL('shots/', import.meta.url), { recursive: true });
+const only = process.argv.slice(2); // optional pose names
 for (const [name, cam] of Object.entries(poses)) {
+  if (only.length && !only.includes(name)) continue;
   process.env.PAGE = `index.html?walk=1&cam=${cam}`;
   await withPage([], { uncapped: false }, async ({ send, ev, logs }) => {
     for (let i = 0; i < 120 && !(await ev('window.__ready === true')); i++) await sleep(250);

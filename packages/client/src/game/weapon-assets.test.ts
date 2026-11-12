@@ -1,10 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs';
 import { WEAPONS } from '@folktown/shared';
 import { describe, expect, it } from 'vitest';
+import manifestJson from '../../public/models/weapons.json';
 import { validateManifest } from './weapon-assets';
 
-const pub = new URL('../../public/', import.meta.url);
-const manifest = JSON.parse(readFileSync(new URL('models/weapons.json', pub), 'utf8'));
+const files = Object.keys(import.meta.glob('../../public/models/*.glb', { query: '?url' }));
+const manifest = manifestJson as Record<string, any>;
 const ids = Object.keys(WEAPONS);
 
 describe('weapon manifest', () => {
@@ -13,7 +13,8 @@ describe('weapon manifest', () => {
   });
   it('points at model files that exist and records source and licence', () => {
     for (const e of Object.values(manifest) as { variants: Record<string, { url: string }> }[])
-      for (const v of Object.values(e.variants)) expect(existsSync(new URL(v.url, pub))).toBe(true);
+      for (const v of Object.values(e.variants))
+        expect(files.includes(`../../public/${v.url}`)).toBe(true);
   });
   it('rejects bad data', () => {
     const bad = structuredClone(manifest);

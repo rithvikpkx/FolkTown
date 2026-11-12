@@ -175,3 +175,65 @@ Code-generated scenes `packages/saltline/src/campus/hotspots/{elliott,memorial-m
 | Not found | monuments on Memorial Mall: none in OSM or in the 5 frames, none drawn | | | |
 
 Note: the brief called Elliott circular/domed; the data show a rectangular hipped-roof hall with a half-round rotunda. Raw frames for memorial-mall were read from a sibling worktree (gitignored, not committed).
+
+## v6-facades (Street View Tiles API, owner key)
+Photographic facade tiles for the 52 non-hotspot massing buildings, rectified from Street View panoramas (Map Tiles API, mapType streetview, zoom 4) with the owner's Google key (owner states usage rights). Raw tiles stay in data/raw/streetview-tiles/ (gitignored). Tools: tools/sv-inventory.mjs, sv-select.mjs, sv-download.mjs, facade-extract.py. Output: packages/saltline/public/campus/facades/photo/*.webp + manifest.json (one rectified wall tile per building, exposure-normalised, duplicated onto every face). **All needs-clearance.** Contributor panos are credited as (c) contributor.
+
+| Building (id) | Pano | Date | Credit | Confidence | Candidate panos |
+|---|---|---|---|---|---|
+| Physics Building (PHYS) (way/74340895) | R5n3-Wan-fR-gmoilcN_9Q | 2025-08 | Google Street View, (c) 2026 Google | 0.998 | 26 |
+| Hovde Hall of Administration (HOVD) (way/75498146) | AlEKOl5L6ZaLeS_RFWTraw | 2019-08 | Google Street View, (c) 2026 Google | 0.978 | 20 |
+| Heine Pharmacy (RHPH) (way/117146482) | 4Di-384KjxdTvozJdh_icw | 2026-04 | Google Street View, (c) 2026 Google | 0.961 | 15 |
+| Union Club Hotel (way/117146483) | kHR6H6noizuVfkj29PCfOQ | 2026-03 | Google Street View, (c) 2026 Google | 0.775 | 18 |
+| Stewart Center (STEW) (way/117146484) | wAIHN7NdJxoKqHXyH8FSMw | 2019-08 | Google Street View, (c) 2026 Google | 0.788 | 20 |
+| Student Health Center (PUSH) (way/117146486) | 3-WO0G8nTRrBDVY2aPQUng | 2026-04 | Google Street View, (c) 2026 Google | 0.995 | 17 |
+| R. B. Wetherill Laboratory of Chemistry (WTHR) (way/117146489) | wJ-Wrf7vCg8ot3AKt_XBIQ | 2017-09 | Google Street View, (c) 2026 Google | 0.836 | 27 |
+| Haas (Felix) Hall (HAAS) (way/117147168) | MtZMclI1aQlsgUm1U4Zsiw | 2026-04 | Google Street View, (c) 2026 Google | 0.832 | 19 |
+| Armory (AR) (way/117147171) | CAoSFkNJSE0wb2dLRUlDQWdJRHEzY25MZVE. | 2021-04 | Google Street View, (c) Dana Moseson-Tarrh | 0.926 | 28 |
+| Matthews Hall (MTHW) (way/117147172) | s1iu6s9n1GN-FE89VbiSFw | 2023-07 | Google Street View, (c) 2026 Google | 0.891 | 22 |
+| Stone Hall (STON) (way/117147178) | K9XU9ibaM4m26MfSH41vog | 2019-08 | Google Street View, (c) 2026 Google | 0.871 | 21 |
+| Materials Science and Electrical Engineering (MSEE) (way/158307858) | u149QOTu5LDQAa6qdW4bkw | 2025-08 | Google Street View, (c) 2026 Google | 0.998 | 21 |
+| Max W & Maileen Brown Family Hall of Electrical Engineering (BHEE) (way/158307860) | yxb2_jy7IK62GQGlRuZMug | 2025-08 | Google Street View, (c) 2026 Google | 0.978 | 35 |
+| University Hall (UNIV) (way/158307901) | se50M2E4MsI4SDY51--kTg | 2019-08 | Google Street View, (c) 2026 Google | 0.981 | 14 |
+| way/301932783 (way/301932783) | exlBMg_pdUN9R3Cfm1-9jQ | 2025-08 | Google Street View, (c) 2026 Google | 0.999 | 29 |
+| University Lutheran Church (way/301932784) | yxb2_jy7IK62GQGlRuZMug | 2025-08 | Google Street View, (c) 2026 Google | 0.998 | 18 |
+| Wang Hall (WANG) (way/301932787) | GDRDAdWQDlUVZI2qsD9uTg | 2025-08 | Google Street View, (c) 2026 Google | 0.915 | 38 |
+| way/301932790 (way/301932790) | 1CPNSiyIlJzORCXct7K_SA | 2026-03 | Google Street View, (c) 2026 Google | 0.99 | 14 |
+| way/860822250 (way/860822250) | MOM0ExItgzNnpRGYGXtlOA | 2017-08 | Google Street View, (c) 2026 Google | 0.765 | 26 |
+| American Railway Building (RAIL) (way/932253994) | 6u2Sw1tE8AOViveStsyV9A | 2017-08 | Google Street View, (c) 2026 Google | 0.916 | 5 |
+| Purdue Graduate Student Center (way/1103303762) | rb-46OKsv-rCfnUUIYr4vA | 2025-08 | Google Street View, (c) 2026 Google | 0.933 | 19 |
+| way/1149668161 (way/1149668161) | SFkpFTnBSvlf7blM-jBa8g | 2026-03 | Google Street View, (c) 2026 Google | 0.87 | 6 |
+| Lambertus Hall (LMBS) (way/1383852532) | MOM0ExItgzNnpRGYGXtlOA | 2017-08 | Google Street View, (c) 2026 Google | 0.785 | 9 |
+| way/1418955365 (way/1418955365) | fQPNgpqxXOkFgFCUmL8hgw | 2026-03 | Google Street View, (c) 2026 Google | 0.998 | 29 |
+| way/1418958953 (way/1418958953) | ycaxPb0AeM9b8EX15LDDOA | 2025-08 | Google Street View, (c) 2026 Google | 1 | 19 |
+| Brown Laboratory of Chemistry (BRWN) (way/117146480) | none: colour/class from way/860822250, way/117146489, way/1383852532 | - | - | fallback | 15 |
+| Knoy Hall (KNOY) (way/117146487) | none: colour/class from way/1383852532, way/301932783, way/860822250 | - | - | fallback | 27 |
+| Johnson Hall of Nursing (JNSN) (way/117146488) | none: colour/class from way/117146482, way/117146486, way/75498146 | - | - | fallback | 4 |
+| Hall of Data Science and AI (DSAI) (way/117146492) | none: colour/class from way/75498146, way/117146488, way/117146482 | - | - | fallback | 3 |
+| Grissom Hall (way/117146493) | none: colour/class from way/117146480, way/860822250, way/117146483 | - | - | fallback | 22 |
+| Hampton Hall of Civil Engineering (HAMP) (way/117146495) | none: colour/class from way/74340895, way/117146486, way/117146488 | - | - | fallback | 9 |
+| Forney Hall of Chemical Engineering (FRNY) (way/117146497) | none: colour/class from way/74340895, way/117146495, way/117146492 | - | - | fallback | 4 |
+| Schleman Hall (SCHM) (way/117147167) | none: colour/class from way/158307901, way/117147178, way/1149668161 | - | - | fallback | 12 |
+| Potter Engineering Center (POTR) (way/117147170) | none: colour/class from way/932253994, way/1383852532, way/860822250 | - | - | fallback | 14 |
+| Psychological Sciences Building (PSYC) (way/117147173) | none: colour/class from way/117147168, way/117147167, way/75498146 | - | - | fallback | 34 |
+| Beering Hall (BRNG) (way/117147176) | none: colour/class from way/117147167, way/158307901, way/117147172 | - | - | fallback | 15 |
+| Mathematical Sciences Building (MATH) (way/117147177) | none: colour/class from way/117147167, way/117147176, way/117147168 | - | - | fallback | 3 |
+| Mechanical Engineering (ME) (way/158307862) | none: colour/class from way/932253994, way/117147170, way/158307860 | - | - | fallback | 16 |
+| Hicks Undergraduate Library (HIKS) (way/158307900) | none: colour/class from way/117146484, way/117146483, way/117146489 | - | - | fallback | 11 |
+| Northwestern Parking Garage (way/283275025) | none: colour/class from way/1418955365, way/1418958953, way/1103303762 | - | - | fallback | 50 |
+| way/301932785 (way/301932785) | none: colour/class from way/301932783, way/301932784, way/1418955365 | - | - | fallback | 13 |
+| way/301932786 (way/301932786) | none: colour/class from way/301932785, way/301932784, way/1418955365 | - | - | fallback | 5 |
+| Class of 1950 Lecture Hall (CL50) (way/309492283) | none: colour/class from way/117147177, way/117147167, way/117147173 | - | - | fallback | 16 |
+| Pierce Hall (PRCE) (way/309492284) | none: colour/class from way/309492283, way/117147173, way/117147177 | - | - | fallback | 10 |
+| way/607137011 (way/607137011) | none: colour/class from way/301932790, way/283275025, way/1418958953 | - | - | fallback | 12 |
+| way/607137013 (way/607137013) | none: colour/class from way/607137011, way/301932790, way/283275025 | - | - | fallback | 12 |
+| way/607137015 (way/607137015) | none: colour/class from way/607137013, way/607137011, way/301932790 | - | - | fallback | 12 |
+| Chaney-Hale Hall of Science (CHAS) (way/866802210) | none: colour/class from way/117147171, way/117146492, way/75498146 | - | - | fallback | 10 |
+| way/1033674918 (way/1033674918) | none: colour/class from way/158307858, way/74340895, way/117146497 | - | - | fallback | 9 |
+| way/1033674919 (way/1033674919) | none: colour/class from way/158307858, way/158307860, way/1418958953 | - | - | fallback | 11 |
+| way/1033674920 (way/1033674920) | none: colour/class from way/75498146, way/117146492, way/866802210 | - | - | fallback | 2 |
+| Dudley Hall (DUDL) (way/1383852533) | none: colour/class from way/860822250, way/1383852532, way/117146493 | - | - | fallback | 22 |
+| way/1418750210 (way/1418750210) | none: colour/class from way/1418958953, way/283275025, way/1103303762 | - | - | fallback | 0 |
+| way/1418954764 (way/1418954764) | none: colour/class from way/283275025, way/607137011, way/1418750210 | - | - | fallback | 30 |
+| way/1419291577 (way/1419291577) | none: colour/class from way/1418750210, way/283275025, way/1418958953 | - | - | fallback | 0 |
+| way/1419291578 (way/1419291578) | none: colour/class from way/301932786, way/301932785, way/1418955365 | - | - | fallback | 0 |

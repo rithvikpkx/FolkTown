@@ -15,6 +15,7 @@ import { applyEarly, installSky } from './env/sky.js';
 import { S as SEASON } from './env/season.js';
 import { buildPlaza, inPlaza, plazaFloor, plazaTrees } from './env/plaza.js';
 import { loadBellTowerScan, SCAN_CREDIT } from './env/belltower-scan.js';
+import { loadFacadePhotos } from './facades.js';
 import { fetchRegion, loadHotspots, massingOpts, addHips, regionSolids } from './region.js';
 
 const TOWER = (typeof location !== 'undefined' && /[?&]tower=(scan|code)/.exec(location.search)?.[1]) || 'code'; // ?tower=scan|code; code wins the comparison (docs/assets.md)
@@ -93,7 +94,7 @@ export async function buildWalk(G) {
   vegMode.walk = true;
   const ortho = await loadOrtho();
   G.bellShaftTexture = await new Promise((r) => new TextureLoader().load(BASE + 'walk/tex/bell-shaft.jpg', (t) => { t.colorSpace = SRGBColorSpace; t.anisotropy = 8; r(t); }, undefined, () => r(null)));
-  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: massingOpts(zone, skip) };
+  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: { ...massingOpts(zone, skip), photos: /[?&]facades=0/.test(location.search) ? {} : await loadFacadePhotos(BASE + 'facades/') } };
   const level = await buildCampus(G, z);
   level.root.add(await buildWalc(G, colliders.find((c) => c.id === KEEP[1]).poly)); // code-generated WALC (walc.js); facades.js skips it
   hot.groups.forEach((g) => level.root.add(g));

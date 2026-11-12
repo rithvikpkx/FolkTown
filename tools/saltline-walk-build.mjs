@@ -9,7 +9,7 @@ execSync('npx -y pnpm@12.18.0 --filter @folktown/saltline exec vite build --base
   env: { ...process.env, VITE_WALK: '1' },
 });
 // walk mode needs none of these: facade/landmark demo shots, the 1K ground sets (walk/ has 2K), the zone copy (bundled into JS)
-for (const p of ['facades', 'landmarks', 'purdue-mall.json', ...['grass', 'pavers', 'asphalt'].flatMap((n) => ['albedo', 'normal', 'roughness'].map((k) => `${n}-${k}.jpg`))])
+for (const p of ['facades/ref', 'facades/shots', 'landmarks', 'purdue-mall.json', ...['grass', 'pavers', 'asphalt'].flatMap((n) => ['albedo', 'normal', 'roughness'].map((k) => `${n}-${k}.jpg`))])
   rmSync(join(out, 'campus', p), { recursive: true, force: true });
 // no network: drop the Google Fonts links (the HUD is not used in walk mode)
 const idx = join(out, 'index.html');

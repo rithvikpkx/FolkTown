@@ -31,6 +31,8 @@ The owner asked for the MVP (end of Stage 2) to be built without check-ins, as c
 - Cloud sessions have no Mac GPU: `pnpm bench` numbers from the cloud do not count. Keep a "Benchmarks pending on the Mac" list below; the owner's Mac runs them. Screenshots in the cloud may use software rendering (set the Chrome path via env; `tools/chrome.mjs` defaults to the macOS path).
 - Landmark and facade references: public photos (Wikimedia Commons), since nobody can take photos.
 - When the Stage 2 done-when criteria are met (apart from the Mac benchmark), stop and report the link.
+- **Fresh context per task (owner's rule, be mindful of usage):** every work package is done by a fresh subagent, never inside an orchestrator's own context. An orchestrator session handles at most 3 packages, then writes its handoff here, pushes, and ends; a new session continues from this file. Read only the files and line ranges a task needs.
+- **Cloud lock:** the cloud track has one hourly routine. The first line of 'Cloud track status' is `Cloud lock: <UTC time>` or `Cloud lock: free`. A cloud session that finds a lock newer than 75 minutes exits at once without doing anything else. Otherwise it writes the current time as the lock, pushes, works (refreshing the lock after each package), and sets `Cloud lock: free` before it ends.
 
 ## Benchmarks pending on the Mac
 
@@ -54,7 +56,9 @@ The client never adds rules; if it needs one, it notes it in the cloud subsectio
 
 ### Cloud track status
 
-- Not started.
+Cloud lock: 2026-11-12T11:40:00Z
+
+- First cloud session starts 11:40 UTC.
 
 ### Local track status
 

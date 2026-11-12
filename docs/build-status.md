@@ -2,6 +2,8 @@
 
 The handoff file. Update it at the end of every work package, so a session that hits a usage limit or loses its transcript loses nothing.
 
+> **LATEST STATE: see the "HANDOFF, end of session 12 November 2026" section at the top of `docs/build-status.md` on branch `v2-walk` (origin/v2-walk). The Saltline pivot is done on `mvp`; the walk-prototype work (versions 1 to 6) lives on `v2-walk` and is not merged into `mvp` yet. Artifact: https://claude.ai/artifact/Q2H24oddSYNjYo2kpPPfma**
+
 ## Where things stand (12 November 2026)
 
 - Planning is finished. All decisions are in `docs/decisions.md`; the plan is `docs/implementation-plan.md`.

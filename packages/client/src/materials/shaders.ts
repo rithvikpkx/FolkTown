@@ -173,7 +173,7 @@ float dn3(vec3 p) {
   float b = mix(mix(dh3(i + vec3(0, 0, 1)), dh3(i + vec3(1, 0, 1)), u.x), mix(dh3(i + vec3(0, 1, 1)), dh3(i + vec3(1, 1, 1)), u.x), u.y);
   return mix(a, b, u.z);
 }
-float dfbm(vec3 p, float foot, float f0) { // 4 octaves; each fades once its cell is under ~2 pixels
+float dfbm(vec3 p, float foot, float f0) { // 3 octaves; each fades once its cell is under ~2 pixels
   float s = 0.0, a = 0.5, t = 0.0, fr = f0;
   for (int i = 0; i < 3; i++) {
     float w = 1.0 - smoothstep(0.35, 0.8, foot * fr);

@@ -41,11 +41,12 @@ This plan is written so a fresh session can start building from it without any o
 
 ## 2. Priorities, in order
 
-1. **Campus fidelity.** Right buildings in the right places at the right size, with the right materials and recognisable landmarks.
+1. **Campus fidelity and game mechanics, jointly.** Right buildings in the right places at the right size, with the right materials and recognisable landmarks; and core gameplay that feels close to finished: movement, guns, bots, a full match. Without the campus the game is generic; without the mechanics there is nothing to play.
 2. **Frame rate** on the baseline machine.
-3. **Gunplay feel** in single-player.
-4. **Multiplayer.**
-5. Everything else in the pitch.
+3. **Multiplayer.**
+4. Everything else in the pitch.
+
+**The MVP is the end of Stage 2:** a high-fidelity campus Zone to play on, with the core gameplay done. To get there fastest, the work runs as two parallel tracks that do not touch the same files: rendering and gameplay, built on the prototype plaza (`packages/client`, later `packages/sim`), and the campus pipeline (`packages/map-tools`, `data/`). They meet when the Engineering Mall Zone is baked.
 
 When two of these conflict, the higher one wins.
 

@@ -28,7 +28,8 @@ This is the game's repository. `docs/` and `reference/` hold the design and refe
 
 ## The rules that matter most
 
-- **Priority order:** campus fidelity, then frame rate, then gunplay feel, then multiplayer, then everything else.
+- **Priority order:** campus fidelity and game mechanics jointly, then frame rate, then multiplayer, then everything else.
+- **The MVP is the end of Stage 2:** a high-fidelity campus Zone to play on, with the core gameplay done. `docs/build-status.md` says where the build is and what is next.
 - **Velocity over polish.** Development speed and getting the game to players come first. When the choice is between fixing a minor issue that does not affect core gameplay (gun clipping, an obscure bug, a final touch) and moving on, add a row to `docs/known-gaps.md` and move on.
 - **Match rules live in a package that never imports rendering code.** The same rules must run in the browser, in a worker and on the server.
 - **Single-player first,** multiplayer after.

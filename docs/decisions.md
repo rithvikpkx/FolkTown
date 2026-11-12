@@ -7,7 +7,8 @@ Current decisions only. Where a later choice replaced an earlier one, only the l
 | Topic | Decision |
 |---|---|
 | Core experience | A first-person shooter on the Purdue West Lafayette campus, in a browser tab |
-| Top priority | Walking around should feel as close as possible to the real campus |
+| Top priorities | Campus fidelity and game mechanics, jointly. Walking around should feel as close as possible to the real campus, and the core gameplay should feel close to finished |
+| MVP | A high-fidelity campus Zone to play on, with the core gameplay done: the end of Stage 2 |
 | Order | Single-player first: a real campus slice with guns and bots. Multiplayer is added after |
 | First multiplayer mode | Deathmatch: click a link, type a name, play. Free-for-all and teams |
 | Match size | Up to 16 humans online. Single-player with up to 128 bots |

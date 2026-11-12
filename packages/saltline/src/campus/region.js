@@ -7,6 +7,7 @@ import { Group } from 'three';
 import STYLES from './building-styles.json';
 import { fetchZone, loadCampus } from './index.js';
 import { hip } from './env/context.js';
+import { roofOf } from './env/roofs.js';
 
 const modules = import.meta.glob('./hotspots/*.js'); // lazy: one chunk per hotspot, none present is fine
 const inPoly = (x, z, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) if ((p[i][1] > z) !== (p[j][1] > z) && x < ((p[j][0] - p[i][0]) * (z - p[i][1])) / (p[j][1] - p[i][1]) + p[i][0]) c = !c; return c; };
@@ -46,7 +47,10 @@ export async function loadHotspots(G, zone, protect = []) {
 export function massingOpts(zone, skip, far = 95) {
   const own = {};
   for (const c of zone.colliders) if (c.style) own[c.id] = c.style;
-  return { skip, far, styles: { ...STYLES, buildings: { ...own, ...STYLES.buildings } } };
+  const buildings = { ...own, ...STYLES.buildings };
+  for (const id of Object.keys(buildings)) { const r = roofOf(id); if (r) buildings[id] = { ...buildings[id], roof: { ...buildings[id].roof, color: r.color } }; } // real roof colour from the Google mosaic
+  for (const c of zone.colliders) { const r = roofOf(c.id); if (r && !buildings[c.id]) buildings[c.id] = { roof: { color: r.color } }; }
+  return { skip, far, styles: { ...STYLES, buildings } };
 }
 
 /** hip roofs of the brick halls (the baked colliders carry `hip`); returns triangle count */
@@ -55,7 +59,7 @@ export function addHips(zone, root, skip) {
   const wanted = new Map(zone.colliders.filter((c) => c.hip && !skip.includes(c.id)).map((c) => [c.id, c.hip]));
   let tris = 0;
   for (const f of loadCampus({ ...zone, colliders: zone.colliders.filter((c) => wanted.has(c.id)), landmarks: {} }).footprints) {
-    const h = wanted.get(f.id), B = hip(f, h.rise, parseInt(h.color.slice(1), 16)), m = B.mesh();
+    const h = wanted.get(f.id), B = hip(f, h.rise, parseInt((roofOf(f.id)?.color ?? h.color).slice(1), 16)), m = B.mesh();
     m.castShadow = true; g.add(m); tris += B.p.length / 9;
   }
   root.add(g);

@@ -175,3 +175,5 @@ Code-generated scenes `packages/saltline/src/campus/hotspots/{elliott,memorial-m
 | Not found | monuments on Memorial Mall: none in OSM or in the 5 frames, none drawn | | | |
 
 Note: the brief called Elliott circular/domed; the data show a rectangular hipped-roof hall with a half-round rotunda. Raw frames for memorial-mall were read from a sibling worktree (gitignored, not committed).
+
+| v6 roof atlas + far-field ground albedo (`public/campus/walk/roofs/atlas-*.webp`, `ground-far.jpg`) | Top-down orthographic render of the Google Photorealistic 3D Tiles mesh (`data/google/mall-area.glb`) by `tools/google-topdown.mjs`, processed by `tools/google-roofs.py` | needs-clearance | Owner states usage rights; attribution "Google" |

@@ -15,6 +15,7 @@ import { applyEarly, installSky } from './env/sky.js';
 import { S as SEASON } from './env/season.js';
 import { buildPlaza, inPlaza, plazaFloor, plazaTrees } from './env/plaza.js';
 import { loadBellTowerScan, SCAN_CREDIT } from './env/belltower-scan.js';
+import { addRoofs } from './env/roofs.js';
 import { fetchRegion, loadHotspots, massingOpts, addHips, regionSolids } from './region.js';
 
 const TOWER = (typeof location !== 'undefined' && /[?&]tower=(scan|code)/.exec(location.search)?.[1]) || 'code'; // ?tower=scan|code; code wins the comparison (docs/assets.md)
@@ -41,6 +42,15 @@ function loadOrtho() {
     const b = j.bounds;
     return { texture: t, xMin: b.xMin, zMin: b.zMin, w: b.xMax - b.xMin, h: b.zMax - b.zMin, fit: j.fit };
   }).catch(() => null); // pilot data absent: PBR ground only
+}
+
+// far-field photo albedo (tools/google-roofs.py): canopy and cast shadows removed, exposure matched to the PBR grass
+function loadFar() {
+  return fetch(BASE + 'walk/ground-far.json').then((r) => r.json()).then((j) => {
+    const t = new TextureLoader().load(BASE + 'walk/ground-far.jpg');
+    t.colorSpace = SRGBColorSpace; t.flipY = false; t.anisotropy = 8; t.minFilter = LinearMipmapLinearFilter;
+    return { texture: t, xMin: j.xMin, zMin: j.zMin, w: j.w, h: j.h };
+  }).catch(() => null);
 }
 
 // lamps and benches along the footways, a few metres off the path
@@ -91,13 +101,14 @@ export async function buildWalk(G) {
     landmarks: TOWER === 'code' ? { bellTower: zone.landmarks.bellTower, fountain: zone.landmarks.fountain } : {}, // scan mode draws its own tower below
   };
   vegMode.walk = true;
-  const ortho = await loadOrtho();
+  const ortho = await loadOrtho(), far = await loadFar();
   G.bellShaftTexture = await new Promise((r) => new TextureLoader().load(BASE + 'walk/tex/bell-shaft.jpg', (t) => { t.colorSpace = SRGBColorSpace; t.anisotropy = 8; r(t); }, undefined, () => r(null)));
-  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: massingOpts(zone, skip) };
+  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, far, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: massingOpts(zone, skip) };
   const level = await buildCampus(G, z);
   level.root.add(await buildWalc(G, colliders.find((c) => c.id === KEEP[1]).poly)); // code-generated WALC (walc.js); facades.js skips it
   hot.groups.forEach((g) => level.root.add(g));
   const hipTris = addHips(zone, level.root, skip);
+  addRoofs(zone, level.root, [...skip, ...zone.colliders.filter((c) => c.hip).map((c) => c.id)]); // hip roofs carry the real colour already
   let scanHalf = BELLTOWER_HALF;
   if (TOWER === 'scan') {
     const bt = zone.landmarks.bellTower, t = await loadBellTowerScan(G, [bt.x, 0, bt.z], { rotY: Number(/[?&]trot=(-?[\d.]+)/.exec(location.search)?.[1] || 0), model: /[?&]tex=model/.test(location.search) });

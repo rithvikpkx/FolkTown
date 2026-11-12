@@ -7,3 +7,4 @@ tools/shots/
 data/debug/
 .vercel
 .env*
+data/raw/lidar/

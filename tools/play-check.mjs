@@ -54,6 +54,56 @@ for (const [ci, query] of configs.entries()) {
     }
     console.log('player hp after 30 s idle:', await ev('Math.round(H.me().health)'));
 
+    // 1b. regression: Safari has no AudioListener.positionX; that used to kill the frame loop (sky only).
+    await ev(`Object.defineProperty(AudioListener.prototype, 'positionX', { get() {} }); 0`);
+    const fails = [];
+    const check = (name, ok) => {
+      console.log(ok ? 'ok  ' : 'FAIL', name);
+      if (!ok) fails.push(name);
+    };
+    const camNow = () =>
+      ev(
+        `(() => { const c = H.g.camera; return [c.position.x, c.position.y, c.position.z, c.rotation.x, c.rotation.y, c.rotation.z]; })()`,
+      );
+    // fraction of pixels with a visible horizontal edge: a sky-only frame is smooth, a world is textured
+    const detail = async () => {
+      const png = (await send('Page.captureScreenshot', { format: 'png' })).data;
+      const r = await send('Runtime.evaluate', {
+        awaitPromise: true,
+        returnByValue: true,
+        expression: `(async () => {
+        const b = await createImageBitmap(await (await fetch('data:image/png;base64,${png}')).blob());
+        const c = new OffscreenCanvas(b.width, b.height), g = c.getContext('2d'); g.drawImage(b, 0, 0);
+        const d = g.getImageData(0, 0, b.width, b.height).data; let e = 0;
+        for (let i = 0; i < d.length - 4; i += 4) if (Math.abs(d[i] + d[i + 1] + d[i + 2] - d[i + 4] - d[i + 5] - d[i + 6]) > 18) e++;
+        return e / (d.length / 4);
+      })()`,
+      });
+      return r.result.value;
+    };
+    const mw = { x: -30, z: -290 };
+    await ev(
+      `H.me().pos.x = ${mw.x}; H.me().pos.z = ${mw.z}; H.me().pos.y = 0; H.g.input.yaw = 0; H.me().alive = true; H.me().health = 100; H.me().spawnProtection = 99;`,
+    );
+    await sleep(1000);
+    const c0 = await camNow();
+    check('camera finite', c0.every(Number.isFinite));
+    check('camera above ground', c0[1] > 1);
+    const d0 = await detail();
+    check(`world visible (edge detail ${(d0 * 100).toFixed(1)}% > 0.5%)`, d0 > 0.005);
+    await ev(`H.g.input.keys.add('KeyW')`);
+    await sleep(1500);
+    const c1 = await camNow();
+    check(
+      'W moves the camera',
+      Math.hypot(c1[0] - c0[0], c1[2] - c0[2]) > 1 && c1.every(Number.isFinite),
+    );
+    const d1 = await detail();
+    check(`world visible after W (edge detail ${(d1 * 100).toFixed(1)}% > 0.5%)`, d1 > 0.005);
+    check('no page errors (the loop kept running)', logs.length === 0);
+    await ev(`H.g.input.keys.clear()`);
+    if (fails.length) process.exitCode = 1;
+
     // 2. movement: walk, sprint, jump (teleport to the open mall centre first)
     await ev(`H.me().pos.x = -30; H.me().pos.z = -290; H.g.input.yaw = 0;`);
     const p0 = JSON.parse(await ev('JSON.stringify(H.me().pos)'));

@@ -67,6 +67,15 @@ if (cam?.length === 5 && cam.every(Number.isFinite)) {
   startGame();
 }
 
+// Audio is optional: a browser quirk in it must never stop the frame loop (it froze the whole game on Safari).
+function safeAudio(f: () => void) {
+  try {
+    f();
+  } catch (e) {
+    console.warn('audio', e);
+  }
+}
+
 function startGame() {
   const config: MatchConfig = {
     mode: q.get('mode') === 'tdm' ? 'tdm' : 'ffa',
@@ -106,7 +115,7 @@ function startGame() {
   });
 
   const hooks: ((events: GameEvent[]) => void)[] = [];
-  (window as unknown as { __game: unknown }).__game = { session, input, hooks, viewModel };
+  (window as unknown as { __game: unknown }).__game = { session, input, hooks, viewModel, camera };
   // ?gun=rifle&variant=flat&ads=1 previews a gun (offsets can be tuned live through __game.viewModel)
   const gun = q.get('gun');
   if (gun && gun in WEAPONS) {
@@ -128,7 +137,7 @@ function startGame() {
     for (const h of hooks) h(events);
     hud.onEvents(events);
     feel.onEvents(events, PLAYER_ID);
-    snd.onEvents(events, PLAYER_ID);
+    safeAudio(() => snd.onEvents(events, PLAYER_ID));
     figures.onEvents(events, PLAYER_ID);
     const eye = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
     for (const i of impactsFor(
@@ -138,7 +147,7 @@ function startGame() {
       eye,
     )) {
       marks.add(i.x, i.y, i.z, i.nx, i.ny, i.nz);
-      snd.impact(i);
+      safeAudio(() => snd.impact(i));
     }
     if (events.some((e) => e.type === 'shot' && e.shooter === PLAYER_ID)) viewModel.fired();
 
@@ -166,7 +175,9 @@ function startGame() {
       pose.z - Math.sin(pose.yaw) * fe.x,
     );
     camera.rotation.set(pose.pitch + fe.pitch, pose.yaw + fe.yaw, fe.roll, 'YXZ');
-    snd.frame(dt, pose, pose.yaw, session.match.playerList, me, locked && input.fire);
+    safeAudio(() =>
+      snd.frame(dt, pose, pose.yaw, session.match.playerList, me, locked && input.fire),
+    );
     figures.update(session.match.playerList, (p) => session.lerpPos(p), PLAYER_ID, dt);
     lodT -= dt;
     if (lodT <= 0) {

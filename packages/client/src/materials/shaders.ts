@@ -159,3 +159,74 @@ void surf(vec2 uv, out vec3 c, out float h, out float r) {
   c = b * (0.9 + w * 0.1); h = w; r = 0.95;
 }`,
 };
+
+/** World-space detail (fragment, after `common`). Octaves fade out with the pixel footprint so they never shimmer. */
+export const DETAIL = /* glsl */ `
+float dh3(vec3 p) {
+  uvec3 q = uvec3(ivec3(p)) * uvec3(374761393u, 668265263u, 2147483647u);
+  uint h = (q.x ^ q.y ^ q.z); h = (h ^ (h >> 13)) * 1274126177u;
+  return float(h ^ (h >> 16)) / 4294967296.0;
+}
+float dn3(vec3 p) {
+  vec3 i = floor(p), f = p - i, u = f * f * (3.0 - 2.0 * f);
+  float a = mix(mix(dh3(i), dh3(i + vec3(1, 0, 0)), u.x), mix(dh3(i + vec3(0, 1, 0)), dh3(i + vec3(1, 1, 0)), u.x), u.y);
+  float b = mix(mix(dh3(i + vec3(0, 0, 1)), dh3(i + vec3(1, 0, 1)), u.x), mix(dh3(i + vec3(0, 1, 1)), dh3(i + vec3(1, 1, 1)), u.x), u.y);
+  return mix(a, b, u.z);
+}
+float dfbm(vec3 p, float foot, float f0) { // 3 octaves; each fades once its cell is under ~2 pixels
+  float s = 0.0, a = 0.5, t = 0.0, fr = f0;
+  for (int i = 0; i < 3; i++) {
+    float w = 1.0 - smoothstep(0.35, 0.8, foot * fr);
+    s += a * w * dn3(p * fr + float(i) * 7.3); t += a * w; a *= 0.5; fr *= 2.1;
+  }
+  return t > 0.0 ? s / t : 0.5;
+}
+// modifies albedo, returns the height field used for bump; r is a roughness offset
+float detail(inout vec3 albedo, out float r) {
+  float foot = length(fwidth(vWp));
+  float cellf = 1.0 / CELL;
+  float g = dfbm(vWp, foot, cellf);          // centimetre grit
+  float m = dfbm(vWp * 0.21 + 3.1, foot * 0.21, cellf * 0.25); // decimetre mottling
+  float big = dn3(vWp * 0.35 + 9.0);           // metre-scale blotches
+  float side = 1.0 - abs(vWn.y);
+  float k = 1.0 + (g - 0.5) * 2.0 * DCOL + (m - 0.5) * DCOL;
+  float h = g;
+  r = (g - 0.5) * DRV;
+#if MODE == 1
+  // masonry: rain streaks running down walls, splash zone and soot near the ground, damp-dark blotches
+  float streak = dfbm(vec3(vWp.x * 3.0 + vWp.z * 3.0, vWp.y * 0.35, vWp.x * 0.2 + vWp.z * 0.2), foot * 3.0, 1.0);
+  float grime = side * (smoothstep(0.55, 0.9, streak) * 0.18 + (1.0 - smoothstep(0.0, 1.2, vWp.y)) * 0.25 * (0.5 + m));
+  k *= 1.0 - grime;
+  albedo = mix(albedo, albedo * vec3(0.9, 0.95, 1.0), smoothstep(0.55, 0.75, big) * 0.3 * side);
+  r += grime * 0.1;
+#elif MODE == 2
+  // ground: dirt and wear patches, loose grit
+  float wear = smoothstep(0.45, 0.8, big);
+  k *= 1.0 - wear * 0.18;
+  albedo = mix(albedo, albedo * vec3(1.06, 1.0, 0.9), wear * 0.5);
+  r += wear * 0.1;
+#elif MODE == 3
+  // metal: rust bloom in blotches, fine scratches that catch the light
+  float rust = smoothstep(0.58, 0.78, dfbm(vWp * 1.7, foot * 1.7, 2.0) * 0.6 + m * 0.4);
+  albedo = mix(albedo, vec3(0.36, 0.16, 0.07), rust * 0.55);
+  r += rust * 0.45 - smoothstep(0.7, 0.9, dn3(vec3(vWp.x * 60.0, vWp.y * 2.0, vWp.z * 60.0))) * 0.15;
+  h += rust * 0.6;
+#elif MODE == 4
+  // turf: blade-scale colour jitter, dry patches and clover-dark clumps
+  float dry = smoothstep(0.5, 0.8, big);
+  albedo = mix(albedo, albedo * vec3(1.35, 1.1, 0.55), dry * 0.45);
+  k *= 0.85 + m * 0.3;
+#endif
+  albedo *= k;
+  return h;
+}
+vec3 bumpNormal(vec3 n, float h, vec3 pos, float faceDirection) {
+  // Mikkelsen surface-gradient bump from screen-space derivatives of the height
+  vec3 sx = dFdx(pos), sy = dFdy(pos);
+  vec3 r1 = cross(sy, n), r2 = cross(n, sx);
+  float det = dot(sx, r1) * faceDirection;
+  float hm = h * DBUMP * CELL * 0.5; // metres of relief
+  vec3 grad = sign(det) * (dFdx(hm) * r1 + dFdy(hm) * r2);
+  return normalize(abs(det) * n - grad);
+}
+`;

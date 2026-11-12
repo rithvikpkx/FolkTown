@@ -28,7 +28,7 @@ import {
 import { lowerPreset, MIN_SCALE, PRESETS, type PresetName, renderSize, stepScale } from './presets';
 import { ADAPT, AO, BLUR, COMPOSITE, DOWN, FINAL, GRADE, HAZE, UP, VERT } from './shaders';
 import { installSoftShadows, uninstallSoftShadows } from './shadow';
-import { createSky, SUN } from './sky';
+import { createSky, createSkyEnv, SUN } from './sky';
 
 export { PRESETS, type PresetName, parseFx } from './presets';
 
@@ -41,6 +41,10 @@ export interface RendererOptions {
 }
 
 const TUNE = {
+  // Sky image-based lighting intensity; `?env=0` turns it off (old hemisphere light), `?env=2` doubles it.
+  env: Number(new URLSearchParams(globalThis.location?.search).get('env') ?? 0.12),
+  hemiFallback: 1.7,
+  hemiWithEnv: 1.0,
   hazeSun: 0.85,
   hazeAmbient: 0.2,
   // Dev default is 20% of the full haze so shots are readable; `?haze=1` restores the look, to be the default near release.
@@ -124,7 +128,18 @@ export function createRenderer(
   });
   const sky = createSky();
   scene.background = null;
-  scene.add(sun, sun.target, new HemisphereLight(0x8aa4d0, 0x7a5a3c, 1.7), sky);
+  const hemi = new HemisphereLight(0x8aa4d0, 0x7a5a3c, TUNE.hemiFallback);
+  scene.add(sun, sun.target, hemi, sky);
+  // Ambient from the sky itself. Call again if SUN or the sky changes.
+  let envRT: ReturnType<typeof createSkyEnv> = null;
+  function applyEnv() {
+    envRT?.dispose();
+    envRT = TUNE.env > 0 ? createSkyEnv(renderer) : null;
+    scene.environment = envRT?.texture ?? null;
+    scene.environmentIntensity = TUNE.env;
+    hemi.intensity = envRT ? TUNE.hemiWithEnv : TUNE.hemiFallback; // small cool fill keeps shadowed sides from going muddy
+  }
+  applyEnv();
 
   const state = {
     enabled: opts.enabled ?? true,
@@ -602,6 +617,8 @@ export function createRenderer(
     setEnabled,
     resize,
     /** Ask for the static sun shadow map to be rendered again (after the world changes). */
+    /** Re-capture the sky environment (after the sun or time of day changes). */
+    refreshEnv: applyEnv,
     invalidateShadow() {
       shadowDirty = true;
     },

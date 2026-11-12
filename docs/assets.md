@@ -65,3 +65,12 @@ Used only in the prototype page (`docs/graphics-research.md`); the files are in 
 | herringbone_pavement (1K, colour warmed toward red) | Plaza pavers | https://polyhaven.com/a/herringbone_pavement | CC0 | No |
 | clay_roof_tiles_02 (1K) | Clay tile hip roofs | https://polyhaven.com/a/clay_roof_tiles_02 | CC0 | No |
 | Concrete012 (1K) | Limestone (brightened, joints drawn in), concrete bands | https://ambientcg.com/view?id=Concrete012 | CC0 | No |
+
+## Google data (owner-exported, local only)
+
+| Asset | Source | Licence / status | Credit needed |
+|---|---|---|---|
+| Photorealistic 3D Tiles around the Mall (`data/google/`, raw in `data/raw/tiles/`) | Google Map Tiles API, official, owner's key (`pnpm map:tiles`, `docs/google-export.md`) | needs-clearance | Attribution strings are recorded in `data/raw/tiles/manifest.json` |
+| Street View Static images (`data/raw/streetview/`) | Google Street View Static API, official, owner's key (`pnpm map:streetview`) | needs-clearance | Copyright text per image in its manifest |
+
+Both are gitignored and not part of any shipped build until cleared.

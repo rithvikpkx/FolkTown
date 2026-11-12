@@ -8,3 +8,6 @@ data/debug/
 .vercel
 .env*
 data/raw/lidar/
+data/raw/tiles/
+data/raw/streetview/
+data/google/

@@ -1,6 +1,7 @@
 """Bake the walkable 'mall-union' region (ZONE_BBOX in tiles/math.ts) into data/zones/mall-union.json, ZoneData-shaped:
 colliders = every OSM footprint touching the region (LiDAR height, name, wall/roof colour, roof type), props = trees, paths = highways clipped to the region.
 Roof colour comes from the 2023 ortho where it covers the building (x -50..190, z -200..50), else a palette by id hash.
+Corrections from the layout audit (duplicates removed, heights, courtyard holes, outlines, official names and codes, missing buildings) come from packages/map-tools/data/footprint-fixes.json (made by layout-audit.py), so they survive re-bakes.
 Run: pnpm map:bake-region   (needs data/campus.json, data/pilot/roofs.json, packages/saltline/public/campus/pilot/ortho.*)"""
 import json, math, hashlib
 from pathlib import Path
@@ -66,9 +67,11 @@ def height(b):
     except Exception: return 8
 
 
+FX = json.load(open(ROOT / 'packages/map-tools/data/footprint-fixes.json'))
 cols = []
 for b in campus['buildings']:
-    o = b['outer']
+    if b['id'] in FX['remove']: continue
+    o = FX['poly'].get(b['id'], {}).get('poly') or b['outer']
     if len(o) < 3: continue
     xs, zs = [p[0] for p in o], [p[1] for p in o]
     if max(xs) < B['minX'] or min(xs) > B['maxX'] or max(zs) < B['minZ'] or min(zs) > B['maxZ']: continue
@@ -76,7 +79,7 @@ for b in campus['buildings']:
     if area < 12: continue
     poly = [[r1(x), r1(z)] for x, z in o]
     if poly[0] == poly[-1]: poly.pop()
-    top = round(max(height(b), 3), 1)
+    top = round(max(FX['height'].get(b['id'], {}).get('topY') or height(b), 3), 1)
     mat, wall = WALLS[h(b['id'], len(WALLS))]
     sty = {'wall': {'mat': mat, 'color': wall}}
     rf = roofs.get(b['id'])
@@ -91,7 +94,15 @@ for b in campus['buildings']:
         if rc: sty['roof'] = {'color': hexc(rc)}
     d = {'id': b['id'], 'poly': poly, 'baseY': 0, 'topY': top, 'style': sty}
     if b.get('name'): d['name'] = b['name']
+    if b['id'] in FX['rename']: d.update(FX['rename'][b['id']])  # official CampusMapper name + Purdue building code
+    if b['id'] in FX['holes']: d['holes'] = FX['holes'][b['id']]  # courtyards measured from the Google mesh (consumers may ignore)
     if hip: d['hip'] = hip
+    cols.append(d)
+
+for a in FX['add']:  # buildings missing from OSM
+    mat, wall = WALLS[h(a['id'], len(WALLS))]
+    d = {'id': a['id'], 'name': a['name'], 'code': a['code'], 'poly': a['poly'], 'baseY': 0, 'topY': a['topY'], 'style': {'wall': {'mat': mat, 'color': wall}}}
+    if a.get('holes'): d['holes'] = a['holes']
     cols.append(d)
 
 

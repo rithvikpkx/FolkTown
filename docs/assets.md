@@ -175,3 +175,9 @@ Code-generated scenes `packages/saltline/src/campus/hotspots/{elliott,memorial-m
 | Not found | monuments on Memorial Mall: none in OSM or in the 5 frames, none drawn | | | |
 
 Note: the brief called Elliott circular/domed; the data show a rectangular hipped-roof hall with a half-round rotunda. Raw frames for memorial-mall were read from a sibling worktree (gitignored, not committed).
+
+### Layout cross-check (v6-layout)
+
+| Asset | Used for | Source URL | Licence | Credit needed |
+|---|---|---|---|---|
+| CampusMapper Purdue campus map SVG + places JSON (not shipped; downloaded to data/raw/campusmapper/) | Cross-check of building outlines, official names and Purdue codes (docs/layout-report.md); no artwork copied, names and codes only | https://campusmapper.com/wp-content/uploads/2026/09/purdue-university-campus-map-2d.svg and https://campusmapper.com/wp-content/uploads/campusmapper-data/9332-3153f440b4d9.json | needs-clearance (unknown) | Unknown |

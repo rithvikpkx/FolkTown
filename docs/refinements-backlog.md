@@ -13,3 +13,7 @@ Known problems that are deliberately deferred. None of them blocks the main impl
 | 7 | **Counting players** | The project's goal is a user number, so it needs a counter. Page analytics from the first public deploy; unique device tokens once the server exists | First public deploy |
 | 8 | **Map data credit and licence** | Credit OpenStreetMap contributors on screen and in the README. Baked map data derived from it is published under the Open Database License | Stage 1, when map data lands |
 | 9 | **Hosting terms** | Vercel's free plan is for non-commercial use. Fine while the game earns nothing; move to a paid plan or another host if that ever changes | Only if money is involved |
+
+## Google data export (tabled 12 November 2026)
+
+Built, not run. See `docs/google-export.md`: 3D tiles for the Mall area, converted into the campus frame, plus Street View photos around target buildings for facade references. Needs the owner's Google Cloud key and billing. Revisit for higher-quality mapping after the MVP look is settled.

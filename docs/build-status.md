@@ -58,10 +58,13 @@ The client never adds rules; if it needs one, it notes it in the cloud subsectio
 
 ### Cloud track status
 
-Cloud lock: 2026-11-12T11:41Z
+Cloud lock: free
 
 - **WP12 merged** (~78k tokens Sonnet): `@folktown/shared` (contract: PlayerInput, WeaponDef/WEAPONS, ZoneData, MatchConfig/State, GameEvent, constants) and `@folktown/sim` (`stepController`, `ZoneCollision` + `raycast`, `makeSyntheticZone`). Yaw 0 looks toward -z, positive yaw turns left. 35 tests.
-- Running: WP9 bake (branch wp9-bake), Stage 2 rules (wp13-rules). Next: bots + nav, then 32-bot headless match test.
+- **WP9 merged** (~79k): `pnpm map:bake` -> `data/zones/engineering-mall.json` (109 KB; 300 m box centred (-30,-290), north of Bell Tower; 14 colliders, 296 trees, 24 spawns, 1443 nav nodes). Flat ground.
+- **WP13 merged** (~81k): `Match` class in sim (weapons, hit-scan, headshots, health, respawn, FFA/TDM, events, `snapshot()`); recoil exposed as `recoilPitch/recoilYaw` on PlayerState.
+- **WP14 merged** (~92k): `NavGraph` A*, `BotController`, 3 difficulties, `runBotMatch`. `packages/sim/test/bot-match.test.ts`: 32-bot FFA and TDM run to matchEnd headless (~2-4 s each). 72 tests pass.
+- **Cloud track step 5 done: Stage 2 sim side complete.** Client needs: feed `PlayerInput` to `Match.step`, render `snapshot()`, load zone JSON, use `BotController` for bots. Open: no hit-scan vs ground, bots have no healing, flat ground (known-gaps).
 
 ### Local track status
 

@@ -243,5 +243,6 @@ export async function buildWalc(G, poly, opts = {}) {
   const c = { x: 70, z: -2 }, upd = () => { const d = Math.hypot(G.camera.position.x - c.x, G.camera.position.z - c.z) > FAR; near.visible = !d; far.visible = d; };
   if (G.camera) (G.campusTick = G.campusTick || []).push(upd);
   root.userData.stats = { tris: Math.round(tris), trisFar: Math.round(trisFar) };
+  if (typeof window !== 'undefined') window.__walcTris = root.userData.stats; // for tools/saltline-walk-shots.mjs
   return root;
 }

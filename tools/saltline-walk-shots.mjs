@@ -20,6 +20,6 @@ for (const [name, cam] of Object.entries(poses)) {
     await sleep(6000);
     const png = await send('Page.captureScreenshot', { format: 'png' });
     writeFileSync(new URL(`shots/walk-${name}.png`, import.meta.url), Buffer.from(png.data, 'base64'));
-    console.log(name, JSON.stringify({ errors: await ev('window.__errors'), fatal: await ev('window.__fatal') }), logs.length ? logs : '');
+    console.log(name, 'walcTris', JSON.stringify(await ev('window.__walcTris')), JSON.stringify({ errors: await ev('window.__errors'), fatal: await ev('window.__fatal') }), logs.length ? logs : '');
   });
 }

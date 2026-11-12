@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilot ortho and roofs</title>
+<style>html,body{margin:0;height:100%;background:#0b0d0f;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.180.0/build/three.module.js"}}</script>
+</head>
+<body>
+<script type="module">
+// Check view for the pilot data: ortho on the ground plane + roofs.json 1 m height columns.
+// Serve the repo root (e.g. `python3 -m http.server` there) and open /packages/saltline/demo-pilot.html
+// Params: ?cam=x,y,z,lx,ly,lz (local metres, y up)  ?noroofs  ?top (orthographic top-down look)
+import * as THREE from 'three';
+const q = Object.fromEntries(new URLSearchParams(location.search));
+const [meta, roofs] = await Promise.all([
+  fetch('public/campus/pilot/ortho.json').then((r) => r.json()),
+  fetch('../../data/pilot/roofs.json').then((r) => r.json()),
+]);
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+r.setSize(innerWidth, innerHeight);
+document.body.append(r.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9fb4c8);
+const b = meta.bounds;
+const tex = await new THREE.TextureLoader().loadAsync('public/campus/pilot/' + meta.image);
+tex.colorSpace = THREE.SRGBColorSpace;
+tex.anisotropy = 8;
+// local x east, z south maps straight onto three x, z (y up); image top = north = zMin
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(b.xMax - b.xMin, b.zMax - b.zMin),
+  new THREE.MeshBasicMaterial({ map: tex }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.set((b.xMin + b.xMax) / 2, 0, (b.zMin + b.zMax) / 2);
+scene.add(ground);
+let cols = 0;
+if (!('noroofs' in q)) {
+  const mat = new THREE.MeshLambertMaterial({ color: 0xc9b79c });
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x556677, 2.2), new THREE.DirectionalLight(0xffffff, 1.5));
+  const cells = [];
+  for (const bd of roofs.buildings) {
+    const ra = bd.raster;
+    if (!ra) continue;
+    ra.data.forEach((row, j) => row.forEach((v, i) => v != null && v > 2 && cells.push([ra.x0 + i + 0.5, ra.z0 + j + 0.5, v])));
+  }
+  const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat, cells.length);
+  const m = new THREE.Matrix4();
+  cells.forEach(([x, z, h], i) => im.setMatrixAt(i, m.compose(new THREE.Vector3(x, h / 2, z), new THREE.Quaternion(), new THREE.Vector3(1, h, 1))));
+  scene.add(im);
+  cols = cells.length;
+}
+const cam = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.5, 2000);
+const c = (q.cam ?? '70,160,110,70,0,-70').split(',').map(Number);
+cam.position.set(c[0], c[1], c[2]);
+cam.lookAt(c[3], c[4], c[5]);
+r.render(scene, cam);
+document.title = `ready ${cols} columns`;
+window.__ready = true;
+</script>
+</body>
+</html>

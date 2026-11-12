@@ -1,0 +1,13 @@
+{
+ "image": "ortho.jpg",
+ "width": 3150,
+ "height": 3281,
+ "bounds": {
+  "xMin": -50,
+  "xMax": 190,
+  "zMin": -200,
+  "zMax": 50
+ },
+ "metresPerPixel": 0.0761904761904762,
+ "source": "Indiana_2023_SPW_06in, IndianaMap/IGIO, CC0"
+}

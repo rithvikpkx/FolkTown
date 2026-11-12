@@ -1,7 +1,7 @@
 import { Color, PerspectiveCamera, Scene } from 'three';
 import { Batch, UP } from './batch';
-import { buildFountain } from './landmarks/fountain';
 import { buildBellTower } from './landmarks/belltower';
+import { buildFountain } from './landmarks/fountain';
 import { MATERIAL_NAMES, type MaterialName, type makeMaterials, TILING } from './materials';
 
 type Mats = Awaited<ReturnType<typeof makeMaterials>>;

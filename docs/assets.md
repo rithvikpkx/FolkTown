@@ -139,3 +139,12 @@ Ortho georeference fit lives in pilot/ortho.json (fit). Trees, shrubs, grasses, 
 |---|---|---|---|---|
 | public/campus/walk/brick-{albedo,normal,rough}.jpg (2K, red_brick_pavers) | WALC plaza brick paving, env/plaza.js (anti-tiled in shader) | https://polyhaven.com/a/red_brick_pavers | CC0 | No |
 - public/campus/walk/belltower-scan.json + belltower-scan-{0,1}.webp: Sketchfab "Purdue University Bell Tower" by Olivia Bultinck, CC BY 4.0, https://sketchfab.com/3d-models/purdue-university-bell-tower-37db7dfc51c347849b8e5975d8a89812 (original in reference/models/, 20,844 tris, 87 meshes). Converted by tools/glb-to-web.mjs, loaded by src/campus/env/belltower-scan.js behind ?tower=scan (default is the code tower). Attribution is shown in the walk hint when ?tower=scan; keep it wherever the scan ships. Not needs-clearance (CC BY credit only).
+
+## v4-walc-streetview
+Google Street View Static API frames bought/downloaded by the owner with their own key (owner states usage rights); raw 640x640 jpgs stay in data/raw/streetview/ (gitignored, not committed). Credit text from the manifest. **All needs-clearance.**
+| File | Use | Source | Credit | needs-clearance |
+|---|---|---|---|---|
+| packages/saltline/public/campus/walk/walc/west-pavilion.jpg, colonnade.jpg, brick-tile.jpg, limestone-tile.jpg | Rectified/colour-corrected albedo of the south pavilion west face; colonnade reference (not mapped); seamless brick strip tile; limestone grain/colour tile (all derived from pano CAoSF0NJSE0wb2dLRUlDQWdJQzZzNVRTbWdF, 2021-09, heading 90) | Google Street View, pano CAoSF0NJSE0wb2dLRUlDQWdJQzZzNVRTbWdF | Google, © Kaho Sakaue | Yes |
+| packages/saltline/public/campus/walk/walc/south-bulge.jpg | Rectified albedo of the south bulge face (pano _2SMIzURFlvLO3vHwJQjiA, 2017-09, heading 0) | Google Street View, pano _2SMIzURFlvLO3vHwJQjiA | © 2026 Google | Yes |
+| (measurements only) pano CAoSFENJSE0wb2dLRUlDQWdJQzZzNVF5, 2021-09 | all four headings are INTERIOR (STEAM Commons, Au Bon Pain): no east-face exterior coverage; used for nothing | Google Street View | Google, © Kaho Sakaue | Yes |
+Tools: tools/walc-rectify.py (rectify + colour correction), tools/walc-sidebyside.py. Roof tile: no roof is visible in any frame (only dark soffits), colour unchanged from the Purdue design render; north face of WALC: COPIED from the south long wall (layout, mirrored in z so x positions are kept), not measured, no photo. Bell tower frames (bell-tower/) not used here (belltower.js is other work).

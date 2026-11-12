@@ -5,7 +5,7 @@
 // Facade kinds: glazed (tall paired lights between brick piers), punched (paired windows, limestone surrounds), colonnade (open ground floor).
 // One mesh per material; near (windows) / far (textured box) LOD for the wall detail. Optional photo-texture manifest: public/campus/walk/facades.json
 //   { walc: { brick: { map, normalMap }, limestone: { map } } } (urls relative to campus/walk/); absent -> procedural brick/limestone.
-import { BoxGeometry, CanvasTexture, Color, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, RepeatWrapping, SphereGeometry, SRGBColorSpace, TextureLoader } from 'three';
+import { BoxGeometry, CanvasTexture, Color, ClampToEdgeWrapping, CylinderGeometry, DoubleSide, Group, Mesh, MeshStandardMaterial, MirroredRepeatWrapping, RepeatWrapping, SphereGeometry, SRGBColorSpace, TextureLoader } from 'three';
 import { Bucket, ring, offset, cap } from './facades.js';
 
 const BASE = import.meta.env.BASE_URL + 'campus/';
@@ -14,6 +14,24 @@ const HIPS = [{ x0: 41.17, x1: 99.92, z0: -55.44, z1: -33 }, { x0: 41.59, x1: 10
 const MID = [-33, 5.7]; // z range of the lower flat-roofed block between the pavilions
 const SPLIT = [-33, -26, 5.7], XL = 90.5, LOW = 7.6; // east two-storey wing (LiDAR 7-8 m) sits east of x 90.5, z -26..5.7; the 16.2 m block steps back to x 90.5
 const inLow = (x, z) => x > XL && z > -26 && z < 5.8;
+// Measured from Street View (data/raw/streetview/walc, rectified by tools/walc-rectify.py). Heights in metres, positions as s = metres from the NORTH end of the face
+// (west faces) or from the WEST end (north/south faces). 'copied' = no photo of that face: layout copied from the covered face named in `of`.
+const PH = 'walc/'; // photo tiles live in public/campus/walk/walc/
+const SPECS = [
+  { id: 'west-pavilion', status: 'measured (2021 frame, west)', match: (e) => e.kind === 'punched' && e.nx < -0.9 && e.mz > 6 && e.mz < 28 && e.L > 20, from: 'n',
+    bays: [[2.2, 5.7], [7.6, 11.1], [13.0, 16.5], [18.4, 21.9]], mull: true, frame: 'dark', belt: [5.7, 6.4], plinth: 0.9,
+    rows: [{ ya: 1.15, yb: 5.65, pc: 4, pr: 3, tr: 4.15, ground: true }, { ya: 8.65, yb: 11.65, pc: 4, pr: 3 }, { ya: 13.9, yb: 16.65, pc: 4, pr: 3 }],
+    photo: { map: 'west-pavilion.jpg', sW: 19.5, y0: 0, yH: 17.4 } },
+  { id: 'south-bulge', status: 'measured (2017 frame, south)', match: (e) => e.nz > 0.9 && e.mz > 31, from: 'w',
+    bays: [[1.9, 4.6], [5.8, 8.5]], mull: true, frame: 'dark', belt: [5.4, 5.85], plinth: 0,
+    rows: [{ ya: 5.9, yb: 7.3, pc: 2, pr: 1, tr: 0, low: true }, { ya: 7.85, yb: 12.1, pc: 2, pr: 4 }, { ya: 12.6, yb: 14.85, pc: 2, pr: 2 }],
+    photo: { map: 'south-bulge.jpg', sW: 10.1, y0: 2.6, yH: 13.8 } },
+  { id: 'south-long', status: 'partly measured (2017 frame, oblique)', match: (e) => e.nz > 0.9 && e.mz > 27.5 && e.mz < 28.6 && e.L > 30, from: 'w', pitch: 3.3, w: 1.4, e0: 1.6,
+    mull: false, frame: 'dark', belt: [5.4, 5.85], plinth: 0, rows: [{ ya: 7.9, yb: 10.5, pc: 2, pr: 3 }, { ya: 12.7, yb: 15.2, pc: 2, pr: 3 }] },
+  { id: 'north', status: 'COPIED, not measured (south-long layout, mirrored in z so x positions are kept)', of: 'south-long', match: (e) => e.nz < -0.9 && e.mz < -50 && e.L > 40, from: 'e', pitch: 3.3, w: 1.4, e0: 1.6,
+    mull: false, frame: 'dark', belt: [5.4, 5.85], plinth: 0, rows: [{ ya: 7.9, yb: 10.5, pc: 2, pr: 3 }, { ya: 12.7, yb: 15.2, pc: 2, pr: 3 }] },
+];
+const COL = { piers: [1.15, 7.35, 13.55, 19.75, 25.95], pw: 1.6, sill: 7.6, tr: 12.85, head: 15.6 }; // colonnade (west face): piers from the north end z=-26; the last bay (south) holds the entrance
 let seed = 7;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const cv = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h });
@@ -58,7 +76,7 @@ function tileTexture() {
 }
 function farTexture() { // one bay x one storey of brick wall with a window, for the distant box
   const w = 90, h = 140, c = cv(w, h), g = c.getContext('2d');
-  g.fillStyle = '#8f4a39'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#84675c'; g.fillRect(0, 0, w, h);
   for (let i = 0; i < 300; i++) { g.fillStyle = rnd() < 0.5 ? 'rgba(60,25,18,.2)' : 'rgba(200,120,95,.15)'; g.fillRect(rnd() * w, rnd() * h, 6, 2); }
   g.fillStyle = '#e4dcc4'; g.fillRect(14, 28, 62, 92); g.fillStyle = '#4c6272'; g.fillRect(18, 32, 54, 84);
   g.fillStyle = '#e4dcc4'; g.fillRect(44, 32, 3, 84); g.fillRect(18, 72, 54, 3); g.fillRect(0, 130, w, 6);
@@ -76,14 +94,18 @@ function materials(m) {
   const load = (u) => { const t = new TextureLoader().load(BASE + 'walk/' + u); t.wrapS = t.wrapT = RepeatWrapping; t.anisotropy = 8; return t; };
   if (m.brick && m.brick.map) { brick.map = load(m.brick.map); brick.map.colorSpace = SRGBColorSpace; brick.bumpMap = null; if (m.brick.normalMap) brick.normalMap = load(m.brick.normalMap); }
   if (m.limestone && m.limestone.map) { stone.map = load(m.limestone.map); stone.map.colorSpace = SRGBColorSpace; }
+  const ph = (u, wrap) => { const t = load(PH + u); t.wrapS = MirroredRepeatWrapping; t.wrapT = wrap || ClampToEdgeWrapping; t.colorSpace = SRGBColorSpace; return t; };
+  brick.map = load(PH + 'brick-tile.jpg'); brick.map.colorSpace = SRGBColorSpace; brick.bumpMap = null; // seamless tile of a clean photographed wall strip, 14 x 1.05 m
+  stone.map = load(PH + 'limestone-tile.jpg'); stone.map.colorSpace = SRGBColorSpace; stone.color.set(0xb9b6ab); // piers sit in shade under the overhang (photo mean ~125 vs 204 on the sunlit belt)
+  const photos = {}; for (const sp of SPECS) if (sp.photo) photos[sp.id] = std({ map: ph(sp.photo.map), roughness: 0.92 });
   const far = std({ map: farTexture(), roughness: 0.9 });
   return {
-    brick, stone, far,
+    brick, stone, far, photos,
     roof: std({ map: tileTexture(), roughness: 0.75 }),
     flat: std({ color: 0xc8c5bc, roughness: 0.9 }),
     steel: std({ color: 0x8d9094, roughness: 0.4, metalness: 0.7 }),
     dark: std({ color: 0x1b1a1a, roughness: 0.7 }),
-    frame: std({ color: 0xe6dfcc, roughness: 0.5, metalness: 0.2 }),
+    frame: std({ color: 0xcfc9b8, roughness: 0.5, metalness: 0.2 }), dframe: std({ color: 0x353b38, roughness: 0.5, metalness: 0.3 }),
     plate: std({ color: 0x1d2024, roughness: 0.6, metalness: 0.4 }),
     pipe: std({ color: 0x3b2f28, roughness: 0.6, metalness: 0.4 }),
     mech: std({ color: 0x9a9c9e, roughness: 0.6, metalness: 0.5 }),
@@ -107,12 +129,13 @@ export async function buildWalc(G, poly, opts = {}) {
     if (!buckets.has(key)) { const b = new Bucket(mat, colored); b.sx = sx; b.sy = sy; buckets.set(key, b); }
     return buckets.get(key);
   };
-  const W = bk('brick', M.brick, false, 1 / 1.35, 1 / 1.2), S = bk('stone', M.stone, false, 0.8, 0.8), RF = bk('roof', M.roof), DK = bk('dark', M.dark),
-    FR = bk('frame', M.frame), PL = bk('plate', M.plate), PP = bk('pipe', M.pipe), GL = bk('glass', M.glass, true), FW = bk('far', M.far),
+  const W = bk('brick', M.brick, false, 1 / 14, 1 / 1.05), S = bk('stone', M.stone, false, 0.8, 0.8), RF = bk('roof', M.roof), DK = bk('dark', M.dark),
+    FR = bk('frame', M.frame), FD = bk('dframe', M.dframe), PL = bk('plate', M.plate), PP = bk('pipe', M.pipe), GL = bk('glass', M.glass, true), FW = bk('far', M.far),
     FL = bk('flat', M.flat), ST = bk('steel', M.steel), MG = bk('mglass', M.glass, true), MF = bk('mfr', M.frame);
   const ROOT = new Set(['roof', 'flat', 'dark', 'mglass', 'mfr']); // always visible (roofs, rooftop monitor)
   const R = refine(poly), n = R.length, root = new Group(), near = new Group(), far = new Group();
-  const glassCol = () => { const v = 0.55 + rnd() * 0.5; return [0.1 * v, 0.19 * v, 0.26 * v]; }; // dark blue-grey, reflections add the sky
+  const glassCol = () => { const v = 0.55 + rnd() * 0.5; return [0.12 * v, 0.2 * v, 0.25 * v]; }; // measured: pavilion glass reads light grey-blue (sky), colonnade glass dark bronze-grey
+  const glassPav = () => { const v = 0.7 + rnd() * 0.5; return [0.2 * v, 0.27 * v, 0.31 * v]; };
   const box = (B, x0, y0, z0, x1, y1, z1) => { // axis-aligned box, sides and top
     B.q([x0, y0, z0], [x0, y1, z0], [x1, y1, z0], [x1, y0, z0]); B.q([x1, y0, z1], [x1, y1, z1], [x0, y1, z1], [x0, y0, z1]);
     B.q([x0, y0, z1], [x0, y1, z1], [x0, y1, z0], [x0, y0, z0]); B.q([x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]); B.q([x0, y1, z0], [x0, y1, z1], [x1, y1, z1], [x1, y1, z0]);
@@ -135,10 +158,15 @@ export async function buildWalc(G, poly, opts = {}) {
   edgeInfo.push({ i: n, a: [XL, -26], b: [XL, 5.7], dx: 0, dz: 31.7, L: 31.7, nx: 1, nz: 0, mx: XL, mz: -10, top: 16.2, kind: 'punched', hip: false, base: LOW });
 
   for (const e of edgeInfo) {
-    const { i, L, kind, base } = e, top = e.top - base, uo = i * 0.37;
+    const { i, L, kind, base } = e, top = e.top - base, uo = i * 0.37, sp = SPECS.find((q) => q.match(e));
+    const northA = e.a[1] < e.b[1], westA = e.a[0] < e.b[0], flip = sp && (sp.from === 'n' ? !northA : sp.from === 'w' ? !westA : westA); // s measured from the n/w/e end -> u along the edge
+    const U = (s) => (flip ? L - s : s);
+    let Wl = W;
+    if (sp && sp.photo) { Wl = bk('photo-' + sp.id, M.photos[sp.id], false); const ph = sp.photo; Wl.uvf = (u, y) => [U(u) / ph.sW, (y - ph.y0) / ph.yH]; }
+    e.sp = sp;
     const P = (u, y, o) => [e.a[0] + (e.dx / L) * u + (e.dz / L) * o, y + base, e.a[1] + (e.dz / L) * u - (e.dx / L) * o];
     const face = (B, u0, ya, u1, yb, o, col) => B.q(P(u0, ya, o), P(u0, yb, o), P(u1, yb, o), P(u1, ya, o), col,
-      [[u0 + uo, ya], [u0 + uo, yb], [u1 + uo, yb], [u1 + uo, ya]].map(([u, v]) => [u * B.sx, v * B.sy]));
+      B.uvf ? [[u0, ya], [u0, yb], [u1, yb], [u1, ya]].map(([u, v]) => B.uvf(u, v)) : [[u0 + uo, ya], [u0 + uo, yb], [u1 + uo, yb], [u1 + uo, ya]].map(([u, v]) => [u * B.sx, v * B.sy]));
     const rq = (B, a, b, c, d, w, h) => B.q(a, b, c, d, null, [[0, 0], [0, h], [w, h], [w, 0]].map(([u, v]) => [u * B.sx, v * B.sy])); // a,b,c,d = BL,TL,TR,BR
     // box standing proud of plane o by depth d: front, two sides, top (mullions with depth, limestone piers, door stiles)
     const bar = (B, u0, y0, u1, y1, o, d) => {
@@ -154,13 +182,13 @@ export async function buildWalc(G, poly, opts = {}) {
     const nb = L < 5 ? 0 : Math.max(1, Math.round((L - 2.2) / BAY)), m0 = 1.1, pitch = nb ? (L - 2 * m0) / nb : 0;
     const colon = kind === 'colonnade', doorK = !base && !colon && L >= 12 && nb ? Math.floor(nb / 2) : -1;
     // ---- shared pieces: plinth, belt courses, cornice or eave
-    if (!colon && !base) { face(S, 0, 0, L, 0.7, 0.07); S.q(P(0, 0.7, 0.07), P(L, 0.7, 0.07), P(L, 0.7, 0), P(0, 0.7, 0)); }
-    if (nF > 1) {
+    if (!colon && !base && !sp) { face(S, 0, 0, L, 0.7, 0.07); S.q(P(0, 0.7, 0.07), P(L, 0.7, 0.07), P(L, 0.7, 0), P(0, 0.7, 0)); }
+    if (nF > 1 && !sp) {
       face(S, 0, fl[1] - 0.18, L, fl[1] + 0.12, 0.09); S.q(P(0, fl[1] + 0.12, 0.09), P(L, fl[1] + 0.12, 0.09), P(L, fl[1] + 0.12, 0), P(0, fl[1] + 0.12, 0));
       S.q(P(0, fl[1] - 0.18, 0), P(L, fl[1] - 0.18, 0), P(L, fl[1] - 0.18, 0.09), P(0, fl[1] - 0.18, 0.09));
     }
-    if (nF > 2) face(S, 0, fl[2] - 0.1, L, fl[2] + 0.1, 0.05);
-    face(W, 0, H, L, top, 0); // frieze
+    if (nF > 2 && !sp) face(S, 0, fl[2] - 0.1, L, fl[2] + 0.1, 0.05);
+    if (!sp) face(W, 0, H, L, top, 0); // frieze
     if (!e.hip) { // flat roof: stone cornice and coping
       face(S, 0, top - 0.55, L, top - 0.3, 0.14); face(S, 0, top - 0.3, L, top, 0.3);
       S.q(P(0, top - 0.3, 0), P(L, top - 0.3, 0), P(L, top - 0.3, 0.3), P(0, top - 0.3, 0.3)); S.q(P(0, top, 0.3), P(L, top, 0.3), P(L, top, 0), P(0, top, 0));
@@ -168,13 +196,14 @@ export async function buildWalc(G, poly, opts = {}) {
     if (!nb) { face(W, 0, 0, L, H, 0); continue; }
 
     // framed lights at plane offset o: dark plate, dark tinted glass per pane, cream mullions and transoms standing proud
+    let FRM = FR, gcol = glassCol; // frame bucket and glass tint for the current face
     const lights = (x0, x1, wa, wb, o, pc, pr, md = 0.12) => {
       face(PL, x0, wa, x1, wb, o);
       const gw = (x1 - x0) / pc, gh = (wb - wa) / pr;
-      for (let a = 0; a < pc; a++) for (let b = 0; b < pr; b++) face(GL, x0 + a * gw + 0.05, wa + b * gh + 0.05, x0 + (a + 1) * gw - 0.05, wa + (b + 1) * gh - 0.05, o + 0.03, glassCol());
-      for (let a = 1; a < pc; a++) bar(FR, x0 + a * gw - 0.045, wa, x0 + a * gw + 0.045, wb, o, md);
-      for (let b = 1; b < pr; b++) bar(FR, x0, wa + b * gh - 0.04, x1, wa + b * gh + 0.04, o, md - 0.02);
-      face(FR, x0, wa, x1, wa + 0.07, o + md); face(FR, x0, wb - 0.07, x1, wb, o + md); face(FR, x0, wa, x0 + 0.07, wb, o + md); face(FR, x1 - 0.07, wa, x1, wb, o + md);
+      for (let a = 0; a < pc; a++) for (let b = 0; b < pr; b++) face(GL, x0 + a * gw + 0.05, wa + b * gh + 0.05, x0 + (a + 1) * gw - 0.05, wa + (b + 1) * gh - 0.05, o + 0.03, gcol());
+      for (let a = 1; a < pc; a++) bar(FRM, x0 + a * gw - 0.045, wa, x0 + a * gw + 0.045, wb, o, md);
+      for (let b = 1; b < pr; b++) bar(FRM, x0, wa + b * gh - 0.04, x1, wa + b * gh + 0.04, o, md - 0.02);
+      face(FRM, x0, wa, x1, wa + 0.07, o + md); face(FRM, x0, wb - 0.07, x1, wb, o + md); face(FRM, x0, wa, x0 + 0.07, wb, o + md); face(FRM, x1 - 0.07, wa, x1, wb, o + md);
     };
     // double glass door in steel stiles with push bars and a stone threshold
     const door = (x0, x1, o) => {
@@ -201,26 +230,66 @@ export async function buildWalc(G, poly, opts = {}) {
     };
     const pipeAt = (u) => { face(PP, u - 0.06, 0.3, u + 0.06, H, 0.2); PP.q(P(u - 0.06, 0.3, 0), P(u - 0.06, H, 0), P(u - 0.06, H, 0.2), P(u - 0.06, 0.3, 0.2)); PP.q(P(u + 0.06, 0.3, 0.2), P(u + 0.06, H, 0.2), P(u + 0.06, H, 0), P(u + 0.06, 0.3, 0)); };
 
+    if (sp) { // measured face: wall pieces around the measured openings, belt course, plinth
+      const d = 0.28, bays = [];
+      if (sp.bays) for (const [a, b] of sp.bays) bays.push([U(a), U(b)].sort((x, y) => x - y));
+      else for (let s0 = sp.e0; s0 + sp.w < L - 0.8; s0 += sp.pitch) bays.push([U(s0), U(s0 + sp.w)].sort((x, y) => x - y));
+      bays.sort((x, y) => x[0] - y[0]);
+      FRM = sp.frame === 'dark' ? FD : FR; gcol = glassPav;
+      const [b0, b1] = sp.belt;
+      face(S, 0, b0, L, b1, 0.09); S.q(P(0, b1, 0.09), P(L, b1, 0.09), P(L, b1, 0), P(0, b1, 0)); S.q(P(0, b0, 0), P(L, b0, 0), P(L, b0, 0.09), P(0, b0, 0.09));
+      if (sp.plinth) { face(S, 0, 0, L, sp.plinth, 0.07); S.q(P(0, sp.plinth, 0.07), P(L, sp.plinth, 0.07), P(L, sp.plinth, 0), P(0, sp.plinth, 0)); }
+      let prev = 0;
+      for (const r of sp.rows) {
+        if (sp.photo && prev < sp.photo.y0) { face(W, 0, prev, L, Math.min(sp.photo.y0, r.ya), 0); prev = Math.min(sp.photo.y0, r.ya); } // below the photo (fence-hidden base): generic brick
+        face(Wl, 0, prev, L, r.ya, 0);
+        let cur = 0;
+        for (const [x0, x1] of bays) {
+          face(Wl, cur, r.ya, x0, r.yb, 0); cur = x1;
+          opening(x0, x1, r.ya, r.yb, r.pc, r.pr, false, false);
+          S.q(P(x0 - 0.06, r.yb, 0.06), P(x0 - 0.06, r.yb + 0.2, 0.06), P(x1 + 0.06, r.yb + 0.2, 0.06), P(x1 + 0.06, r.yb, 0.06)); // limestone lintel
+          if (sp.mull) bar(S, (x0 + x1) / 2 - 0.09, r.ya, (x0 + x1) / 2 + 0.09, r.yb, -d, d + 0.03);
+          if (r.tr) bar(S, x0, r.tr - 0.1, x1, r.tr + 0.1, -d, d + 0.03);
+        }
+        face(Wl, cur, r.ya, L, r.yb, 0); prev = r.yb;
+      }
+      face(Wl, 0, prev, L, top, 0);
+      FRM = FR; gcol = glassCol;
+      for (let k = 0; k <= nb; k += k === 0 || k === nb ? 1 : 4) pipeAt(k === 0 ? 0.35 : k === nb ? L - 0.35 : m0 + k * pitch);
+      e.P = P; e.nbk = nb;
+      continue;
+    }
+    let cb = [], pierAll = [], dIdx = 0;
+    if (colon) { // colonnade bays between the measured pier lines
+      const pu = COL.piers.map((q) => (northA ? q : L - q)).sort((x, y) => x - y), pr2 = pu.slice(1).map((q, k) => [pu[k], q]);
+      cb = northA ? [...pr2, [pu[pu.length - 1], L]] : [[0, pu[0]], ...pr2]; dIdx = northA ? cb.length - 1 : 0; pierAll = [...pu, 0.4, L - 0.4];
+      FRM = FD;
+    }
     for (let f = 0; f < nF; f++) {
       const fa = fl[f], fb = fl[f + 1];
       if (colon && f === 0) { // open ground floor: slender limestone piers to the roof, glazed back wall with entrance doors, glass canopies
         const Rd = 2.2, hb = fb - 0.65;
         DK.q(P(0, hb, -Rd), P(L, hb, -Rd), P(L, hb, 0), P(0, hb, 0)); face(S, 0, hb, L, fb, 0.04);
         for (const u of [0, L]) rq(W, P(u, 0, 0), P(u, fb, 0), P(u, fb, -Rd), P(u, 0, -Rd), Rd, fb);
-        for (let k = 0; k <= nb; k++) bar(S, m0 + k * pitch - 0.25, 0, m0 + k * pitch + 0.25, H, -0.5, 0.7);
-        face(W, 0, 0, m0 + 0.3, hb, -Rd); face(W, L - m0 - 0.3, 0, L, hb, -Rd);
-        for (let k = 0; k < nb; k++) {
-          const x0 = m0 + k * pitch + 0.3, x1 = m0 + (k + 1) * pitch - 0.3;
-          lights(x0, x1, 0.1, hb, -Rd, 2, 2); if (k % 2) door(x0, x1, -Rd);
+        for (const q of pierAll) bar(S, q - COL.pw / 2, 0, q + COL.pw / 2, H, -0.5, 0.7);
+        const c0 = cb[0][0] + COL.pw / 2, c1 = cb[cb.length - 1][1] - COL.pw / 2;
+        if (c0 > 0.05) face(W, 0, 0, c0, hb, -Rd); if (L - c1 > 0.05) face(W, c1, 0, L, hb, -Rd);
+        cb.forEach(([a, b], k) => {
+          const x0 = a + COL.pw / 2 + 0.05, x1 = b - COL.pw / 2 - 0.05;
+          lights(x0, x1, 0.1, hb, -Rd, 2, 2); if (k === dIdx) door(x0 + (x1 - x0) / 2 - 1.2, x0 + (x1 - x0) / 2 + 1.2, -Rd);
           GL.q(P(x0, hb - 0.12, 0.2), P(x1, hb - 0.12, 0.2), P(x1, hb - 0.4, 2.3), P(x0, hb - 0.4, 2.3), [0.16, 0.22, 0.26]); // canopy
           bar(ST, x0, hb - 0.5, x1, hb - 0.36, 2.2, 0.08);
-        }
+        });
         continue;
       }
       if (colon) { // upper floors: one curtain wall, a tall pane per bay and floor pair, between the piers
-        if (f === 1) {
-          for (let k = 0; k < nb; k++) lights(m0 + k * pitch + 0.25, m0 + (k + 1) * pitch - 0.25, fl[1] + 0.1, H - 0.1, -0.25, 1, 2, 0.16);
-          face(W, 0, fl[1], m0 - 0.25, H, 0); face(W, L - m0 + 0.25, fl[1], L, H, 0);
+        if (f === 1) { // measured: tall bronze-framed groups, 2 over 3 panes either side of a transom, between the limestone piers
+          for (const [a, b] of cb) {
+            const x0 = a + COL.pw / 2 + 0.05, x1 = b - COL.pw / 2 - 0.05;
+            lights(x0, x1, COL.sill, COL.tr, -0.25, 2, 3, 0.16); lights(x0, x1, COL.tr + 0.25, COL.head, -0.25, 2, 2, 0.16); bar(S, x0, COL.tr, x1, COL.tr + 0.25, -0.25, 0.16);
+          }
+          const c0 = cb[0][0] + COL.pw / 2, c1 = cb[cb.length - 1][1] - COL.pw / 2;
+          if (c0 > 0.05) face(W, 0, fl[1], c0, H, 0); if (L - c1 > 0.05) face(W, c1, fl[1], L, H, 0);
         }
         continue;
       }
@@ -240,7 +309,7 @@ export async function buildWalc(G, poly, opts = {}) {
       }
       face(W, u, fa, L, fb, 0);
     }
-    if (kind === 'glazed') for (let k = 0; k <= nb; k++) pier(m0 + k * pitch, 0.7, H);
+    if (kind === 'glazed' && !sp) for (let k = 0; k <= nb; k++) pier(m0 + k * pitch, 0.7, H);
     for (let k = 0; k <= nb; k += k === 0 || k === nb ? 1 : 4) pipeAt(k === 0 ? 0.35 : k === nb ? L - 0.35 : m0 + k * pitch);
     if (colon) { // deep tiled overhang over the bay, on the piers: eave 16.1 m, rises to meet the flat roof
       const ye = 16.1, oe = 2.8;
@@ -248,6 +317,7 @@ export async function buildWalc(G, poly, opts = {}) {
       face(DK, 0, ye - 0.35, L, ye + 0.04, oe); DK.q(P(0, ye - 0.35, oe), P(L, ye - 0.35, oe), P(L, ye - 0.35, 0), P(0, ye - 0.35, 0));
       for (const u of [0, L]) DK.q(P(u, ye - 0.35, 0), P(u, ye - 0.35, oe), P(u, ye + 0.04, oe), P(u, 16.95, -0.3));
     }
+    FRM = FR;
     e.P = P; e.nbk = nb;
   }
 
@@ -312,6 +382,7 @@ export async function buildWalc(G, poly, opts = {}) {
   root.add(near, far, props);
   const c = { x: 70, z: -2 }, upd = () => { const d = Math.hypot(G.camera.position.x - c.x, G.camera.position.z - c.z) > FAR; near.visible = !d; far.visible = d; };
   if (G.camera) (G.campusTick = G.campusTick || []).push(upd);
+  if (typeof window !== 'undefined') window.__walcSpecs = edgeInfo.filter((e) => e.sp).map((e) => `${e.sp.id}:${e.L.toFixed(1)}:flip${e.sp.from}`);
   root.userData.stats = { tris: Math.round(tris), trisFar: Math.round(trisFar) };
   if (typeof window !== 'undefined') window.__walcTris = root.userData.stats; // for tools/saltline-walk-shots.mjs
   return root;

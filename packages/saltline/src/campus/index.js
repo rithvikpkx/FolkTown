@@ -7,6 +7,7 @@ import { Kn, Z0 } from '../game/common.js';
 import { buildGround, withPaths } from './ground.js';
 import { buildGrass, buildTrees } from './vegetation.js';
 import { buildNav } from '../modes/nav.js';
+import { buildFacades } from './facades.js';
 
 const CHUNK = 64;
 const optional = import.meta.glob('./{ground,vegetation,landmarks}.js', { eager: true });
@@ -80,6 +81,7 @@ function toGeometry(floats) {
 }
 
 export function buildBuildings(G, data, root) {
+  try { return buildFacades(G, data, root); } catch (err) { console.error('[campus] facades failed, plain extrusion', err); }
   const chunks = new Map();
   for (const f of data.footprints) {
     let e;

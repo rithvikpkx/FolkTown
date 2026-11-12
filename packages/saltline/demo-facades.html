@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Saltline facades demo</title>
+<style>html,body{margin:0;background:#222;overflow:hidden;height:100%}#w{display:grid;grid-template-columns:1fr 1fr;height:100%}#w>*{min-width:0;min-height:0}
+#ref{width:100%;height:100%;object-fit:contain;background:#111}#hud{position:fixed;left:8px;top:8px;color:#fff;font:12px monospace;text-shadow:0 0 3px #000}</style></head>
+<body><div id="w"><div id="c"></div><img id="ref"></div><div id="hud"></div>
+<script type="module">
+import * as THREE from 'three';
+import { lv } from './src/game/mats.js';
+import { Z0 } from './src/game/common.js';
+import { loadCampus } from './src/campus/index.js';
+import { buildFacades } from './src/campus/facades.js';
+import zone from '../../data/zones/purdue-mall.json';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+// ?b=walc|honors|math  &a=<deg around the building> &d=<metres from its centre> &h=<eye height, default 1.7> &ref=0 hides the photo
+// honors and math use stand-in footprints (they are outside the Purdue Mall zone); walc is the real OSM footprint.
+const q = new URLSearchParams(location.search), which = q.get('b') || 'walc';
+const ref = { walc: 'walc-news-plant-wilmeth-now2LO.jpg', honors: 'tour-Honors.jpg', math: 'tour-MATH-1.jpg' }[which];
+const rect = (id, x, z, w, l, top) => ({ id, poly: [x, z, x + w, z, x + w, z + l, x, z + l], base: 0, top, minX: x, maxX: x + w, minZ: z, maxZ: z + l });
+const data = loadCampus(zone);
+let fps;
+if (which === 'walc') fps = data.footprints.filter((f) => f.id === 'way/508846031');
+else if (which === 'honors') fps = [rect('demo/honors', 0, 0, 62, 15, 19), rect('demo/honors', 62, 0, 14, 15, 19)];
+else fps = [rect('demo/math', 0, 0, 52, 20, 42)];
+fps = fps.map((f) => ({ ...f, minX: Math.min(...f.poly.filter((_, i) => i % 2 === 0)), maxX: Math.max(...f.poly.filter((_, i) => i % 2 === 0)), minZ: Math.min(...f.poly.filter((_, i) => i % 2)), maxZ: Math.max(...f.poly.filter((_, i) => i % 2)) }));
+const cx = fps.reduce((s, f) => s + (f.minX + f.maxX) / 2, 0) / fps.length, cz = fps.reduce((s, f) => s + (f.minZ + f.maxZ) / 2, 0) / fps.length;
+const box = document.getElementById('c'), W = q.get('ref') === '0' ? innerWidth : innerWidth / 2;
+if (q.get('ref') === '0') document.getElementById('w').style.gridTemplateColumns = '1fr'; else document.getElementById('ref').src = '/campus/facades/ref/' + ref;
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+r.setSize(W, innerHeight); r.setPixelRatio(1);
+r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = 0.6; r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+box.appendChild(r.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x6f8db5); scene.fog = new THREE.Fog(0x9db3c8, 150, 600);
+const sun = new THREE.DirectionalLight(Z0.color, Z0.intensity);
+sun.position.set(cx, 0, cz).addScaledVector(Z0.dir, 120); sun.target.position.set(cx, 0, cz); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 1, far: 300 }); sun.shadow.bias = -1e-4; sun.shadow.normalBias = 0.05;
+scene.add(sun, sun.target, new THREE.HemisphereLight(0x9db8e0, 0x4a4a3a, 2.2));
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.5;
+const mats = await lv({ renderer: r, params: { tex: 512 } });
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800).rotateX(-Math.PI / 2), mats.get('concrete_dirty', { triplanar: true, scale: 4, color: 0x7a9a5a }));
+ground.receiveShadow = true; ground.position.set(cx, -0.02, cz); scene.add(ground);
+const root = new THREE.Group(); scene.add(root);
+const st = buildFacades({ mats }, { footprints: fps }, root);
+const a = (+(q.get('a') || 200)) * Math.PI / 180, d = +(q.get('d') || 60), h = +(q.get('h') || 1.7), ty = +(q.get('ty') || 9);
+const cam = new THREE.PerspectiveCamera(+(q.get('fov') || 50), W / innerHeight, 0.1, 900);
+cam.position.set(cx + Math.cos(a) * d, h, cz + Math.sin(a) * d); cam.lookAt(cx + +(q.get('lx') || 0), ty, cz + +(q.get('lz') || 0));
+st.update(cam.position, q.get('far') ? 0 : 150);
+let tt = 0, n = 0, t0 = performance.now();
+r.setAnimationLoop(() => { r.render(scene, cam); if (++n === 5) { window.__ready = true; } });
+setTimeout(() => { const t1 = performance.now(); let k = 0; for (; performance.now() - t1 < 1000; k++) r.render(scene, cam); window.__fps = k; document.getElementById('hud').textContent = `${which} near tris=${st.tris} far tris=${st.trisFar} max/building=${st.maxBuilding} render-loop=${k}/s ${r.info.render.triangles} drawn`; window.__stats = st; window.__done = true; }, 1500);
+</script></body></html>

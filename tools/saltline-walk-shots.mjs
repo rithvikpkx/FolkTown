@@ -13,6 +13,8 @@ const poses = {
   'walc-w': '20,1.7,-12,50,8,-6',
   'walc-aerial': '-4,48,44,66,6,-14', // high oblique from the south-west above the plaza, like the design render
   'walc-bay': '27,1.7,-10,45,9,-10',
+  'v5-bay': '28,1.7,-10,45,8,-10', // owner shot 18: plaza facing the west glazed bay (no back wall behind the curtain wall)
+  'v5-sw-up': '108,1.7,2,96,11,-8', // owner shot 19 area: the pavilions and the low wing between them, seen from the south-east, looking up at the eaves
 };
 // Street View frames (data/raw/streetview/walc): fov 90, heading h (0 = north, 90 = east). Positions are FITTED to the photos (tools/walc-rectify.py): the manifest lat/lon
 // project ~8 m away from where the frames sit against the OSM footprint (pano 1 manifest (33.3,-2.2), fitted (25.1,5.5); pano 3 manifest (70.2,40.2), fitted ~(66,53)).

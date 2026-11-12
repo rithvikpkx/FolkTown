@@ -74,6 +74,13 @@ function tileTexture() {
   }
   return tex(c);
 }
+function innerTexture() { // dark interior backdrop seen through the glazing: warm ceiling-light glow over a dim wall, one storey (5 m) per tile
+  const c = cv(64, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256);
+  gr.addColorStop(0, '#ffcf8a'); gr.addColorStop(0.12, '#6a4a2c'); gr.addColorStop(0.5, '#2a211b'); gr.addColorStop(1, '#17120f');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 256); // v=1 is the top of the tile, so the glow sits at the ceiling
+  g.scale(1, -1); g.translate(0, -256); g.fillStyle = gr; g.fillRect(0, 0, 64, 256);
+  return tex(c);
+}
 function farTexture() { // one bay x one storey of brick wall with a window, for the distant box
   const w = 90, h = 140, c = cv(w, h), g = c.getContext('2d');
   g.fillStyle = '#84675c'; g.fillRect(0, 0, w, h);
@@ -101,7 +108,7 @@ function materials(m) {
   const far = std({ map: farTexture(), roughness: 0.9 });
   return {
     brick, stone, far, photos,
-    roof: std({ map: tileTexture(), roughness: 0.75 }),
+    roof: std({ map: tileTexture(), roughness: 0.75, name: 'tile' }),
     flat: std({ color: 0xc8c5bc, roughness: 0.9 }),
     steel: std({ color: 0x8d9094, roughness: 0.4, metalness: 0.7 }),
     dark: std({ color: 0x1b1a1a, roughness: 0.7 }),
@@ -109,6 +116,7 @@ function materials(m) {
     plate: std({ color: 0x1d2024, roughness: 0.6, metalness: 0.4 }),
     pipe: std({ color: 0x3b2f28, roughness: 0.6, metalness: 0.4 }),
     mech: std({ color: 0x9a9c9e, roughness: 0.6, metalness: 0.5 }),
+    inner: std({ map: innerTexture(), emissive: 0xffa860, emissiveMap: innerTexture(), emissiveIntensity: 0.5, roughness: 1 }),
     glass: std({ vertexColors: true, color: 0xffffff, roughness: 0.04, metalness: 0.45, envMapIntensity: 0.9 }),
   };
 }
@@ -131,14 +139,14 @@ export async function buildWalc(G, poly, opts = {}) {
   };
   const W = bk('brick', M.brick, false, 1 / 14, 1 / 1.05), S = bk('stone', M.stone, false, 0.8, 0.8), RF = bk('roof', M.roof), DK = bk('dark', M.dark),
     FR = bk('frame', M.frame), FD = bk('dframe', M.dframe), PL = bk('plate', M.plate), PP = bk('pipe', M.pipe), GL = bk('glass', M.glass, true), FW = bk('far', M.far),
-    FL = bk('flat', M.flat), ST = bk('steel', M.steel), MG = bk('mglass', M.glass, true), MF = bk('mfr', M.frame);
+    FL = bk('flat', M.flat), ST = bk('steel', M.steel), MG = bk('mglass', M.glass, true), MF = bk('mfr', M.frame), IN = bk('inner', M.inner);
   const ROOT = new Set(['roof', 'flat', 'dark', 'mglass', 'mfr']); // always visible (roofs, rooftop monitor)
   const R = refine(poly), n = R.length, root = new Group(), near = new Group(), far = new Group();
   const glassCol = () => { const v = 0.55 + rnd() * 0.5; return [0.12 * v, 0.2 * v, 0.25 * v]; }; // measured: pavilion glass reads light grey-blue (sky), colonnade glass dark bronze-grey
   const glassPav = () => { const v = 0.7 + rnd() * 0.5; return [0.2 * v, 0.27 * v, 0.31 * v]; };
   const box = (B, x0, y0, z0, x1, y1, z1) => { // axis-aligned box, sides and top
     B.q([x0, y0, z0], [x0, y1, z0], [x1, y1, z0], [x1, y0, z0]); B.q([x1, y0, z1], [x1, y1, z1], [x0, y1, z1], [x0, y0, z1]);
-    B.q([x0, y0, z1], [x0, y1, z1], [x0, y1, z0], [x0, y0, z0]); B.q([x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]); B.q([x0, y1, z0], [x0, y1, z1], [x1, y1, z1], [x1, y1, z0]);
+    B.q([x0, y0, z1], [x0, y1, z1], [x0, y1, z0], [x0, y0, z0]); B.q([x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]); B.q([x0, y1, z0], [x0, y1, z1], [x1, y1, z1], [x1, y1, z0]); B.q([x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]); // top and bottom
   };
   const rect = (B, x0, z0, x1, z1, y) => B.q([x0, y, z0], [x0, y, z1], [x1, y, z1], [x1, y, z0]);
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
@@ -177,6 +185,8 @@ export async function buildWalc(G, poly, opts = {}) {
     // far LOD: textured box
     FW.q(P(0, 0, 0), P(0, top, 0), P(L, top, 0), P(L, 0, 0), null, [[0, 0], [0, top / 5.5], [L / BAY, top / 5.5], [L / BAY, 0]]);
 
+    const dep = kind === 'colonnade' ? -2.6 : -0.6; // interior backdrop behind every opening, glazing and gap; closes see-through slits at piers and storey bands
+    IN.q(P(0, 0, dep), P(0, top, dep), P(L, top, dep), P(L, 0, dep), null, [[0, 0], [0, top / 5], [L / 6, top / 5], [L / 6, 0]]);
     const H = top - 0.6, lowish = base || e.top < 9, nF = lowish ? 2 : Math.max(1, Math.round(H / 5.5)), g0 = nF > 1 ? (lowish ? H / 2 : 5.0) : H, fl = [0];
     for (let f = 1; f <= nF; f++) fl.push(f === nF ? H : g0 + ((H - g0) * (f - 1)) / (nF - 1));
     const nb = L < 5 ? 0 : Math.max(1, Math.round((L - 2.2) / BAY)), m0 = 1.1, pitch = nb ? (L - 2 * m0) / nb : 0;
@@ -284,6 +294,7 @@ export async function buildWalc(G, poly, opts = {}) {
       }
       if (colon) { // upper floors: one curtain wall, a tall pane per bay and floor pair, between the piers
         if (f === 1) { // measured: tall bronze-framed groups, 2 over 3 panes either side of a transom, between the limestone piers
+          face(W, 0, fl[1], L, COL.sill, 0); // brick spandrel over the arcade between the ground-floor fascia and the first-floor glazing
           for (const [a, b] of cb) {
             const x0 = a + COL.pw / 2 + 0.05, x1 = b - COL.pw / 2 - 0.05;
             lights(x0, x1, COL.sill, COL.tr, -0.25, 2, 3, 0.16); lights(x0, x1, COL.tr + 0.25, COL.head, -0.25, 2, 2, 0.16); bar(S, x0, COL.tr, x1, COL.tr + 0.25, -0.25, 0.16);
@@ -316,6 +327,7 @@ export async function buildWalc(G, poly, opts = {}) {
       rfq(P(0, ye, oe), P(L, ye, oe), P(L, 16.95, -0.3), P(0, 16.95, -0.3));
       face(DK, 0, ye - 0.35, L, ye + 0.04, oe); DK.q(P(0, ye - 0.35, oe), P(L, ye - 0.35, oe), P(L, ye - 0.35, 0), P(0, ye - 0.35, 0));
       for (const u of [0, L]) DK.q(P(u, ye - 0.35, 0), P(u, ye - 0.35, oe), P(u, ye + 0.04, oe), P(u, 16.95, -0.3));
+      face(DK, 0, 16.2, L, 16.95, -0.3); // close the back of the overhang against the flat roof
     }
     FRM = FR;
     e.P = P; e.nbk = nb;
@@ -323,9 +335,10 @@ export async function buildWalc(G, poly, opts = {}) {
 
   // ---------- roofs: clay-tile hips from the LiDAR ridge lines, flat membrane over the middle block, glazed rooftop monitor ----------
   const strip = (B, A, yA, C, yC) => { for (let i = 0; i < A.length; i++) { const j = (i + 1) % A.length; B.q([A[i][0], yA, A[i][1]], [C[i][0], yC, C[i][1]], [C[j][0], yC, C[j][1]], [A[j][0], yA, A[j][1]]); } };
-  for (const [x0, z0, x1, z1] of [[45.2, -33, XL, 5.7], [43.95, -33, 45.2, -26.5], [XL, -33, 99.9, -26]]) rect(FL, x0, z0, x1, z1, 16.25);
-  for (const [x0, z0, x1, z1] of [[XL, -21.5, 95.9, 1.3], [XL, -26, 99.8, -21.5], [XL, 1.3, 100.1, 5.7]]) rect(FL, x0, z0, x1, z1, LOW + 0.1); // low east wing roof
-  cap(FL, ring([46.19, 28.3, 49.91, 32.75, 60.03, 32.2, 63.43, 28.3]), 16.25);
+  for (const [x0, z0, x1, z1] of [[45.2, -33, XL, 5.7], [43.95, -33, 45.2, -26.5], [XL, -33, 99.9, -26]]) rect(FL, x0, z0, x1, z1, 16.2); // = wall top, so no slit under the coping
+  for (const [x0, z0, x1, z1] of [[XL, -21.5, 95.9, 1.3], [XL, -26, 99.8, -21.5], [XL, 1.3, 100.1, 5.7]]) rect(FL, x0, z0, x1, z1, LOW); // low east wing roof, flush with the wall tops
+  cap(FL, ring([46.19, 28.3, 49.91, 32.75, 60.03, 32.2, 63.43, 28.3]), 16.2);
+  cap(DK, R, 0.03); // ground floor, so nothing below the walls is open
   const yt = 17.2, tip = yt - SLOPE * EAVE, soff = yt - 0.9;
   for (const h of HIPS) {
     const hd = (h.z1 - h.z0) / 2, zc = (h.z0 + h.z1) / 2, ry = yt + SLOPE * hd, X0 = h.x0 - EAVE, X1 = h.x1 + EAVE, Z0 = h.z0 - EAVE, Z1 = h.z1 + EAVE;
@@ -333,7 +346,7 @@ export async function buildWalc(G, poly, opts = {}) {
     rfq(tipP(X0, Z0), tipP(X1, Z0), r1, r0); rfq(tipP(X1, Z1), tipP(X0, Z1), r0, r1);
     for (const [a, b, c] of [[tipP(X0, Z1), tipP(X0, Z0), r0], [tipP(X1, Z0), tipP(X1, Z1), r1]]) { const w = dist(a, b), hh = Math.hypot(c[0] - a[0], c[2] - (a[2] + b[2]) / 2, c[1] - a[1]); RF.t(a, b, c, [[0, 0], [w, 0], [w / 2, hh]]); }
     const wallR = [[h.x0, h.z0], [h.x1, h.z0], [h.x1, h.z1], [h.x0, h.z1]], outR = [[X0, Z0], [X1, Z0], [X1, Z1], [X0, Z1]];
-    strip(DK, wallR, soff, outR, soff); strip(DK, outR, soff, outR, tip + 0.06); // soffit + fascia
+    strip(DK, [[h.x0 + 1.3, h.z0 + 1.3], [h.x1 - 1.3, h.z0 + 1.3], [h.x1 - 1.3, h.z1 - 1.3], [h.x0 + 1.3, h.z1 - 1.3]], soff, outR, soff); strip(DK, outR, 16.2, outR, tip + 0.06); // soffit (runs 1.3 m in under the wall: the OSM walls slant up to 1.2 m inside the LiDAR hip outline) + fascia (down to the flat roof, so no slit where the eave overhangs it)
     for (let s = 0; s < 4; s++) { // exposed rafter tails under the soffit, every 1.2 m
       const a = outR[s], b = outR[(s + 1) % 4], w = wallR[s], L = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L, vx = (w[0] - a[0]) / EAVE, vz = (w[1] - a[1]) / EAVE;
       for (let u = 1.6; u < L - 1.4; u += 1.2) {
@@ -345,8 +358,22 @@ export async function buildWalc(G, poly, opts = {}) {
     }
     box(DK, h.x0 + hd, ry, zc - 0.12, h.x1 - hd, ry + 0.22, zc + 0.12); // ridge cap
   }
+  // walls that slant away from the LiDAR hip outline end below the tile plane (up to 0.5 m on the south pavilion's west face): raise brick up to the tile
+  const tileY = (x, z) => { let y = 0; for (const h of HIPS) { const d = Math.min(x - h.x0, h.x1 - x, z - h.z0, h.z1 - z); if (d > -1.5) y = Math.max(y, yt + SLOPE * d); } return y; };
+  for (const e of edgeInfo) {
+    if (!e.hip || e.L < 1) continue;
+    const pt = (k) => { const t = k / 8; return [e.a[0] + e.dx * t, e.a[1] + e.dz * t]; };
+    for (let k = 0; k < 8; k++) {
+      const [x0, z0] = pt(k), [x1, z1] = pt(k + 1), y0 = tileY(x0, z0), y1 = tileY(x1, z1);
+      if (y0 > e.top + 0.01 || y1 > e.top + 0.01) W.q([x0, e.top, z0], [x0, Math.max(y0, e.top) + 0.04, z0], [x1, Math.max(y1, e.top) + 0.04, z1], [x1, e.top, z1], null, [[0, 0], [0, 0.5], [e.L / 8, 0.5], [e.L / 8, 0]].map(([u, v]) => [u * W.sx, v * W.sy]));
+    }
+  }
+  // south pavilion north gable face, above the low east wing roof (x XL..100.8, z 5.7): brick from the wing roof to the eave line
+  W.q([XL, LOW, 5.7], [XL, 17.2, 5.7], [100.8, 17.2, 5.7], [100.8, LOW, 5.7], null, [[0, 0], [0, 9.6 * W.sy], [10.3 * W.sx, 9.6 * W.sy], [10.3 * W.sx, 0]]);
+  // south face of the 16.2 m block over the low east wing (z -26, x XL..99.8), from the wing roof to the cornice
+  W.q([XL, LOW, -26], [XL, 16.2, -26], [99.8, 16.2, -26], [99.8, LOW, -26], null, [[0, 0], [0, 8.6 * W.sy], [9.3 * W.sx, 8.6 * W.sy], [9.3 * W.sx, 0]]);
   // glazed rooftop monitor on the flat roof (LiDAR plant box x 64..75, z -24..4, +3.3 m): cream frame, dark glass, white overhanging roof slab
-  { const x0 = 64, x1 = 75, z0 = -23.5, z1 = 3.5, y0 = 16.25, yb = y0 + 0.55, yt2 = y0 + 2.85;
+  { const x0 = 64, x1 = 75, z0 = -23.5, z1 = 3.5, y0 = 16.2, yb = y0 + 0.55, yt2 = y0 + 2.85;
     for (const [ax, az, bx, bz] of [[x0, z0, x1, z0], [x1, z0, x1, z1], [x1, z1, x0, z1], [x0, z1, x0, z0]]) {
       const L = Math.hypot(bx - ax, bz - az), m = Math.max(1, Math.round(L / 1.7)), ux = (bx - ax) / L, uz = (bz - az) / L;
       MG.q([ax, yb, az], [ax, yt2, az], [bx, yt2, bz], [bx, yb, bz], glassCol());
@@ -363,7 +390,7 @@ export async function buildWalc(G, poly, opts = {}) {
   }
   // rooftop plant (LiDAR: ~3 m above the flat roof)
   const mech = (x0, x1, z0, z1, y0, y1) => { const m = new Mesh(new BoxGeometry(x1 - x0, y1 - y0, z1 - z0), M.mech); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; root.add(m); tris += 12; };
-  mech(52, 58, -30, 5, 16.25, 19.4);
+  mech(52, 58, -30, 5, 16.2, 19.4);
 
   // ---------- site details: entrance canopy, lamp posts, limestone seat walls ----------
   const props = new Group(), lampMat = new MeshStandardMaterial({ color: 0xfff1d0, emissive: 0xffe2a8, emissiveIntensity: 0.6 });
@@ -379,10 +406,13 @@ export async function buildWalc(G, poly, opts = {}) {
     const yaw = -Math.atan2(colonE.dz, colonE.dx), seat = new BoxGeometry(3.6, 0.5, 0.55);
     for (const u of [4, 12, 22]) { const [x, z] = place(colonE, u, 4.2); add(seat, M.stone, x, 0.25, z, yaw); }
   }
+  near.name = 'near'; far.name = 'far'; props.name = 'props';
   root.add(near, far, props);
   const c = { x: 70, z: -2 }, upd = () => { const d = Math.hypot(G.camera.position.x - c.x, G.camera.position.z - c.z) > FAR; near.visible = !d; far.visible = d; };
   if (G.camera) (G.campusTick = G.campusTick || []).push(upd);
   if (typeof window !== 'undefined') window.__walcSpecs = edgeInfo.filter((e) => e.sp).map((e) => `${e.sp.id}:${e.L.toFixed(1)}:flip${e.sp.from}`);
+  if (typeof window !== 'undefined') window.__walcEdges = edgeInfo.map((e) => [e.a.map((v) => +v.toFixed(1)), e.b.map((v) => +v.toFixed(1)), e.kind, e.top]);
+  if (typeof window !== 'undefined') window.__walcRoot = root; // tools/walc-holes.mjs raycasts this
   root.userData.stats = { tris: Math.round(tris), trisFar: Math.round(trisFar) };
   if (typeof window !== 'undefined') window.__walcTris = root.userData.stats; // for tools/saltline-walk-shots.mjs
   return root;

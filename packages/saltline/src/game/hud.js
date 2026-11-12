@@ -41,7 +41,7 @@ __late_weapon.rb(rb);
     let c = si(
         "div",
         "h-obj",
-        '<div class="h-k">Objective</div><div class="h-obj-t"></div><div class="h-relays"><span>Relays</span><i></i><i></i><i></i><b>0/3</b></div>',
+        '<div class="h-k">Objective</div><div class="h-obj-t"></div><div class="h-relays"><span>Beacons</span><i></i><i></i><i></i><b>0/3</b></div>',
       ),
       u = c.querySelector(".h-obj-t"),
       f = c.querySelector(".h-relays"),
@@ -94,7 +94,7 @@ __late_weapon.rb(rb);
       H = L.querySelector(".h-alt"),
       N = si("div", "h-marks");
     (t.append(N, i, c, m, b, x, y, E, w, S, R, L), e.appendChild(t));
-    let Z = si("div", "comms", '<span class="comms-who">Control</span><span class="comms-t"></span>');
+    let Z = si("div", "comms", '<span class="comms-who">Dispatch</span><span class="comms-t"></span>');
     (Z.setAttribute("role", "status"), Z.setAttribute("aria-live", "polite"));
     let Q = Z.querySelector(".comms-t");
     e.appendChild(Z);
@@ -335,7 +335,7 @@ __late_weapon.rb(rb);
       if ((Ge !== oe.crossOn && ((oe.crossOn = Ge), x.classList.toggle("off", !Ge)), Ge)) {
         let $e = typeof ne.spread == "number" ? ne.spread : 0.012,
           Ke = (ye.fov * Math.PI) / 360,
-          Bt = (Math.tan($e) / Math.tan(Ke)) * (te / 2) + 4 + (V.sprinting ? 10 : 0);
+          Bt = (Math.tan($e) / Math.tan(Ke)) * (te / 2) * (1 - 0.5 * Te) + 4 - 2 * Te + (V.sprinting ? 10 : 0);
         ((Bt = Math.round(Math.max(4, Math.min(70, Bt)) * 2) / 2),
           Bt !== oe.gap &&
             ((oe.gap = Bt),
@@ -474,23 +474,23 @@ __late_weapon.rb(rb);
     } catch {}
     return (document.open(), document.write(s), document.close(), !0);
   }
-  export var lT = "saltline.settings.v1",
-    tL = { quality: "auto", sens: 1, invertY: !1, volume: 0.8, fov: zi.fov, difficulty: "hard", mode: "ffa", bots: 8, view: 1 },
+  export var lT = "folktown.settings.v1",
+    tL = { quality: "auto", sens: 1, invertY: !1, volume: 0.8, fov: zi.fov, difficulty: "hard", mode: "ffa", bots: 8, view: 1, xhSize: 6, xhOpacity: 0.9 },
     cT = [
       [1, "Close"],
       [2, "Three-quarter"],
       [3, "Compact"],
     ],
     uT = [
-      ["ffa", "Free-for-all"],
-      ["tdm", "Team deathmatch"],
-      ["holdout", "Holdout"],
+      ["ffa", "Mall Brawl"],
+      ["tdm", "Gold vs Black"],
+      ["holdout", "Last Stand"],
     ],
     botOpts = [4, 8, 16, 31],
     nL = {
-      ffa: "Everyone for themselves on the Mall. First to 30 kills or the most when ten minutes run out.",
-      tdm: "Old Gold against Black. First team to 50 kills, or the lead at ten minutes. Hold Tab for the scoreboard.",
-      holdout: "Endless waves that keep growing. Resupply between waves. How long can you hold?",
+      ffa: "Mall Brawl: everyone for themselves on the Mall. First to 30 kills or the most when ten minutes run out.",
+      tdm: "Gold vs Black: first team to 50 kills, or the lead at ten minutes. Hold Tab for the scoreboard.",
+      holdout: "Last Stand: endless waves that keep growing. Resupply between waves. How long can you hold?",
     },
     ab = [
       ["standard", "Standard"],
@@ -508,6 +508,8 @@ __late_weapon.ab(ab);
         ((e.quality === "auto" || fT.includes(e.quality)) && (n.quality = e.quality),
         Number.isFinite(e.sens) && (n.sens = Math.min(3, Math.max(0.2, e.sens))),
         (n.invertY = !!e.invertY),
+        Number.isFinite(e.xhSize) && (n.xhSize = Math.min(14, Math.max(2, e.xhSize))),
+        Number.isFinite(e.xhOpacity) && (n.xhOpacity = Math.min(1, Math.max(0.2, e.xhOpacity))),
         Number.isFinite(e.volume) && (n.volume = Math.min(1, Math.max(0, e.volume))),
         Number.isFinite(e.fov) && (n.fov = Math.min(95, Math.max(60, e.fov))),
         ab.some((t) => t[0] === e.difficulty) && (n.difficulty = e.difficulty),
@@ -569,13 +571,13 @@ __late_enemies.sL(sL);
     <div class="m-veil"></div>
     <div class="m-bars"><i></i><i></i></div>
 
-    <section class="m-screen m-title" data-s="title" aria-label="Saltline">
+    <section class="m-screen m-title" data-s="title" aria-label="FolkTown">
       <div class="m-title-main">
-        <div class="m-eyebrow"><span class="m-tag">B4</span><span>Port Authority Breach Unit</span><span class="m-dim">Saltline Terminal \xB7 05:42</span></div>
-        <h1 class="m-word">SALTLINE</h1>
-        <p class="m-premise">Purdue Mall, loaded with hostile machines. Pick a mode, pick your bots, last gun standing.</p>
+        <div class="m-eyebrow"><span class="m-tag">WL</span><span>Purdue campus shooter</span><span class="m-dim">West Lafayette \xB7 16:42</span></div>
+        <h1 class="m-word">FOLKTOWN</h1>
+        <p class="m-premise">The West Lafayette campus, black and old gold, and nobody friendly. Pick a mode, pick your bots, last one standing.</p>
         <div class="m-actions">
-          <button class="btn primary" data-act="deploy">Deploy</button>
+          <button class="btn primary" data-act="deploy">Play</button>
           <button class="btn" data-act="settings">Settings</button>
           <button class="btn m-only-narrow" data-act="controls">Controls</button>
         </div>
@@ -585,55 +587,55 @@ __late_enemies.sL(sL);
           <label id="l-tb">Bots</label><div class="seg" role="group" aria-labelledby="l-tb">${botOpts.map((W) => `<button data-b="${W}" aria-pressed="false">${W}</button>`).join("")}</div>
           <div class="m-pick-note" data-f="modenote"></div>
         </div>
-        <p class="m-note">Every surface, machine and sound is generated in your browser. Nothing is downloaded.</p>
+        <p class="m-note">Early build. The Mall is a stand-in until the real campus map lands.</p>
       </div>
       <aside class="m-legend" aria-label="Controls at a glance">
         <div><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span><span><kbd>Mouse</kbd> Look</span><span><kbd>LMB</kbd> Fire</span><span><kbd>RMB</kbd> Aim</span><span><kbd>R</kbd> Reload</span></div>
         <div><span><kbd>Q</kbd> Sidearm</span><span><kbd>Tab</kbd> Scores</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>C</kbd> Crouch</span><span><kbd>Esc</kbd> Pause</span></div>
-        <div class="lg-pad"><em>Controller</em><span>Sticks move and look</span><span><kbd>RT</kbd> Fire</span><span><kbd>LT</kbd> Aim</span><span><kbd>X</kbd> Reload / cut</span><span><kbd>Y</kbd> Sidearm</span><span><kbd>A</kbd> Deploy</span></div>
+        <div class="lg-pad"><em>Controller</em><span>Sticks move and look</span><span><kbd>RT</kbd> Fire</span><span><kbd>LT</kbd> Aim</span><span><kbd>X</kbd> Reload / use</span><span><kbd>Y</kbd> Sidearm</span><span><kbd>A</kbd> Play</span></div>
         <div class="lg-touch"><em>Touch</em><span>Left thumb moves</span><span>Right thumb looks</span><span>Fire \xB7 Aim \xB7 Reload \xB7 Jump on screen</span></div>
       </aside>
-      <aside class="m-callout" aria-label="A note from Felix" hidden>
-        <button class="m-callout-tab" data-act="note" aria-expanded="false">A note from Felix</button>
+      <aside class="m-callout" aria-label="About this build" hidden>
+        <button class="m-callout-tab" data-act="note" aria-expanded="false">About this build</button>
         <div class="m-callout-body">
           <button class="m-callout-x" data-act="note" aria-label="Dismiss this note">&times;</button>
-          <p>Hi, Felix here. People online were impressed with the one-shotted version of this game - Claude Fable 5.2 built something pretty good without any human feedback. However, I really wanted to fix the weapon models, sounds, and some gameplay work. I spent an additional two hours to improve this game.</p>
-          <p>If you'd rather see the first version that didn't receive any human feedback, click here:</p>
+          <p>FolkTown is an early build of a Purdue-campus shooter.</p>
+          
           <a class="btn small" href="https://claude.ai/artifact/2UXyB49DrVHFfhTMdNDFTA" style="display:flex;align-items:center;justify-content:center;text-align:center;padding-left:18px;padding-right:18px;text-decoration:none">See the one-shotted version</a>
         </div>
       </aside>
     </section>
 
     <section class="m-screen m-card" data-s="paused" aria-label="Paused">
-      <div class="m-k">Operation on hold</div>
+      <div class="m-k">Timeout</div>
       <h2 class="m-h">Paused</h2>
       <p class="m-line" data-f="lookmode"></p>
       <div class="m-actions col">
         <button class="btn primary" data-act="resume">Resume</button>
         <button class="btn" data-act="settings">Settings</button>
         <button class="btn" data-act="controls">Controls</button>
-        <button class="btn" data-act="restart">Restart mission</button>
+        <button class="btn" data-act="restart">Restart match</button>
       </div>
     </section>
 
-    <section class="m-screen m-card m-dead" data-s="dead" aria-label="Signal lost">
-      <div class="m-k">Breacher down</div>
-      <h2 class="m-h">Signal lost</h2>
-      <dl class="m-stats"><div><dt>Time survived</dt><dd data-f="dead-time">00:00</dd></div><div data-only="mission"><dt>Relays cut</dt><dd data-f="dead-relays">0/3</dd></div><div data-only="holdout"><dt>Waves cleared</dt><dd data-f="dead-wave">0</dd></div><div data-only="holdout"><dt>Machines destroyed</dt><dd data-f="dead-kills">0</dd></div><div data-only="holdout"><dt>Score</dt><dd data-f="dead-score">0</dd></div><div data-only="holdout"><dt>Best</dt><dd data-f="dead-best">0</dd></div></dl>
+    <section class="m-screen m-card m-dead" data-s="dead" aria-label="Eliminated">
+      <div class="m-k">Down</div>
+      <h2 class="m-h">Eliminated</h2>
+      <dl class="m-stats"><div><dt>Time survived</dt><dd data-f="dead-time">00:00</dd></div><div data-only="mission"><dt>Beacons cut</dt><dd data-f="dead-relays">0/3</dd></div><div data-only="holdout"><dt>Waves cleared</dt><dd data-f="dead-wave">0</dd></div><div data-only="holdout"><dt>Bots eliminated</dt><dd data-f="dead-kills">0</dd></div><div data-only="holdout"><dt>Score</dt><dd data-f="dead-score">0</dd></div><div data-only="holdout"><dt>Best</dt><dd data-f="dead-best">0</dd></div></dl>
       <div class="m-actions col"><button class="btn primary" data-act="retry">Retry</button></div>
     </section>
 
-    <section class="m-screen m-card m-debrief" data-s="complete" aria-label="Debrief">
-      <div class="m-k">Berth 4 \xB7 Debrief</div>
-      <h2 class="m-h">Saltline is dark</h2>
+    <section class="m-screen m-card m-debrief" data-s="complete" aria-label="Match summary">
+      <div class="m-k">Match summary</div>
+      <h2 class="m-h">Campus secured</h2>
       <div class="m-rating"><span>Rating</span><b data-f="rating">Clean</b></div>
       <dl class="m-stats">
         <div><dt>Time</dt><dd data-f="time">00:00</dd></div>
         <div><dt>Accuracy</dt><dd data-f="acc">0%</dd></div>
-        <div><dt>Machines destroyed</dt><dd data-f="kills">0</dd></div>
+        <div><dt>Bots eliminated</dt><dd data-f="kills">0</dd></div>
         <div><dt>Retries</dt><dd data-f="retries">0</dd></div>
       </dl>
-      <div class="m-actions col"><button class="btn primary" data-act="redeploy">Redeploy</button></div>
+      <div class="m-actions col"><button class="btn primary" data-act="redeploy">Play again</button></div>
     </section>
 
     <div class="panel" role="dialog" aria-modal="true" aria-label="Settings and controls" tabindex="-1" hidden>
@@ -653,6 +655,8 @@ __late_enemies.sL(sL);
           <div class="seg" role="group" aria-labelledby="l-q">${fT.map((W) => `<button data-q="${W}" aria-pressed="false">${W}</button>`).join("")}</div></div>
         <div class="row"><label for="s-sens">Mouse sensitivity</label><div class="slider"><input id="s-sens" type="range" min="0.2" max="3" step="0.05"><output data-o="sens"></output></div></div>
         <div class="row"><label id="l-inv">Invert Y</label><button class="toggle" data-act="invert" aria-labelledby="l-inv" aria-pressed="false"><i></i><span>Off</span></button></div>
+        <div class="row"><label for="s-xs">Crosshair size</label><div class="slider"><input id="s-xs" type="range" min="2" max="14" step="1"><output data-o="xs"></output></div></div>
+        <div class="row"><label for="s-xo">Crosshair opacity</label><div class="slider"><input id="s-xo" type="range" min="20" max="100" step="5"><output data-o="xo"></output></div></div>
         <div class="row"><label for="s-vol">Master volume</label><div class="slider"><input id="s-vol" type="range" min="0" max="100" step="1"><output data-o="vol"></output></div></div>
         <div class="row"><label for="s-fov">Field of view</label><div class="slider"><input id="s-fov" type="range" min="60" max="95" step="1"><output data-o="fov"></output></div></div>
         <div class="row" data-row="fs"><label id="l-fs">Display</label><button class="btn small" data-act="fullscreen" aria-labelledby="l-fs fs-t"><span id="fs-t">Enter fullscreen</span></button></div>
@@ -667,7 +671,7 @@ __late_enemies.sL(sL);
       </div>
     </div>
 
-    <div class="loc-card" aria-hidden="true"><i></i><b>Saltline Terminal \xB7 Berth 4 \xB7 05:42</b><span>Port Authority Breach Unit \u2014 one breacher, no backup</span></div>
+    <div class="loc-card" aria-hidden="true"><i></i><b>West Lafayette \xB7 The Mall \xB7 16:42</b><span>FolkTown \u2014 black and old gold hour</span></div>
   `),
       t.appendChild(s));
     let o = (W) => s.querySelector(W),
@@ -678,6 +682,8 @@ __late_enemies.sL(sL);
       u = o("#s-sens"),
       f = o("#s-vol"),
       h = o("#s-fov"),
+      xs = o("#s-xs"),
+      xo = o("#s-xo"),
       p = "none",
       d = null;
     function m(W) {
@@ -722,6 +728,12 @@ __late_enemies.sL(sL);
         (u.value = i.sens),
         (f.value = Math.round(i.volume * 100)),
         (h.value = i.fov),
+        (xs.value = i.xhSize),
+        (xo.value = Math.round(i.xhOpacity * 100)),
+        document.documentElement.style.setProperty("--xh-len", i.xhSize + "px"),
+        document.documentElement.style.setProperty("--xh-op", i.xhOpacity),
+        (o('[data-o="xs"]').textContent = i.xhSize + "px"),
+        (o('[data-o="xo"]').textContent = Math.round(i.xhOpacity * 100) + "%"),
         (o('[data-o="sens"]').textContent = i.sens.toFixed(2) + "\xD7"),
         (o('[data-o="vol"]').textContent = Math.round(i.volume * 100) + "%"),
         (o('[data-o="fov"]').textContent = Math.round(i.fov) + "\xB0"));
@@ -732,9 +744,15 @@ __late_enemies.sL(sL);
           i.quality === "auto"
             ? `Quality was picked for this device (${W || "default"}). Lower it if the frame rate struggles.`
             : "Quality changes apply at once; shadows and reflections may take a moment to rebuild."),
-        (c("qnote").textContent += " Difficulty applies to machines that arrive from now on."));
+        (c("qnote").textContent += " Difficulty applies to bots that arrive from now on."));
     }
-    (u.addEventListener("input", () => {
+    (xs.addEventListener("input", () => {
+      ((i.xhSize = +xs.value), x(), cc(i));
+    }),
+      xo.addEventListener("input", () => {
+        ((i.xhOpacity = +xo.value / 100), x(), cc(i));
+      }),
+      u.addEventListener("input", () => {
       ((i.sens = +u.value), m("sens"), x(), cc(i));
     }),
       f.addEventListener("input", () => {
@@ -1049,14 +1067,14 @@ __late_enemies.sL(sL);
       heal: 35,
       killScore: { gull: 100, hound: 250 },
       waveBonus: 500,
-      bestKey: "saltline.holdout.best",
+      bestKey: "folktown.holdout.best",
     },
     dT = ["NORTH", "NORTH-EAST", "EAST", "SOUTH-EAST", "SOUTH", "SOUTH-WEST", "WEST", "NORTH-WEST"],
     Vu = {
-      intro: "Breacher, this is Control. The Harbormaster holds the berth. Cut its three uplinks \u2014 yard, shed, quay.",
-      contact: "It has seen you. Gulls fly, Hounds walk. Put them down.",
-      cut: ["One relay dark. It felt that \u2014 machines inbound.", "Two dark. It is throwing everything it has left at you."],
-      all: "All three dark. The boat is holding at the quay ladder, south end. Run.",
+      intro: "Dispatch to you. The Overseer is running the Mall. Cut its three beacons \u2014 north, centre, south.",
+      contact: "It has seen you. Drones fly, walkers walk. Put them down.",
+      cut: ["One beacon dark. It felt that \u2014 bots inbound.", "Two dark. It is throwing everything it has left at you."],
+      all: "All three beacons dark. The shuttle is holding at the south end. Run.",
       low: "You are hit hard. Get behind steel and breathe.",
-      done: "Breacher is aboard. Saltline is dark. Good work.",
+      done: "You are aboard. The Mall is quiet. Good work.",
     };

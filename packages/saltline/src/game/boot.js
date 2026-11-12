@@ -30,7 +30,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
     ((window.__fatal = String(n)), console.error("[fatal] " + n));
     let e = document.getElementById("fatal");
     (e || ((e = document.createElement("div")), (e.id = "fatal"), document.getElementById("app").appendChild(e)),
-      (e.textContent = "Saltline could not start: " + n));
+      (e.textContent = "FolkTown could not start: " + n));
   }
   window.addEventListener("error", (n) => {
     window.__errors.push(String(n.message));
@@ -97,7 +97,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
       (t.scene = t.render.scene),
       (t.camera = t.render.camera),
       (t.viewCamera = t.render.viewCamera),
-      await fa("Mixing paint, rust and rain", 0.12),
+      await fa("Mixing brick and limestone", 0.12),
       await r("mats", "materials", () => lv(t)),
       (t.physics = v_(t)),
       (t.props = fv(t)),
@@ -147,11 +147,11 @@ __late_audio.vT(vT); __late_audio.gT(gT);
       ((t.showcaseInfo = d || {}), d && d.cam && o({ cam: [...d.cam, ...(d.target || [0, 1, 0])].join(",") }));
     } else {
       if (
-        (await fa("Stacking containers", 0.34),
+        (await fa("Laying out the Mall", 0.34),
         await r("level", "level", () => (n.level === "harbour" ? Pg(t) : buildCampus(t)), !0),
-        await fa("Raising the cranes", 0.5),
+        await fa("Raising the bell tower", 0.5),
         await r("backdrop", "backdrop", () => (n.level === "harbour" ? Iv(t) : Sr.backdrop())),
-        await fa("Flooding the apron", 0.58),
+        await fa("Rolling out the lawns", 0.58),
         await r("ground", "ground", () => (n.level === "harbour" ? Vg(t) : Sr.ground())),
         t.ground.stub && n.level === "harbour")
       ) {
@@ -171,12 +171,12 @@ __late_audio.vT(vT); __late_audio.gT(gT);
       }
       (await fa("Checking the rifle", 0.74),
         await r("weapon", "weapon", () => I5(t)),
-        await fa("Waking the Harbormaster", 0.82),
+        await fa("Waking the Overseer", 0.82),
         await r("enemies", "enemies", () => W5(t)),
         await r("hud", "hud", () => sT(t)),
         (t.game = pT(t)));
     }
-    await fa("Waiting for first light", 0.92);
+    await fa("Waiting for golden hour", 0.92);
     try {
       await t.render.onLevelReady();
     } catch (p) {
@@ -275,7 +275,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
     let e = document.createElement("pre");
     ((e.id = "bench"),
       (e.style.cssText =
-        'position:absolute;left:12px;top:12px;z-index:90;margin:0;padding:10px 12px;font:12px/1.45 "IBM Plex Mono",ui-monospace,monospace;color:#d8f0d0;background:rgba(0,0,0,.72);white-space:pre-wrap;max-width:min(560px,90vw);pointer-events:none'),
+        'position:absolute;left:12px;top:12px;z-index:90;margin:0;padding:10px 12px;font:12px/1.45 "JetBrains Mono",ui-monospace,monospace;color:#d8f0d0;background:rgba(0,0,0,.72);white-space:pre-wrap;max-width:min(560px,90vw);pointer-events:none'),
       document.getElementById("app").appendChild(e));
     let t = "unknown";
     try {
@@ -324,7 +324,7 @@ __late_audio.vT(vT); __late_audio.gT(gT);
               g = v[v.length >> 1],
               E = n.render.stats ? n.render.stats() : {},
               M = n.renderer.getDrawingBufferSize(new We());
-            e.textContent = `SALTLINE BENCH  t=${o.toFixed(0)}s
+            e.textContent = `FOLKTOWN BENCH  t=${o.toFixed(0)}s
 GPU: ${t}
 buffer ${M.x}x${M.y}  quality ${n.quality.name}  dpr ${window.devicePixelRatio}
 frame ms avg ${y.toFixed(1)}  median ${g.toFixed(1)}  p99 ${b.toFixed(1)}  => ${(1e3 / y).toFixed(0)} fps

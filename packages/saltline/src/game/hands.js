@@ -1761,7 +1761,7 @@ __late_fx.sr(sr); __late_audio.sr(sr); __late_weapon.bs(bs);
     SS = [-0.309, -0.951],
     RS = 0.1185,
     G0 = {
-      name: "PAC-4 Bosun",
+      name: "PAC-4 Black",
       muzzle: [0, 0, -0.1075],
       eject: [0.017, 0.007, -0.01],
       sightY: No,

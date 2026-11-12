@@ -98,7 +98,7 @@ export function pT(n) {
         (g.waveHot = 30));
       let Ve = ((Math.atan2(Te, -Re) * 180) / Math.PI + 360) % 360;
       (o.warn && o.warn(`Wave ${Y} \u2014 ${dT[Math.round(Ve / 45) % 8]}`, 3.6),
-        o.setObjective("Hold the berth"),
+        o.setObjective("Hold the Mall"),
         m(),
         n.events.emit("holdout:wave", { wave: Y, count: V }));
     }
@@ -306,7 +306,7 @@ export function pT(n) {
       if (!o.setMarkers) return;
       let Y = g.relays
         .filter((he) => !he.cut)
-        .map((he) => ({ id: he.id, short: he.short, label: he.o.label || "Relay " + he.short, pos: he.o.pos, kind: "relay" }));
+        .map((he) => ({ id: he.id, short: he.short, label: he.o.label || "Beacon " + he.short, pos: he.o.pos, kind: "relay" }));
       (g.allCut && s.extraction && Y.push({ id: "extract", short: "EX", label: "Boat", pos: s.extraction.pos, kind: "extract" }),
         o.setMarkers(Y));
     }
@@ -342,10 +342,10 @@ export function pT(n) {
     }
     function oe() {
       if (modes.active) return modes.objective();
-      if (p()) return g.waveOn ? "Hold the berth" : g.wave ? "Catch your breath" : "Machines inbound";
+      if (p()) return g.waveOn ? "Hold the Mall" : g.wave ? "Catch your breath" : "Bots inbound";
       if (g.allCut) return "Get to the boat";
       let Y = g.relays.length - g.cut;
-      return g.cut === 0 ? "Cut the three uplink relays" : Y === 1 ? "Cut the last relay" : `Cut the remaining ${Y} relays`;
+      return g.cut === 0 ? "Cut the three beacons" : Y === 1 ? "Cut the last beacon" : `Cut the remaining ${Y} beacons`;
     }
     function ee(Y) {
       let he = r.describeMode ? r.describeMode() : "";
@@ -548,7 +548,7 @@ export function pT(n) {
             : ne.t > 0 &&
               ((ne.t = Math.max(0, ne.t - Y * 1.6)),
               ne.cutting && ((ne.cutting = !1), W(ne.o, "live"), n.events.emit("objective:progress", { id: ne.id, t: 0 }))));
-      he && !he.cut ? o.setPrompt && o.setPrompt("Cut relay " + he.short, Is(he.t)) : o.setPrompt && o.setPrompt(null);
+      he && !he.cut ? o.setPrompt && o.setPrompt("Cut beacon " + he.short, Is(he.t)) : o.setPrompt && o.setPrompt(null);
       let V = s.extraction;
       if (V && V.pos) {
         let ne = Math.hypot(V.pos.x - i.pos.x, V.pos.z - i.pos.z),
@@ -559,7 +559,7 @@ export function pT(n) {
             !g.allCut &&
             !p() &&
             g.extractHint <= 0 &&
-            ((g.extractHint = 8), o.message("Relays still live \u2014 the boat will not wait under fire", 3.5)),
+            ((g.extractHint = 8), o.message("Beacons still live \u2014 the shuttle will not wait under fire", 3.5)),
           (g.extractHint = Math.max(0, g.extractHint - Y)));
       }
     }

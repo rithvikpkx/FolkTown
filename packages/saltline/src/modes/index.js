@@ -1,10 +1,10 @@
-// Match modes for the Mall: free-for-all and team deathmatch against Saltline's machines ("bots").
+// Match modes for the Mall: free-for-all and team deathmatch against bots ("bots").
 // Rules ported from packages/sim Match (kill limit, timer, respawn, team balance); bodies and AI are Saltline's own hounds.
 // Shortcut: Saltline machines only ever fight the player. Up to CAP bots are physical hounds; the rest (and allied
 // TDM bots) are scoreboard-only and trade ambient kills, so a 31-bot match scores like a full lobby.
 export const MODES = {
-  ffa: { label: 'Free-for-all', killLimit: 30 },
-  tdm: { label: 'Team deathmatch', killLimit: 50 },
+  ffa: { label: 'Mall Brawl', killLimit: 30 },
+  tdm: { label: 'Gold vs Black', killLimit: 50 },
 };
 export const MAX_BOTS = 31;
 const CAP = 8, RESPAWN = 3, PROTECT = 2, TEAMS = ['Old Gold', 'Black'];

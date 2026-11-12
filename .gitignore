@@ -5,3 +5,5 @@ tools/shots/
 .claude/worktrees/
 .claude/settings.local.json
 data/debug/
+.vercel
+.env*

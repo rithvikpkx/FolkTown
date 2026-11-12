@@ -1,0 +1,380 @@
+// Geometry primitives (bevelled box, cylinder, tube), vertex-colour weathering and the per-material merge that keep the whole level in a few draw calls.
+// Source: Saltline bundle https://claude.ai/artifact/BGY1SztrAYcJQHSsnHHGmp, prettier-formatted; identifiers are minified bundle names, shader text intact. Reuse permitted by the owner.
+
+// ---- beautified bundle lines 29140-29330 ----
+  function ot(n, e, t, i = "center") {
+    let s = new R0(n, e, t),
+      o = s.attributes.uv,
+      r = s.attributes.position,
+      a = s.attributes.normal;
+    for (let l = 0; l < o.count; l++) {
+      let c = Math.abs(a.getX(l)),
+        u = Math.abs(a.getY(l)),
+        f = r.getX(l),
+        h = r.getY(l),
+        p = r.getZ(l);
+      c > 0.5 ? o.setXY(l, p, h) : u > 0.5 ? o.setXY(l, f, p) : o.setXY(l, f, h);
+    }
+    return (i === "bottom" && s.translate(0, e / 2, 0), s);
+  }
+  function Ei(n, e, t, i = 0.02, s = "center") {
+    i = Math.min(i, n / 2 - 1e-4, e / 2 - 1e-4, t / 2 - 1e-4);
+    let o = new R0(n, e, t, 3, 3, 3),
+      r = o.attributes.position,
+      a = o.attributes.normal,
+      l = o.attributes.uv,
+      c = n / 2,
+      u = e / 2,
+      f = t / 2,
+      h = (p, d) => {
+        let m = Math.abs(p),
+          x = Math.sign(p);
+        return m > d - 1e-5 ? x * d : x * (d - i);
+      };
+    for (let p = 0; p < r.count; p++) {
+      let d = h(r.getX(p), c),
+        m = h(r.getY(p), u),
+        x = h(r.getZ(p), f),
+        v = Math.max(-(c - i), Math.min(c - i, d)),
+        y = Math.max(-(u - i), Math.min(u - i, m)),
+        b = Math.max(-(f - i), Math.min(f - i, x));
+      if ((za.set(d - v, m - y, x - b), za.lengthSq() > 1e-10)) {
+        za.normalize();
+        let _ = a.getX(p),
+          T = a.getY(p),
+          w = a.getZ(p);
+        (Math.abs(d) > c - 1e-5 ? 1 : 0) + (Math.abs(m) > u - 1e-5 ? 1 : 0) + (Math.abs(x) > f - 1e-5 ? 1 : 0) >= 2
+          ? ((d = v + za.x * i), (m = y + za.y * i), (x = b + za.z * i), a.setXYZ(p, za.x, za.y, za.z))
+          : a.setXYZ(p, _, T, w);
+      }
+      r.setXYZ(p, d, m, x);
+      let g = Math.abs(a.getX(p)),
+        E = Math.abs(a.getY(p)),
+        M = Math.abs(a.getZ(p));
+      g >= E && g >= M ? l.setXY(p, x, m) : E >= g && E >= M ? l.setXY(p, d, x) : l.setXY(p, d, m);
+    }
+    return (s === "bottom" && o.translate(0, e / 2, 0), o);
+  }
+  function vt(n, e, t, i = 16, s = !1, o = "center") {
+    let r = new io(n, e, t, i, 1, s),
+      a = r.attributes.uv,
+      l = r.attributes.position,
+      c = r.attributes.normal,
+      u = Math.PI * (n + e);
+    for (let f = 0; f < a.count; f++) Math.abs(c.getY(f)) > 0.9 ? a.setXY(f, l.getX(f), l.getZ(f)) : a.setXY(f, a.getX(f) * u, l.getY(f));
+    return (o === "bottom" && r.translate(0, t / 2, 0), r);
+  }
+  function bn(n, e = 0.03, t = 8, i = !1, s = 0) {
+    let o = n.map((f) => (f.isVector3 ? f : new K(f[0], f[1], f[2]))),
+      r = new Sa(o, i, "catmullrom", s),
+      a = r.getLength(),
+      l = Math.max(2, Math.ceil(a / Math.max(0.08, e * 3))),
+      c = new Ta(r, Math.min(l, 400), e, t, i),
+      u = c.attributes.uv;
+    for (let f = 0; f < u.count; f++) u.setXY(f, u.getX(f) * a, u.getY(f) * Math.PI * 2 * e);
+    return c;
+  }
+  var OM = new Je(),
+    VM = new St(),
+    WM = new _0(),
+    GM = new K(),
+    ev = new K();
+  function th(n, { p: e = [0, 0, 0], r: t = [0, 0, 0], s: i = 1 } = {}) {
+    return (
+      WM.set(t[0], t[1], t[2]),
+      VM.setFromEuler(WM),
+      GM.set(e[0], e[1], e[2]),
+      typeof i == "number" ? ev.set(i, i, i) : ev.set(i[0], i[1], i[2]),
+      OM.compose(GM, VM, ev),
+      n.applyMatrix4(OM),
+      n
+    );
+  }
+  function Kr(n, e) {
+    let t = n.attributes.position,
+      i = t.count,
+      s = new Float32Array(i * 3);
+    for (let o = 0; o < i; o++) {
+      let r = typeof e == "function" ? e(t.getX(o), t.getY(o), t.getZ(o)) : e;
+      ((s[o * 3] = r[0]), (s[o * 3 + 1] = r[1]), (s[o * 3 + 2] = r[2]));
+    }
+    return (n.setAttribute("color", new nt(s, 3)), n);
+  }
+  function Jr(n) {
+    let e = n
+      .filter(Boolean)
+      .map(
+        (l) => (
+          l.attributes.uv || l.setAttribute("uv", new nt(new Float32Array(l.attributes.position.count * 2), 2)),
+          l.attributes.normal || l.computeVertexNormals(),
+          l
+        ),
+      );
+    if (!e.length) return new pt();
+    let t = e.some((l) => l.attributes.color),
+      i = e.map((l) => {
+        let c = (l.index, l);
+        if (t && !c.attributes.color) {
+          let u = new Float32Array(c.attributes.position.count * 3).fill(1);
+          c.setAttribute("color", new nt(u, 3));
+        }
+        for (let u of Object.keys(c.attributes)) ["position", "normal", "uv", "color"].includes(u) || c.deleteAttribute(u);
+        return c;
+      }),
+      s = i.every((l) => l.index),
+      o = i.every((l) => !l.index),
+      r = s || o ? i : i.map((l) => (l.index ? l.toNonIndexed() : l));
+    return Tr(r, !1) || new pt();
+  }
+  function ig(n, { castShadow: e = !0, receiveShadow: t = !0 } = {}) {
+    n.updateMatrixWorld(!0);
+    let i = new Map(),
+      s = [];
+    n.traverse((r) => {
+      if (!r.isMesh) return;
+      let a = r,
+        l = !1;
+      for (; a;) {
+        if (a.userData && a.userData.noMerge) {
+          l = !0;
+          break;
+        }
+        a = a.parent;
+      }
+      if (l || r.isSkinnedMesh || r.isInstancedMesh || Array.isArray(r.material)) {
+        s.push(r);
+        return;
+      }
+      let c = r.material.uuid + (r.castShadow ? "c" : "n") + (r.receiveShadow ? "r" : "n") + ":" + r.layers.mask;
+      i.has(c) || i.set(c, { mat: r.material, geos: [], cast: r.castShadow, recv: r.receiveShadow, layers: r.layers.mask });
+      let u = r.geometry.clone();
+      (u.applyMatrix4(r.matrixWorld), i.get(c).geos.push(u));
+    });
+    let o = new At();
+    for (let r of i.values()) {
+      let a = new ht(Jr(r.geos), r.mat);
+      ((a.castShadow = r.cast && e), (a.receiveShadow = r.recv && t), (a.layers.mask = r.layers), o.add(a));
+    }
+    for (let r of s) {
+      r.updateMatrixWorld(!0);
+      let a = r.matrixWorld.clone();
+      (o.add(r), r.matrix.copy(a), r.matrix.decompose(r.position, r.quaternion, r.scale));
+    }
+    return o;
+  }
+  function ns(n, e, { cast: t = !0, recv: i = !0 } = {}) {
+    let s = new ht(n, e);
+    return ((s.castShadow = t), (s.receiveShadow = i), s);
+  }
+  var rv = {};
+  ar(rv, { create: () => ov, showcase: () => ik });
+  var tv = `
+uniform sampler2D tNoise;
+float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return texture2D(tNoise, (i + f + 0.5) / 256.0).r; }
+float fbm5(vec2 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 5; i++){ s += a * n2(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p + 17.3; a *= 0.5; } return s / 0.96875; }
+float fbm3(vec2 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 3; i++){ s += a * n2(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p + 17.3; a *= 0.5; } return s / 0.875; }
+`,
+    nv = `
+uniform vec3 uSunDir, uZen, uHor, uHorAway, uSunCol;
+float skyToSun(vec3 d){ return clamp(dot(normalize(d.xz + vec2(1e-5)), normalize(uSunDir.xz)) * 0.5 + 0.5, 0.0, 1.0); }
+vec3 horizonColor(vec3 d){
+  float ts = skyToSun(d);
+  vec3 c = mix(uHorAway, uHorAway * 1.25 + vec3(0.05, 0.03, 0.02), smoothstep(0.2, 0.75, ts));
+  c = mix(c, uHor * vec3(1.9, 1.55, 1.2), pow(ts, 6.0));
+  c = mix(c, vec3(1.0, 0.60, 0.24) * 3.4, pow(ts, 34.0));
+  return c;
+}
+`;
+  function qM() {
+    let e = new Uint8Array(262144),
+      t = 2654435769,
+      i = () => ((t ^= t << 13), (t >>>= 0), (t ^= t >>> 17), (t ^= t << 5), (t >>>= 0), t / 4294967296);
+    for (let o = 0; o < 256 * 256; o++)
+      ((e[o * 4] = i() * 256), (e[o * 4 + 1] = i() * 256), (e[o * 4 + 2] = i() * 256), (e[o * 4 + 3] = 255));
+    let s = new li(e, 256, 256, $0, wi);
+    return (
+
+// ---- beautified bundle lines 41148-41330 ----
+  function dP(n, e) {
+    for (; n && n !== e;) {
+      if (n.userData && n.userData.noMerge) return !0;
+      n = n.parent;
+    }
+    return !1;
+  }
+  function pP(n) {
+    let e = 0;
+    return (
+      n.traverse((t) => {
+        t.isMesh && e++;
+      }),
+      e
+    );
+  }
+  async function mP(n) {
+    let e = await Pg(n);
+    return { cam: [-32, 1.7, 6], target: [0, 2.4, 6.4], update: (t) => e.update(t) };
+  }
+  var zv = {};
+  ar(zv, { create: () => Iv, showcase: () => _P });
+  var Ft = (n, e, t) => new K(n, e, t),
+    lu = (n) => (n.isVector3 ? n : new K(n[0], n[1], n[2])),
+    xw = new K(0, 1, 0),
+    gP = new K(1, 1, 1),
+    gw = new St(),
+    zg = new Je();
+  function Wl(n, e, t) {
+    let i = Math.imul(n, 374761393) ^ Math.imul(e, 668265263) ^ Math.imul(t, 1274126177);
+    return ((i = Math.imul(i ^ (i >>> 13), 1274126177)), ((i ^ (i >>> 16)) >>> 0) / 4294967295);
+  }
+  function au(n, e, t) {
+    let i = Math.floor(n),
+      s = Math.floor(e),
+      o = Math.floor(t),
+      r = n - i,
+      a = e - s,
+      l = t - o;
+    ((r = r * r * (3 - 2 * r)), (a = a * a * (3 - 2 * a)), (l = l * l * (3 - 2 * l)));
+    let c = (u, f, h) => u + (f - u) * h;
+    return c(
+      c(c(Wl(i, s, o), Wl(i + 1, s, o), r), c(Wl(i, s + 1, o), Wl(i + 1, s + 1, o), r), a),
+      c(c(Wl(i, s, o + 1), Wl(i + 1, s, o + 1), r), c(Wl(i, s + 1, o + 1), Wl(i + 1, s + 1, o + 1), r), a),
+      l,
+    );
+  }
+  function Rv(n) {
+    let e = n >>> 0;
+    return () => ((e = (Math.imul(e, 1664525) + 1013904223) >>> 0), e / 4294967296);
+  }
+  var Ig = [1, 1, 1],
+    vw = [1, 1, 1];
+  function Cv(n, e, t, i = vw, s = 1) {
+    let o = au(n * 0.31 + 11.3, e * 0.23 + 5.1, t * 0.31 + 3.7),
+      r = au(n * 1.7 + 40.2, 9.5, t * 1.7 + 17.9),
+      a = 1 - s * (0.3 - 0.36 * o),
+      l = i[0] * a,
+      c = i[1] * a,
+      u = i[2] * a;
+    if (r > 0.68) {
+      let f = Math.min(1, (r - 0.68) / 0.3) * 0.6 * s * (0.35 + 0.65 * au(n * 0.9, e * 0.45, t * 0.9));
+      ((l *= 1 + 0.45 * f), (c *= 1 - 0.3 * f), (u *= 1 - 0.6 * f));
+    }
+    return ((Ig[0] = l), (Ig[1] = c), (Ig[2] = u), Ig);
+  }
+  var yw = new WeakSet();
+  function po(n, e, t = {}) {
+    let i = n.mats.get(e, { vertexColors: !0, ...t });
+    return (yw.add(i), i);
+  }
+  var ho = class {
+    constructor() {
+      ((this.b = new Map()), (this.tris = 0), (this.remap = null), (this.dz = 0), (this.minSize = 0));
+    }
+    add(e, t, i) {
+      if (!t) return;
+      if (Array.isArray(t)) {
+        for (let o of t) this.add(e, o, i);
+        return;
+      }
+      if (this.remap) {
+        let o = this.remap(e, i);
+        if (!o) return;
+        if (this.minSize) {
+          t.computeBoundingBox();
+          let r = t.boundingBox;
+          if (Math.max(r.max.x - r.min.x, r.max.y - r.min.y, r.max.z - r.min.z) < this.minSize) return;
+        }
+        ((e = o[0]), (i = o[1]), this.dz && t.translate(0, 0, this.dz));
+      }
+      yw.has(e) && !t.attributes.color && Kr(t, (o, r, a) => Cv(o, r, a, i || vw));
+      let s = this.b.get(e.uuid);
+      (s || ((s = { mat: e, geos: [] }), this.b.set(e.uuid, s)),
+        s.geos.push(t),
+        (this.tris += (t.index ? t.index.count : t.attributes.position.count) / 3));
+    }
+    build({ cast: e = !0, recv: t = !0 } = {}) {
+      let i = new At();
+      for (let s of this.b.values()) {
+        let o = Jr(s.geos),
+          r = new ht(o, s.mat),
+          a = s.mat.isMeshBasicMaterial || s.mat.transparent;
+        ((r.castShadow = e && !a), (r.receiveShadow = t && !a), i.add(r));
+      }
+      return (this.b.clear(), i);
+    }
+  };
+  function Pe(n, e, t, i, s, o, r = 0) {
+    let a = Math.abs(i - n),
+      l = Math.abs(s - e),
+      c = Math.abs(o - t),
+      u = r > 0 ? Ei(a, l, c, r) : ot(a, l, c);
+    return (u.translate((n + i) / 2, (e + s) / 2, (t + o) / 2), u);
+  }
+  function Pt(n, e, t, i, s, o, r, a = 12, l = !1) {
+    let c = vt(n, e, t, a, l);
+    return (i === "x" ? c.rotateZ(Math.PI / 2) : i === "z" && c.rotateX(Math.PI / 2), c.translate(s, o, r), c);
+  }
+  function dt(n, e, t = 0.03, i = 5, s = !1) {
+    ((n = lu(n)), (e = lu(e)));
+    let o = new K().subVectors(e, n),
+      r = o.length();
+    if (r < 1e-5) return null;
+    let a = vt(t, t, r, i, !s);
+    return (
+      gw.setFromUnitVectors(xw, o.multiplyScalar(1 / r)),
+      zg.compose(new K().addVectors(n, e).multiplyScalar(0.5), gw, gP),
+      a.applyMatrix4(zg),
+      a
+    );
+  }
+  function v0(n, e, t = 0.3, i = 0.3, s = 0) {
+    ((n = lu(n)), (e = lu(e)));
+    let o = new K().subVectors(e, n),
+      r = o.length();
+    o.multiplyScalar(1 / r);
+    let a = new K().crossVectors(o, xw);
+    a.lengthSq() < 1e-6 ? a.set(1, 0, 0) : a.normalize();
+    let l = new K().crossVectors(a, o),
+      c = s > 0 ? Ei(t, r, i, s) : ot(t, r, i);
+    return (zg.makeBasis(a, o, l).setPosition((n.x + e.x) / 2, (n.y + e.y) / 2, (n.z + e.z) / 2), c.applyMatrix4(zg), c);
+  }
+  function ia(n, e = 0.03, t = 5) {
+    let i = [];
+    for (let s = 0; s < n.length - 1; s++) {
+      let o = dt(n[s], n[s + 1], e, t);
+      o && i.push(o);
+    }
+    return i;
+  }
+  function Ua(n, e, t = 1, i = 10) {
+    ((n = lu(n)), (e = lu(e)));
+    let s = [];
+    for (let o = 0; o <= i; o++) {
+      let r = o / i,
+        a = new K().lerpVectors(n, e, r);
+      ((a.y -= t * 4 * r * (1 - r)), s.push(a));
+    }
+    return s;
+  }
+  function cu(n, e, t, i, s, o = 0, r = 0) {
+    let a = new w0(n, e);
+    return (r && a.rotateX(r), o && a.rotateY(o), a.translate(t, i, s), a);
+  }
+  function os(n, e, t, { h: i = 1.1, post: s = 2.2, r: o = 0.022, tint: r, mid: a = !0 } = {}) {
+    t = t.map(lu);
+    for (let l = 0; l < t.length - 1; l++) {
+      let c = t[l],
+        u = t[l + 1],
+        f = c.distanceTo(u),
+        h = Math.max(1, Math.round(f / s));
+      for (let p = l === 0 ? 0 : 1; p <= h; p++) {
+        let d = new K().lerpVectors(c, u, p / h);
+        n.add(e, dt(d, Ft(d.x, d.y + i, d.z), o, 4), r);
+      }
+      (n.add(e, dt(Ft(c.x, c.y + i, c.z), Ft(u.x, u.y + i, u.z), o * 1.15, 5), r),
+        a && n.add(e, dt(Ft(c.x, c.y + i * 0.5, c.z), Ft(u.x, u.y + i * 0.5, u.z), o * 0.9, 4), r));
+    }
+  }
+  function bw() {
+    let n = { value: 0 },
+      e = new An({ vertexColors: !0, fog: !1 });

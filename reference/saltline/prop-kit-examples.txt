@@ -1,0 +1,221 @@
+// Two prop builders (jersey barrier, light mast with ladder and lamps) showing the mm-scale modelling style, plus the builder kit (box/cyl/tube/bar/beam) they call.
+// Source: Saltline bundle https://claude.ai/artifact/BGY1SztrAYcJQHSsnHHGmp, prettier-formatted; identifiers are minified bundle names, shader text intact. Reuse permitted by the owner.
+
+// ---- beautified bundle lines 34479-34554 ----
+  function k_(n, e = {}) {
+    let t = new On(n),
+      i = e.seed | 0,
+      s = Fl(i + 11),
+      o = i * 3.7,
+      r = t.M("concrete", { vertexColors: !0 }),
+      a = [
+        [-0.3, 0],
+        [0.3, 0],
+        [0.3, 0.076],
+        [0.127, 0.33],
+        [0.1, 0.57],
+        [0.077, 0.79],
+        [0.06, 0.81],
+        [-0.06, 0.81],
+        [-0.077, 0.79],
+        [-0.1, 0.57],
+        [-0.127, 0.33],
+        [-0.3, 0.076],
+      ],
+      l = [-1.5, -1.47];
+    for (let h = -1.25; h <= 1.26; h += 0.25) l.push(h);
+    l.push(1.47, 1.5);
+    let c = [];
+    for (let h = 0; h < 7; h++) c.push([(s() * 2 - 1) * 1.5, s() * 0.8, 0.08 + s() * 0.14, s() < 0.5 ? 1 : -1]);
+    let u = Fa(
+      a,
+      l,
+      (h, p, d) => {
+        let m = Math.abs(d) > 1.49 ? 1 : 0;
+        return [d, p - m * 0.022 * (p / 0.81), h * (1 - m * 0.09)];
+      },
+      { closed: !0, caps: !0 },
+    );
+    t.add(r, u, (h, p, d) => {
+      let m = 0.86 + 0.2 * Jn(h * 1.3 + o, p * 3 + d * 2) + 0.08 * Jn(h * 7, p * 9 + o),
+        x = [m, m * 0.99, m * 0.97];
+      x = Qr(x, [m * 0.5, m * 0.48, m * 0.44], H0(0.3, 0, p) * 0.8);
+      let v = H0(0.55, 0.8, Jn(h * 4.5 + o, 3.3)) * H0(0.25, 0.8, p);
+      x = Qr(x, [m * 0.62, m * 0.6, m * 0.56], v * 0.6);
+      let y = H0(0.6, 0.85, Jn(h * 2.1 + o * 2, d * 3)) * H0(0.2, 0.33, p) * H0(0.62, 0.4, p);
+      x = Qr(x, [0.22, 0.22, 0.22], y * 0.65);
+      for (let b of c)
+        if (Math.sign(d || 1) === b[3]) {
+          let g = Math.hypot(h - b[0], p - b[1]) / b[2];
+          g < 1 && (x = Qr(x, [1.12, 1.1, 1.05], (1 - g) * 0.7));
+        }
+      return (Math.abs(h) > 1.4 && (x = Qr(x, [1.08, 1.06, 1.02], 0.4 * Jn(p * 9, d * 9 + o))), x);
+    });
+    let f = [0.05, 0.05, 0.05];
+    for (let h of [-1, 1])
+      for (let p of [-0.85, 0.85])
+        (t.add(r, ct(D0(0.3, 0.058), p, 0.03, h * 0.3008, [0, h > 0 ? 0 : F0, 0]), f),
+          t.box(r, 0.34, 0.012, 0.012, p, 0.064, h * 0.3, { r: 0.003, col: [0.7, 0.7, 0.68] }));
+    for (let h of [-0.9, 0.9])
+      t.tube(
+        t.M("steel_rust"),
+        [
+          [h - 0.05, 0.8, 0],
+          [h - 0.04, 0.85, 0],
+          [h + 0.04, 0.85, 0],
+          [h + 0.05, 0.8, 0],
+        ],
+        0.008,
+        { seg: 5 },
+      );
+    if (e.stripe) {
+      let h = t.M("hazard_stripes");
+      t.add(h, ct(oh(2.9, 0.118), 0, 0.8125, 0, [-F0 / 2, 0, 0]));
+      for (let p of [-1, 1]) t.add(h, ct(oh(2.9, 0.2), 0, 0.68, p * 0.0905, [p > 0 ? -0.108 : 0.108, p > 0 ? 0 : F0, 0]));
+    }
+    return $i(t.group(), "jersey_barrier", Na("jersey_barrier"), [
+      { min: [-1.5, 0, -0.3], max: [1.5, 0.33, 0.3], surface: "concrete" },
+      { min: [-1.5, 0.33, -0.13], max: [1.5, 0.81, 0.13], surface: "concrete" },
+    ]);
+  }
+
+// ---- beautified bundle lines 34570-34650 ----
+  function P_(n, e = {}) {
+    let t = new On(n),
+      i = t.M("steel_galv"),
+      s = t.M("concrete", { vertexColors: !0 }),
+      o = t.M("steel_dark"),
+      r = n.mats.emissive(16769981, e.on === !1 ? 0.02 : 8);
+    (t.box(s, 0.8, 0.32, 0.8, 0, 0.16, 0, {
+      r: 0.03,
+      col: (v, y, b) => {
+        let g = 0.62 + 0.36 * H0(0, 0.3, y) + 0.1 * Jn(v * 5, b * 5);
+        return [g, g, g * 0.97];
+      },
+    }),
+      t.box(i, 0.5, 0.03, 0.5, 0, 0.335, 0, { r: 0.006 }));
+    for (let v = 0; v < 8; v++) {
+      let y = ((v + 0.5) * F0) / 4,
+        b = Math.cos(y) * 0.215,
+        g = Math.sin(y) * 0.215;
+      (t.cyl(i, 0.014, 0.014, 0.1, b, 0.38, g, { seg: 6 }), t.cyl(i, 0.027, 0.027, 0.024, b, 0.362, g, { seg: 6, flat: !0 }));
+    }
+    let a = 0.35,
+      l = 13.3,
+      c = 0.168,
+      u = 0.07,
+      f = (v) => c + ((u - c) * (v - a)) / (l - a),
+      h = [
+        [a, 4.75, 0],
+        [4.6, 9.15, 0.007],
+        [9, l, 0.014],
+      ];
+    for (let [v, y, b] of h) t.cyl(i, f(y) + b, f(v) + b, y - v, 0, (v + y) / 2, 0, { seg: 8, flat: !0, open: !0, rot: [0, F0 / 8, 0] });
+    for (let v = 0; v < 4; v++) {
+      let y = (v * F0) / 2;
+      t.box(i, 0.012, 0.2, 0.12, Math.cos(y) * 0.2, 0.45, -Math.sin(y) * 0.2, { r: 0, rot: [0, y + F0 / 2, 0] });
+    }
+    (t.cyl(i, 0.2, 0.2, 0.02, 0, 0.36, 0, { seg: 8, rot: [0, F0 / 8, 0] }),
+      t.cyl(i, 0.09, 0.09, 0.03, 0, l, 0, { seg: 8, rot: [0, F0 / 8, 0] }));
+    let p = f(1.05) * 0.924;
+    (t.box(i, 0.13, 0.52, 0.012, 0, 1.05, p + 0.005, { r: 0.004 }),
+      t.box(o, 0.03, 0.045, 0.012, 0.04, 1.05, p + 0.013, { r: 0.003 }),
+      t.decal(Vn(n, "hazard_voltage"), 0.09, -0.01, 1.2, p + 0.0125, null),
+      t.tube(
+        o,
+        [
+          [-0.3, 0.3, 0.28],
+          [-0.3, 0.52, 0.28],
+          [-0.24, 0.72, 0.2],
+          [-0.1, 0.8, 0.1],
+        ],
+        0.024,
+        { seg: 6 },
+      ),
+      t.cyl(o, 0.034, 0.034, 0.03, -0.3, 0.335, 0.28, { seg: 8 }),
+      t.bar(i, [0.1, 3, -0.13], [0.42, 3, -0.13], 0.012),
+      t.bar(i, [0.1, 3, 0.13], [0.42, 3, 0.13], 0.012),
+      t.bar(i, [0.42, 3, -0.16], [0.42, 3, 0.16], 0.012, { caps: !0 }),
+      t.bar(i, [0.42, 3, -0.13], [0.42, 3.09, -0.13], 0.012, { caps: !0 }),
+      t.bar(i, [0.42, 3, 0.13], [0.42, 3.09, 0.13], 0.012, { caps: !0 }),
+      t.cyl(i, f(3) + 0.012, f(3) + 0.012, 0.05, 0, 3, 0, { seg: 8, rot: [0, F0 / 8, 0] }));
+    let d = 0;
+    for (let v = 3.45; v < 12.9; v += 0.38, d++) {
+      let y = d % 2 ? 1 : -1;
+      t.bar(i, [0, v, y * f(v) * 0.8], [0, v, y * (f(v) + 0.15)], 0.009, { seg: 5, caps: !0 });
+    }
+    let m = l + 0.12;
+    (t.box(i, 0.1, 0.1, 1.9, 0, m, 0, { r: 0.012 }),
+      t.box(i, 0.5, 0.07, 0.07, 0, m + 0.085, 0.55, { r: 0.01 }),
+      t.box(i, 0.5, 0.07, 0.07, 0, m + 0.085, -0.55, { r: 0.01 }),
+      t.beam(i, [0, l - 0.5, 0.08], [0, m - 0.03, 0.7], 0.04, 0.04),
+      t.beam(i, [0, l - 0.5, -0.08], [0, m - 0.03, -0.7], 0.04, 0.04));
+    for (let v of [-0.55, 0.55]) (R_(t, i, o, r, 0.22, m - 0.14, v, 0, -0.62), R_(t, i, o, r, -0.22, m - 0.14, v, F0, -0.62));
+    (t.box(o, 0.16, 0.2, 0.12, 0, l - 0.25, -0.14, { r: 0.01 }), t.bar(i, [0, m, 0], [0, 14, 0], 0.012, { r2: 0.003, seg: 5, caps: !0 }));
+    let x = t.group();
+    x.userData.lamps = [];
+    for (let v of [-0.55, 0.55])
+      for (let y of [-1, 1]) x.userData.lamps.push({ pos: [y * 0.34, m - 0.22, v], dir: [y * 0.81, -0.58, 0], color: 16769981 });
+    return $i(x, "light_mast", Na("light_mast"), [
+      { min: [-0.4, 0, -0.4], max: [0.4, 0.32, 0.4], surface: "concrete" },
+      { min: [-0.17, 0.32, -0.17], max: [0.17, 14, 0.17], surface: "metal" },
+    ]);
+  }
+
+// ---- beautified bundle lines 38465-38520 ----
+  function uw(n) {
+    let e = new At();
+    e.name = "level-static";
+    let t = new At();
+    t.name = "level-dynamic";
+    let i = [],
+      s = [],
+      o = [],
+      r = [],
+      a = n.rng && n.rng.fork ? n.rng.fork() : Math.random,
+      l = (C, A) => C + (A - C) * a(),
+      c = (C, A) => n.mats.get(C, A),
+      u = (C, A) => n.mats.get(C, { interior: !0, ...(A || {}) }),
+      f = (C) => (typeof C == "string" ? c(C) : C);
+    function h(C, A, F = {}) {
+      let H = ns(C, f(A), { cast: F.cast !== !1, recv: F.recv !== !1 });
+      return (
+        F.p && H.position.set(F.p[0], F.p[1], F.p[2]),
+        F.r && H.rotation.set(F.r[0] || 0, F.r[1] || 0, F.r[2] || 0),
+        (F.parent || e).add(H),
+        H
+      );
+    }
+    function p(C, A, F, H, N, Z, Q, W = {}) {
+      let J = W.bevel ? Ei(A, F, H, W.bevel) : ot(A, F, H);
+      return h(J, C, { ...W, p: [N, Z, Q] });
+    }
+    function d(C, A, F, H, N, Z, Q, W = {}) {
+      return p(C, Math.abs(N - A), Math.abs(Z - F), Math.abs(Q - H), (A + N) / 2, (F + Z) / 2, (H + Q) / 2, W);
+    }
+    function m(C, A, F, H, N, Z, Q = {}) {
+      let W = vt(Q.rTop ?? A, A, F, Q.seg || 12, !!Q.open),
+        J = Q.axis === "x" ? [0, 0, Math.PI / 2] : Q.axis === "z" ? [Math.PI / 2, 0, 0] : Q.r || [0, 0, 0];
+      return h(W, C, { ...Q, p: [H, N, Z], r: J });
+    }
+    function x(C, A, F = 0.03, H = {}) {
+      return h(bn(A, F, H.radial || 6, !1, H.tension ?? 0.5), C, H);
+    }
+    function v(C, A, F, H = 0.015, N = {}) {
+      let Z = new K(...A),
+        Q = new K(...F),
+        W = Z.distanceTo(Q),
+        J = vt(H, H, W, N.seg || 6),
+        G = h(J, C, N);
+      return (G.position.copy(Z).add(Q).multiplyScalar(0.5), G.quaternion.setFromUnitVectors(new K(0, 1, 0), Q.sub(Z).normalize()), G);
+    }
+    function y(C, A, F, H, N, Z, { depth: Q = 0.4, width: W = 0.2, tf: J = 0.02, tw: G = 0.012, depthAxis: te = null, r: oe = null } = {}) {
+      let ee = new At();
+      (ee.position.set(H, N, Z), oe && ee.rotation.set(oe[0] || 0, oe[1] || 0, oe[2] || 0));
+      let le = te || (A === "y" ? "z" : "y"),
+        xe = ["x", "y", "z"].find((ue) => ue !== A && ue !== le),
+        j = (ue, de, $) => {
+          let se = {};
+          return ((se[A] = ue), (se[le] = de), (se[xe] = $), [se.x, se.y, se.z]);
+        },
+        O = (ue) => {

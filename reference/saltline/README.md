@@ -15,3 +15,5 @@ The JavaScript is minified; the shader text inside it is intact and commented. P
 Not taken yet, still in the bundle: close-up material detail, the ground and water shaders, weapon and arm shaders, and all gameplay code. Pull them from the link above when a work package needs them.
 
 `docs/saltline-findings.md` explains how the frame is built.
+
+Second pass (`docs/saltline-deep-findings.md`) added: `material-system.txt`, `ground-wet-shader.txt`, `geometry-kit.txt`, `container-builder.txt`, `prop-kit-examples.txt`, `weapon-surface-shader.txt`, `arm-glove-shader.txt`. Their code is prettier-formatted with minified identifiers.

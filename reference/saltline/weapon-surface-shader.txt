@@ -1,0 +1,344 @@
+// The view-model material: per-vertex edge/cavity/bare/zone attributes drive procedural wear, polish, scratches, grip studs and rain beads, with pixel-footprint fades and a derivative bump; plus the vertex baking (edge from convexity, voxel cavity AO).
+// Source: Saltline bundle https://claude.ai/artifact/BGY1SztrAYcJQHSsnHHGmp, prettier-formatted; identifiers are minified bundle names, shader text intact. Reuse permitted by the owner.
+
+// ---- beautified bundle lines 54696-54700 ----
+    bE = `vec3 dBump(vec3 N, float h){ vec3 dpdx = dFdx(-vViewPosition), dpdy = dFdy(-vViewPosition); float dhx = dFdx(h), dhy = dFdy(h);
+  vec3 r1 = cross(dpdy, N), r2 = cross(N, dpdx); float det = dot(dpdx, r1); vec3 g = sign(det) * (dhx * r1 + dhy * r2);
+  return normalize(abs(det) * N - g); }
+`,
+    ny = null;
+
+// ---- beautified bundle lines 54969-55135 ----
+  var iy = { value: 1 },
+    Bz = {
+      pac9_anodised: { kind: 0, color: [0.038, 0.039, 0.043], roughness: 0.54, metalness: 0.1 },
+      pac9_phosphate: { kind: 1, color: [0.042, 0.042, 0.043], roughness: 0.66, metalness: 0.2 },
+      pac9_polymer: { kind: 2, color: [0.034, 0.035, 0.038], roughness: 0.6, metalness: 0 },
+      pac9_polymer_tan: { kind: 2, color: [0.15, 0.112, 0.068], roughness: 0.6, metalness: 0 },
+      pac4_nitride: { kind: 3, color: [0.034, 0.035, 0.039], roughness: 0.47, metalness: 0.35 },
+      pac9_matte: { kind: 4, color: [1, 1, 1], roughness: 0.86, metalness: 0 },
+    },
+    Hz =
+      `
+varying vec3 vObjP; varying vec3 vWNrm; varying vec3 vONrm; varying vec4 vSurf; uniform float uRain;
+float dh3(vec3 p){ return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+float dn3(vec3 p){ vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(dh3(i), dh3(i + vec3(1,0,0)), f.x), mix(dh3(i + vec3(0,1,0)), dh3(i + vec3(1,1,0)), f.x), f.y),
+             mix(mix(dh3(i + vec3(0,0,1)), dh3(i + vec3(1,0,1)), f.x), mix(dh3(i + vec3(0,1,1)), dh3(i + vec3(1,1,1)), f.x), f.y), f.z); }
+vec2 dh2(vec2 p){ return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453); }
+vec2 dDrops(vec2 uv, float cell, float seed, float thr){ vec2 g = uv / cell, i = floor(g), f = fract(g); float best = 0.0;
+  for (int a = -1; a <= 1; a++) for (int b = -1; b <= 1; b++) { vec2 o = vec2(float(a), float(b)); vec2 r = dh2(i + o + seed);
+    float keep = step(thr, fract(r.x * 7.31 + r.y * 3.17)); vec2 c = o + 0.2 + 0.6 * r; float rad = (0.14 + 0.20 * fract(r.x * 13.7)) * keep;
+    float d = length(f - c); best = max(best, sqrt(max(rad * rad - d * d, 0.0))); }
+  return vec2(best * cell, step(1e-6, best)); }
+` + bE,
+    Oz = `
+vec3 dP = vObjP; vec3 dAn = abs(vONrm);
+vec2 dUV = (dAn.y > dAn.x && dAn.y > dAn.z) ? dP.xz : (dAn.x > dAn.z ? dP.zy : dP.xy);
+float dEdge = vSurf.x, dCav = vSurf.y, dBare = vSurf.z, dZone = vSurf.w;
+float dPx = length(fwidth(dP));                                         // metres of surface per pixel
+float dNear = 1.0 - smoothstep(0.00020, 0.00075, dPx);                  // micro detail fades out before it can alias
+vec3 dQ = mat3(0.36, 0.48, -0.80, -0.80, 0.60, 0.0, 0.48, 0.64, 0.60) * dP;       // turned domain: the noise lattice never lines up with the gun
+float dLo = dn3(dQ * 34.0), dMid = dn3(dQ * 180.0 + 7.0);
+float dGr = (dh3(floor(dP * 2900.0)) - 0.5) * dNear;                    // finest grain: one hash
+float dScr = dn3(dP * vec3(640.0, 640.0, 21.0) + 3.0);                  // long fine scratches along the bore
+float dHt = 0.0, dR = 0.0; vec3 dAlb = diffuseColor.rgb;
+float dBreak = dMid * 0.65 + dLo * 0.35;
+float dPolish = smoothstep(0.15, 0.85, dEdge) * (0.35 + 0.65 * dLo);     // exposed edges are a little burnished, unevenly
+float dWorn = smoothstep(0.60, 0.72, dBreak) * smoothstep(0.55, 0.95, dEdge);   // and worn through in a few patches (high-wear parts only)
+float dScratch = smoothstep(0.80, 0.94, dScr) * (0.10 + 0.90 * dZone) * smoothstep(0.30, 0.62, dMid * 0.5 + dLo * 0.5) * (1.0 - smoothstep(0.0007, 0.0020, dPx));
+#if D_KIND == 0
+  float smear = smoothstep(0.52, 0.82, dn3(dQ * vec3(52.0, 30.0, 15.0) + 11.0));      // palm and finger oil on the flats
+  dR = (dLo - 0.5) * 0.14 + (dMid - 0.5) * 0.08 + dGr * 0.10 - smear * 0.12;
+  dHt = dGr * 0.000012;
+  dAlb *= (0.90 + 0.20 * dLo) * (1.0 - 0.10 * smear);
+  dAlb = mix(dAlb, dAlb * 1.7 + 0.005, dPolish * 0.55); dR -= dPolish * 0.06;
+  dAlb = mix(dAlb, vec3(0.30, 0.31, 0.33), dScratch * 0.55); dR -= dScratch * 0.10; dHt -= dScratch * 0.000012;
+  metalnessFactor = mix(metalnessFactor, 1.0, max(dWorn, dScratch * 0.5));
+  dAlb = mix(dAlb, vec3(0.50, 0.51, 0.53), dWorn); dR = mix(dR, -0.10 + 0.12 * dMid, dWorn);
+#elif D_KIND == 3
+  float lay = dn3(vec3(dP.xy * 2600.0, dP.z * 36.0));                                  // surface-ground lay along the bore
+  float smear = smoothstep(0.50, 0.80, dn3(dQ * vec3(60.0, 34.0, 20.0) + 11.0));
+  dR = (dLo - 0.5) * 0.10 + (lay - 0.5) * 0.14 * dNear + dGr * 0.04 - smear * 0.11;
+  dHt = lay * 0.000007 * dNear;
+  dAlb *= (0.92 + 0.16 * dLo) * (1.0 - 0.12 * smear);
+  dAlb = mix(dAlb, dAlb * 1.9 + 0.006, dPolish * 0.6); dR -= dPolish * 0.06;
+  dAlb = mix(dAlb, vec3(0.16, 0.16, 0.17), dScratch * 0.35); dR -= dScratch * 0.06;
+  float through = dWorn * 0.8;                                                         // holster wear: grey steel, not silver
+  metalnessFactor = mix(metalnessFactor, 1.0, through); dAlb = mix(dAlb, vec3(0.36, 0.36, 0.37), through); dR = mix(dR, -0.06, through);
+#elif D_KIND == 1
+  float oil = smoothstep(0.30, 0.72, dn3(dQ * vec3(46.0, 46.0, 30.0) + 5.0));
+  float lay = dn3(vec3(dP.xy * 1400.0, dP.z * 60.0));
+  // phosphate: crystalline, porous, drinks oil
+  float cR = (dLo - 0.5) * 0.14 + dGr * 0.14 - oil * 0.20, cH = dGr * 0.000022 + dMid * 0.000004;
+  vec3 cA = dAlb * mix(1.22, 0.72, oil) * (0.94 + 0.12 * dMid);
+  cA = mix(cA, cA * 1.8 + 0.006, dPolish * 0.6); cR -= dPolish * 0.10;
+  float cM = metalnessFactor; float through = max(dWorn, dScratch * 0.6);
+  cM = mix(cM, 1.0, through); cA = mix(cA, vec3(0.40, 0.40, 0.41), through); cR = mix(cR, -0.26 + 0.10 * dMid, through);
+  // bare: turned or ground steel, faint lay, a little staining
+  float bR = -0.30 + (lay - 0.5) * 0.20 + (dLo - 0.5) * 0.14, bH = lay * 0.000008 * dNear;
+  vec3 bA = min(dAlb, vec3(0.78)) * (0.86 + 0.20 * dMid); bA = mix(bA, bA * vec3(0.72, 0.62, 0.50), smoothstep(0.62, 0.9, dLo) * 0.35);
+  dAlb = mix(cA, bA, dBare); dR = mix(cR, bR, dBare); dHt = mix(cH, bH, dBare); metalnessFactor = mix(cM, 1.0, dBare);
+#elif D_KIND == 4
+  // rubber and matte liners (the 'plain' group, absolute vertex albedo): fine moulded grain, chalky bloom, shiny where rubbed
+  float bloom = smoothstep(0.45, 0.80, dMid * 0.6 + dLo * 0.4);
+  dR = (dLo - 0.5) * 0.10 + dGr * 0.08 - dPolish * 0.22; dHt = dGr * 0.000018;
+  dAlb = mix(dAlb, dAlb * 1.5 + 0.012, bloom * 0.35) * (1.0 + 0.35 * dPolish);
+#else
+  float st = dn3(dP * 1500.0) * 0.6 + dh3(floor(dP * 3300.0)) * 0.4;                    // mould texture (VDI-ish spark finish)
+  dR = (dLo - 0.5) * 0.14 + (st - 0.5) * 0.12 * dNear - smoothstep(0.55, 0.90, dMid) * 0.035;
+  dHt = st * 0.000045 * dNear;
+  dAlb *= 0.92 + 0.16 * dLo;
+  // studded grip zones: 1.15 mm pyramids on a diagonal grid; past the range where they resolve they fold into roughness
+  float zk = smoothstep(0.35, 0.60, dZone); vec2 q = vec2(dUV.x + dUV.y, dUV.x - dUV.y) / 0.00115, qc = abs(fract(q) - 0.5);
+  float stud = 1.0 - smoothstep(0.10, 0.46, max(qc.x, qc.y)), studK = 1.0 - smoothstep(0.00024, 0.00056, dPx);   // gone before a stud is under two pixels: no moire
+  dHt += zk * stud * 0.00028 * studK; dR += zk * (0.10 - stud * 0.16 * studK);
+  dAlb *= 1.0 - zk * 0.14 * (1.0 - stud * studK);
+  // moulding parting line on the centre plane, flash trimmed
+  float pl = (1.0 - smoothstep(0.00012, 0.00034, abs(dP.x))) * step(dAn.x, 0.55) * dNear; dHt += pl * 0.00005; dR -= pl * 0.10;
+  // handling shine on edges, a few pale scuffs (polymer whitens where it is scraped)
+  float scuff = smoothstep(0.86, 0.96, dScr) * smoothstep(0.45, 0.70, dLo) * (1.0 - smoothstep(0.0007, 0.0020, dPx));
+  dAlb = mix(dAlb, dAlb * 1.5 + 0.006, dPolish * 0.5); dR -= dPolish * 0.12;
+  dAlb = mix(dAlb, dAlb * 2.0 + 0.015, scuff * 0.35 + dWorn * 0.25); dR += scuff * 0.06;
+#endif
+// recesses: darker, rougher, a little pale dust settled in them
+float dGrime = dCav * (0.55 + 0.45 * dMid);
+dAlb *= 1.0 - 0.50 * dGrime;
+dAlb = mix(dAlb, vec3(0.115, 0.100, 0.082), dCav * smoothstep(0.50, 0.85, dLo * 0.5 + dMid * 0.5) * 0.30);
+dR += dGrime * 0.22; metalnessFactor *= 1.0 - 0.5 * dGrime;
+// rain
+float dUpN = vWNrm.y, dUp = smoothstep(0.30, 0.75, dUpN) * uRain, dSide = (1.0 - smoothstep(0.10, 0.60, abs(dUpN))) * uRain;
+float dDrop = 0.0, dDropH = 0.0, dRun = 0.0;
+if (dUp > 0.002) { vec2 dD1 = dDrops(dUV, 0.0050, 3.0, 0.80), dD2 = dDrops(dUV + 0.31, 0.0024, 9.0, 0.90); dDrop = max(dD1.y, dD2.y) * dUp; dDropH = max(dD1.x, dD2.x) * dUp; }
+if (dSide > 0.002) dRun = smoothstep(0.80, 0.90, dn3(vec3(dP.x * 420.0 + dP.z * 610.0, dP.y * 9.0, dP.z * 37.0))) * smoothstep(0.42, 0.62, dLo) * dSide * (1.0 - smoothstep(0.0008, 0.0024, dPx));   // run-off: thin, sparse, broken trickles
+float dWet = max(dUp * (0.5 + 0.5 * smoothstep(0.3, 0.7, dLo)), dRun * 0.55);
+diffuseColor.rgb = dAlb * (1.0 - 0.20 * dWet);
+roughnessFactor = clamp(roughnessFactor + dR, 0.12, 1.0);
+roughnessFactor = mix(roughnessFactor, roughnessFactor * 0.52, dWet);
+roughnessFactor = mix(roughnessFactor, 0.20, dDrop * 0.8);
+float dOcc = 1.0 - 0.80 * dCav;
+`,
+    Vz = `
+normal = dBump(normal, dHt + dDropH * 0.17);
+`,
+    Wz = `
+reflectedLight.indirectDiffuse *= dOcc; reflectedLight.indirectSpecular *= dOcc * dOcc;
+reflectedLight.directDiffuse *= mix(1.0, dOcc, 0.35); reflectedLight.directSpecular *= mix(1.0, dOcc, 0.6);
+`;
+  function _E(n, e) {
+    let t = Bz[n.name];
+    return (
+      t && ((e = t.kind), n.color.setRGB(t.color[0], t.color[1], t.color[2]), (n.roughness = t.roughness), (n.metalness = t.metalness)),
+      (n.onBeforeCompile = (i) => {
+        ((i.uniforms.uRain = iy),
+          (i.vertexShader = i.vertexShader
+            .replace(
+              "#include <common>",
+              `#include <common>
+attribute vec4 aSurf; varying vec3 vObjP; varying vec3 vWNrm; varying vec3 vONrm; varying vec4 vSurf;`,
+            )
+            .replace(
+              "#include <begin_vertex>",
+              `#include <begin_vertex>
+vObjP = position; vONrm = normal; vWNrm = normalize(mat3(modelMatrix) * normal); vSurf = aSurf;`,
+            )),
+          (i.fragmentShader = i.fragmentShader
+            .replace(
+              "#include <common>",
+              `#include <common>
+#define D_KIND ` +
+                (e | 0) +
+                `
+` +
+                Hz,
+            )
+            .replace(
+              "#include <metalnessmap_fragment>",
+              `#include <metalnessmap_fragment>
+` + Oz,
+            )
+            .replace(
+              "#include <normal_fragment_maps>",
+              `#include <normal_fragment_maps>
+` + Vz,
+            )
+            .replace(
+              "#include <aomap_fragment>",
+              `#include <aomap_fragment>
+` + Wz,
+            )));
+      }),
+      (n.customProgramCacheKey = () => "pac-detail-3-" + e),
+      n
+    );
+  }
+  var u5 = (n, e, t) => {
+    let i = Math.min(1, Math.max(0, (t - n) / (e - n)));
+    return i * i * (3 - 2 * i);
+  };
+
+// ---- beautified bundle lines 55191-55240 ----
+  function vh(n, e, t = {}) {
+    let i = n.index ? n.toNonIndexed() : n,
+      s = i.attributes.position.array,
+      o = i.attributes.normal ? i.attributes.normal.array : null,
+      r = [],
+      a = [];
+    for (let b = 0; b < s.length; b += 9) {
+      let g = s[b + 3] - s[b],
+        E = s[b + 4] - s[b + 1],
+        M = s[b + 5] - s[b + 2],
+        _ = s[b + 6] - s[b],
+        T = s[b + 7] - s[b + 1],
+        w = s[b + 8] - s[b + 2];
+      if (!(Math.hypot(E * w - M * T, M * _ - g * w, g * T - E * _) < 1e-11))
+        for (let S = 0; S < 9; S++) (r.push(s[b + S]), o && a.push(o[b + S]));
+    }
+    let l = new pt();
+    (l.setAttribute("position", new nt(new Float32Array(r), 3)),
+      t.keepN && o ? l.setAttribute("normal", new nt(new Float32Array(a), 3)) : Gz(l, t.crease || 50));
+    let c = r.length / 3,
+      u = l.attributes.normal.array,
+      f = new Float32Array(c * 3),
+      h = new Float32Array(c * 4),
+      p = new Float32Array(c),
+      d = new Float32Array(c),
+      m = t.wear == null ? 1 : t.wear,
+      x = t.bare || 0,
+      v = t.zone || 0,
+      y = t.ao || 0;
+    for (let b = 0; b < c; b += 3) {
+      let g = 0,
+        E = 0;
+      for (let M = 0; M < 3; M++) {
+        let _ = b + M,
+          T = b + ((M + 1) % 3),
+          w = r[T * 3] - r[_ * 3],
+          S = r[T * 3 + 1] - r[_ * 3 + 1],
+          R = r[T * 3 + 2] - r[_ * 3 + 2],
+          z = w * w + S * S + R * R,
+          I = ((u[T * 3] - u[_ * 3]) * w + (u[T * 3 + 1] - u[_ * 3 + 1]) * S + (u[T * 3 + 2] - u[_ * 3 + 2]) * R) / z;
+        (I > g && (g = I), I < E && (E = I));
+      }
+      ((p[b] = p[b + 1] = p[b + 2] = g), (d[b] = d[b + 1] = d[b + 2] = E));
+    }
+    for (let b = 0; b < c; b++)
+      ((f[b * 3] = e[0]),
+        (f[b * 3 + 1] = e[1]),
+        (f[b * 3 + 2] = e[2]),
+        (h[b * 4] = Math.min(1, u5(110, 520, p[b]) * m)),
+        (h[b * 4 + 1] = Math.min(1, (t.aoFn ? Math.max(y, t.aoFn(r[b * 3], r[b * 3 + 1], r[b * 3 + 2])) : y) + 0.7 * u5(110, 520, -d[b]))),
+
+// ---- beautified bundle lines 55514-55625 ----
+  function sy(n, e = null, t = 0.002) {
+    let i = [1e9, 1e9, 1e9],
+      s = [-1e9, -1e9, -1e9],
+      o = [];
+    for (let E of n) {
+      let M = E.g.attributes.position.array,
+        _ = E.g.attributes.normal.array,
+        T = new Float32Array(M.length),
+        w = new Float32Array(M.length),
+        S = Math.cos(E.rx || 0),
+        R = Math.sin(E.rx || 0),
+        z = E.off || [0, 0, 0];
+      for (let I = 0; I < M.length; I += 3) {
+        ((T[I] = M[I] + z[0]),
+          (T[I + 1] = M[I + 1] * S - M[I + 2] * R + z[1]),
+          (T[I + 2] = M[I + 1] * R + M[I + 2] * S + z[2]),
+          (w[I] = _[I]),
+          (w[I + 1] = _[I + 1] * S - _[I + 2] * R),
+          (w[I + 2] = _[I + 1] * R + _[I + 2] * S));
+        for (let L = 0; L < 3; L++) (T[I + L] < i[L] && (i[L] = T[I + L]), T[I + L] > s[L] && (s[L] = T[I + L]));
+      }
+      o.push({ w: T, wn: w });
+    }
+    let r = 8,
+      a = Math.ceil((s[0] - i[0]) / t) + 2 * r,
+      l = Math.ceil((s[1] - i[1]) / t) + 2 * r,
+      c = Math.ceil((s[2] - i[2]) / t) + 2 * r,
+      u = new Uint8Array(a * l * c),
+      f = i[0] - r * t,
+      h = i[1] - r * t,
+      p = i[2] - r * t,
+      d = 1 / t,
+      m = t * 0.9;
+    for (let { w: E } of o)
+      for (let M = 0; M < E.length; M += 9) {
+        let _ = E[M],
+          T = E[M + 1],
+          w = E[M + 2],
+          S = E[M + 3] - _,
+          R = E[M + 4] - T,
+          z = E[M + 5] - w,
+          I = E[M + 6] - _,
+          L = E[M + 7] - T,
+          U = E[M + 8] - w,
+          k = Math.max(1, Math.ceil(Math.hypot(S, R, z) / m)),
+          C = Math.max(1, Math.ceil(Math.hypot(I, L, U) / m));
+        for (let A = 0; A <= k; A++) {
+          let F = A / k,
+            H = Math.max(1, Math.ceil(C * (1 - F)));
+          for (let N = 0; N <= H; N++) {
+            let Z = (N / H) * (1 - F);
+            u[((((w + z * F + U * Z - p) * d) | 0) * l + (((T + R * F + L * Z - h) * d) | 0)) * a + (((_ + S * F + I * Z - f) * d) | 0)] =
+              1;
+          }
+        }
+      }
+    let x = (E, M, _) => u[((((_ - p) * d) | 0) * l + (((M - h) * d) | 0)) * a + (((E - f) * d) | 0)],
+      v = [0.0032, 0.007],
+      y = [1, 0.6],
+      b = [1, -0.5, -0.5],
+      g = [0, 0.866, -0.866];
+    n.forEach((E, M) => {
+      let { w: _, wn: T } = o[M],
+        w = E.g.attributes.aSurf.array;
+      for (let S = 0; S < _.length; S += 9) {
+        let R = Math.max(
+            Math.hypot(_[S + 3] - _[S], _[S + 4] - _[S + 1], _[S + 5] - _[S + 2]),
+            Math.hypot(_[S + 6] - _[S + 3], _[S + 7] - _[S + 4], _[S + 8] - _[S + 5]),
+            Math.hypot(_[S] - _[S + 6], _[S + 1] - _[S + 7], _[S + 2] - _[S + 8]),
+          ),
+          z = 1 - u5(0.012, 0.045, R);
+        for (let I = 0; I < 3; I++) {
+          let L = S + I * 3,
+            U = L / 3,
+            k = _[L],
+            C = _[L + 1],
+            A = _[L + 2],
+            F = T[L],
+            H = T[L + 1],
+            N = T[L + 2];
+          if (e) {
+            let ue = e(k, C, A, E.key);
+            ue > w[U * 4 + 3] && (w[U * 4 + 3] = ue);
+          }
+          if (z <= 0) continue;
+          let Z, Q, W;
+          Math.abs(F) < 0.8 ? ((Z = 0), (Q = -N), (W = H)) : ((Z = N), (Q = 0), (W = -F));
+          let J = Math.hypot(Z, Q, W) || 1;
+          ((Z /= J), (Q /= J), (W /= J));
+          let G = H * W - N * Q,
+            te = N * Z - F * W,
+            oe = F * Q - H * Z,
+            ee = 0,
+            le = 0,
+            xe = k + F * t * 1.3,
+            j = C + H * t * 1.3,
+            O = A + N * t * 1.3;
+          for (let ue = 0; ue < 4; ue++) {
+            let de = F,
+              $ = H,
+              se = N;
+            if (ue) {
+              let fe = b[ue - 1] * 0.78,
+                me = g[ue - 1] * 0.78;
+              ((de = F * 0.62 + Z * fe + G * me), ($ = H * 0.62 + Q * fe + te * me), (se = N * 0.62 + W * fe + oe * me));
+            }
+            ((le += 1.6),
+              x(xe + de * v[0], j + $ * v[0], O + se * v[0]) ? (ee += 1.6) : x(xe + de * v[1], j + $ * v[1], O + se * v[1]) && (ee += 0.6));
+          }
+          let q = Math.min(1, (ee / le) * 1.4) * z;
+          q > w[U * 4 + 1] && (w[U * 4 + 1] = Math.min(1, q + w[U * 4 + 1] * 0.4));
+        }

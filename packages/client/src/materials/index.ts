@@ -78,7 +78,7 @@ export async function makeMaterials(renderer: WebGLRenderer): Promise<Set> {
       map: col,
       normalMap: nor,
       roughnessMap: rgh,
-      metalness: name === 'metal' ? 0.85 : 0,
+      metalness: name === 'metal' ? 0.85 : name === 'verdigris' ? 0.25 : 0,
       vertexColors: true, // Batch writes per-vertex grime/AO into the colour attribute
     });
   });

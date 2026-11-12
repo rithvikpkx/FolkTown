@@ -134,6 +134,15 @@ void surf(vec2 uv, out vec3 c, out float h, out float r) {
   float s = sc > 0.72 ? 1.0 : 0.0, k = 200.0 + g * 40.0 + s * 30.0;
   c = vec3(k); h = g * 0.6 + s * 0.5; r = 0.34 + g * 0.22 - s * 0.12;
 }`,
+  verdigris: /* glsl */ `
+void surf(vec2 uv, out vec3 c, out float h, out float r) {
+  // oxidised copper roofing: blue-green patina, vertical standing seams every 1/4 repeat, streaky bare-copper tint
+  float g = fbm(uv, 70, 171, 3), st = fbm(uv, ivec2(24, 3), 173, 3), big = fbm(uv, 4, 177, 3);
+  float seam = abs(fract(uv.x * 4.0) - 0.5) > 0.47 ? 1.0 : 0.0;
+  vec3 b = mix(vec3(92.0, 150.0, 128.0), vec3(122.0, 176.0, 152.0), big);
+  b = mix(b, vec3(84.0, 112.0, 88.0), sstep(0.62, 0.8, st) * 0.6);
+  c = b * (0.82 + g * 0.3) * (1.0 - seam * 0.25); h = g * 0.5 + seam * 0.6; r = 0.6 + g * 0.25;
+}`,
   polymer: /* glsl */ `
 void surf(vec2 uv, out vec3 c, out float h, out float r) {
   ivec2 p = ivec2(uv * N) / 2;

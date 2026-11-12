@@ -8,6 +8,7 @@ export const MATERIAL_NAMES = [
   'metal',
   'polymer',
   'fabric',
+  'verdigris',
 ] as const;
 export type MaterialName = (typeof MATERIAL_NAMES)[number];
 
@@ -27,4 +28,5 @@ export const TILING: Record<MaterialName, { tile: number; size: number; bump: nu
   metal: { tile: 1, size: 512, bump: 2 },
   polymer: { tile: 1, size: 512, bump: 1.5 },
   fabric: { tile: 1, size: 512, bump: 3 },
+  verdigris: { tile: 1, size: 512, bump: 2 },
 };

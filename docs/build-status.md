@@ -80,7 +80,7 @@ Cloud lock: done
 
 ### Cloud client status
 
-Client lock: free
+Client lock: 2026-11-12T12:16Z
 
 Work package numbers are from section 8 of the plan.
 

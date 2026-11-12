@@ -8,7 +8,6 @@ import {
   type ZoneData,
 } from '@folktown/shared';
 import { Vector3 } from 'three';
-import zoneJson from '../../../data/zones/engineering-mall.json';
 import { AudioSystem } from './audio/audio';
 import { cameraPose } from './game/camera';
 import { CameraFeel } from './game/feel';
@@ -32,12 +31,20 @@ const canvas = document.createElement('canvas');
 document.body.appendChild(canvas);
 const { scene, camera } = createScene(innerWidth / innerHeight);
 scene.add(camera);
-const zone = zoneJson as unknown as ZoneData;
+// ?zone=<name> picks data/zones/<name>.json (default purdue-mall); the JSON is loaded on demand.
+const zoneFiles = import.meta.glob('../../../data/zones/*.json', { import: 'default' });
+const zoneName = q.get('zone') ?? 'purdue-mall';
+const loadZone = zoneFiles[`../../../data/zones/${zoneName}.json`];
+if (!loadZone) throw new Error(`unknown zone "${zoneName}"`);
+const zone = (await loadZone()) as ZoneData;
 const cx = (zone.bounds.minX + zone.bounds.maxX) / 2;
 const cz = (zone.bounds.minZ + zone.bounds.maxZ) / 2;
 const fx = createRenderer(canvas, scene, camera, {
   ...parseFx(location.search),
-  shadow: { center: new Vector3(cx, 0, cz), size: 340 },
+  shadow: {
+    center: new Vector3(cx, 0, cz),
+    size: Math.max(340, zone.bounds.maxX - zone.bounds.minX, zone.bounds.maxZ - zone.bounds.minZ),
+  },
 });
 addEventListener('resize', () => fx.resize());
 // frame-time ring buffer (ms) for tools/bench.mjs and shoot.mjs
@@ -123,6 +130,17 @@ function startGame() {
     input.ads = q.get('ads') === '1';
   }
 
+  // Soft edge: the sim holds the player at the zone border; a note shows when they are near it.
+  const edge = document.createElement('div');
+  edge.style.cssText =
+    'position:fixed;left:50%;top:18%;transform:translateX(-50%);color:#fff;font:600 16px system-ui;text-shadow:0 1px 4px #000;pointer-events:none;opacity:0;transition:opacity .4s';
+  edge.textContent = 'Edge of the play area';
+  document.body.appendChild(edge);
+  const nearEdge = (x: number, z: number) => {
+    const b = zone.bounds;
+    return Math.min(x - b.minX, b.maxX - x, z - b.minZ, b.maxZ - z) < 12;
+  };
+
   let last = performance.now();
   let lodT = 0;
   let hudT = 0;
@@ -184,6 +202,7 @@ function startGame() {
       lodT = 0.5;
       view.updateLod(pose.x, pose.z);
     }
+    edge.style.opacity = nearEdge(pos.x, pos.z) ? '1' : '0';
     viewModel.update(dt, me, input.ads);
     hudT -= dt;
     if (hudT <= 0) {

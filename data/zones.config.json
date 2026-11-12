@@ -1,0 +1,28 @@
+{
+  "engineering-mall": {
+    "name": "Engineering Mall",
+    "centre": [-30, -290],
+    "size": 300,
+    "navSpacing": 6,
+    "clearance": 1.5,
+    "spawnsPerTeam": 12
+  },
+  "purdue-mall": {
+    "name": "Purdue Mall",
+    "bounds": [-190, 275, -335, 135],
+    "centre": [42, -100],
+    "size": 465,
+    "navSpacing": 6,
+    "clearance": 1.5,
+    "spawnsPerTeam": 14,
+    "landmarks": { "bellTower": [0, 0], "fountain": [23.73, -151.06], "walc": "way/508846031" },
+    "extraBuildings": [
+      {
+        "id": "relation/3759822",
+        "name": "Stanley Coulter Hall (SC)",
+        "height": 14,
+        "outer": [[-54.8, 56.7], [1.6, 56.7], [1.6, 112.1], [-54.8, 112.1]]
+      }
+    ]
+  }
+}

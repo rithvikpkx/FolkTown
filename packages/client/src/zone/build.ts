@@ -32,7 +32,7 @@ export const NEAR_DISTANCE = 150;
 /** Hysteresis so a building at the threshold does not flip every check. */
 const NEAR_HYST = 15;
 
-/** Where the landmarks stand (world metres). The Bell Tower is the map origin, south of the zone. */
+/** Fallback landmark positions for zones baked without landmark records (the old Engineering Mall). */
 export const LANDMARKS = {
   bellTower: [0, 0, 0] as [number, number, number],
   fountain: { x: 0, z: -165 },
@@ -156,11 +156,17 @@ export function buildZone(scene: Scene, mats: Mats, zone: ZoneData): ZoneView {
     glass: glassMaterial(),
   };
 
-  const buildings: Building[] = zone.colliders.map((c) => {
-    const g = new Group();
-    group.add(g);
-    return { c, wall: wallFor(c.id), near: null, far: null, group: g, isNear: false };
-  });
+  const lmk = zone.landmarks;
+  const bell = lmk?.bellTower ?? { x: LANDMARKS.bellTower[0], z: LANDMARKS.bellTower[2] };
+  const fountain = lmk?.fountain ?? LANDMARKS.fountain;
+  // The Bell Tower's own footprint is drawn by the tower model, not as a facade.
+  const buildings: Building[] = zone.colliders
+    .filter((c) => c.id !== lmk?.bellTower?.id)
+    .map((c) => {
+      const g = new Group();
+      group.add(g);
+      return { c, wall: wallFor(c.id), near: null, far: null, group: g, isNear: false };
+    });
 
   const make = (bd: Building, near: boolean) => {
     const B = new Batches();
@@ -188,8 +194,8 @@ export function buildZone(scene: Scene, mats: Mats, zone: ZoneData): ZoneView {
   for (const o of treeMeshes(zone.props, mats)) group.add(o);
 
   const lm = new Group();
-  buildBellTower(scene, mats, LANDMARKS.bellTower);
-  lm.add(buildFountain(mats, LANDMARKS.fountain.x, LANDMARKS.fountain.z));
+  buildBellTower(scene, mats, [bell.x, gy, bell.z]);
+  lm.add(buildFountain(mats, fountain.x, fountain.z));
   group.add(lm);
   scene.add(group);
 

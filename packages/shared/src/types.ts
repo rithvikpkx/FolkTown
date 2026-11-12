@@ -131,6 +131,13 @@ export interface ZoneData {
   props: PropData[];
   spawns: SpawnData[];
   nav: { nodes: NavNode[]; edges: [a: number, b: number][] };
+  /** Real landmark positions, so the client does not hard-code them. Absent on older zones. */
+  landmarks?: {
+    /** `id` is the footprint collider the tower stands in, if any (the client draws the tower itself, not a facade). */
+    bellTower?: { x: number; z: number; id?: string };
+    fountain?: { x: number; z: number };
+    walc?: { id: string; x: number; z: number };
+  };
 }
 
 export type MatchMode = 'ffa' | 'tdm';

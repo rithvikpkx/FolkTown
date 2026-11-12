@@ -226,3 +226,24 @@ Data © OpenStreetMap contributors, available under the Open Database License.
 | Yue-Kong Pao Hall | university | - | - |
 | Zeta Tau Alpha | yes | - | - |
 | hub | apartments | - | - |
+
+## Purdue Mall zone (Z1) target match
+
+Zone `purdue-mall` (`data/zones.config.json`): x -190..275, z -335..135 (465 x 470 m), origin Bell Tower. Matched to `data/campus.json` by name; heights are LiDAR P90 (`heightLidar`).
+
+| Target | OSM id | Matched name | Height (m) | Note |
+|---|---|---|---|---|
+| Bell Tower | way/301837711 | Purdue Bell Tower | 45.9 | drawn by the tower model, footprint kept as collider |
+| WALC | way/508846031 | Wilmeth Active Learning Center (WALC) | 21.0 | landmark record |
+| Elliott Hall of Music | way/74151922 | Elliott Hall of Music (ELLT) | 23.8 | |
+| Hovde Hall of Administration | way/75498146 | Hovde Hall of Administration (HOVD) | 18.3 | |
+| Stanley Coulter Hall | relation/3759822 | Stanley Coulter Hall (SC) | 14 (assumed) | geometry missing from campus.json; baked as the relation's bounding box |
+| Psychological Sciences | way/117147173 | Psychological Sciences Building (PSYC) | 17.5 | |
+| Hall of Data Science and AI | way/117146492 | Hall of Data Science and AI (DSAI) | 16.2 | |
+| Forney Hall of Chemical Engineering | way/117146497 | Forney Hall of Chemical Engineering (FRNY) | 22.9 | |
+| Cheney Hall | way/866802210 | Chaney-Hale Hall of Science (CHAS) | 13.1 | no "Cheney" in OSM; closest name, owner to confirm |
+| Mechanical Engineering Building | way/158307862 | Mechanical Engineering (ME) | 20.5 | |
+| Materials Science and Electrical Engineering | way/158307858 | Materials Science and Electrical Engineering (MSEE) | 19.4 | |
+| BHEE | way/158307860 | Max W & Maileen Brown Family Hall of Electrical Engineering (BHEE) | 18.6 | |
+| Duncan Annex | none | MISSING | | not in OSM; unnamed buildings near ME/MSEE (way/1033674918, way/1033674919) are candidates |
+| Engineering Fountain | way/283274213 | Engineering Fountain (amenity=fountain, fetched from Overpass; not in `data/raw`) | | centre (23.73, -151.06) |

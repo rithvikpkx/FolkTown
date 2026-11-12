@@ -241,6 +241,15 @@ function substep(state: PlayerState, input: PlayerInput, col: ZoneCollision, dt:
     if (!moved) break;
   }
 
+  // Invisible walls at the zone edge.
+  const zb = col.zone.bounds;
+  const cx = clamp(pos.x, zb.minX + r, zb.maxX - r);
+  const cz = clamp(pos.z, zb.minZ + r, zb.maxZ - r);
+  if (cx !== pos.x) vel.x = 0;
+  if (cz !== pos.z) vel.z = 0;
+  pos.x = cx;
+  pos.z = cz;
+
   // Vertical.
   vel.y -= GRAVITY * dt;
   pos.y += vel.y * dt;

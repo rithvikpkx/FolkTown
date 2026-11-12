@@ -3,10 +3,25 @@
 //   near: recessed windows (reveals, sills, frame plate, per-pane tinted glass), base course, cornice, parapet or eave roof;
 //   far (> FAR m from the camera): one textured wall mesh + flat roof. Both merged per 64 m chunk, one mesh per material.
 // Collision is untouched (it uses the footprints). Materials come from G.mats (Saltline's set); glass is a tinted metal-ish standard material.
-import { BufferGeometry, Float32BufferAttribute, Group, Mesh, MeshStandardMaterial, CanvasTexture, Color, RepeatWrapping, SRGBColorSpace, Shape, ShapeGeometry } from 'three';
+import { BufferGeometry, Float32BufferAttribute, Group, Mesh, MeshStandardMaterial, CanvasTexture, Color, ClampToEdgeWrapping, MirroredRepeatWrapping, RepeatWrapping, TextureLoader, SRGBColorSpace, Shape, ShapeGeometry } from 'three';
 import STYLES from './building-styles.json';
 
 const CHUNK = 64, FAR = 150, BUDGET = 4000;
+
+// ---------- Street View facade photos ----------
+/** manifest.json + one texture per photographed building -> { id: { map, w, h, y0, color, mat, fallback } }; {} when the manifest is missing */
+export async function loadFacadePhotos(dir) {
+  let man; try { man = await (await fetch(dir + 'manifest.json')).json(); } catch { return {}; }
+  const loader = new TextureLoader(), out = {};
+  await Promise.all(Object.entries(man).map(async ([id, m]) => {
+    out[id] = { ...m };
+    if (!m.tex) return;
+    try {
+      out[id].map = await new Promise((ok, no) => loader.load(dir + m.tex, (t) => { t.wrapS = MirroredRepeatWrapping; t.wrapT = ClampToEdgeWrapping; t.colorSpace = SRGBColorSpace; t.anisotropy = 8; ok(t); }, undefined, no));
+    } catch { out[id].fallback = true; out[id].mat = 'brick'; }
+  }));
+  return out;
+}
 
 // ---------- styles ----------
 const mix = (...os) => os.reduce((a, o) => {
@@ -130,6 +145,11 @@ function building(f, S, level, get) {
   };
   for (let i = 0; i < n; i++) {
     const e = R[(i + 1) % n], L = Math.hypot(e[0] - R[i][0], e[1] - R[i][1]);
+    if (S.photo) { // Street View facade tile as the wall base on every face: u in tile widths along the edge, v by height (no window geometry, the photo has the windows)
+      const ph = S.photo, v = (y) => (y - ph.y0) / ph.h, u1 = L / ph.w;
+      W.q(P(i, 0, y0, 0), P(i, 0, top - zone, 0), P(i, L, top - zone, 0), P(i, L, y0, 0), null, [[0, v(y0)], [0, v(top - zone)], [u1, v(top - zone)], [u1, v(y0)]]);
+      continue;
+    }
     const nb = wH < 0.6 ? 0 : Math.floor((L - 1.8) / S.bay);
     if (nb < 1) { face(W, i, 0, y0, L, top - zone, 0); continue; }
     const bay = (L - 1.8) / nb, ww = Math.min(bay - 0.5, S.winW);
@@ -196,7 +216,9 @@ export function buildFacades(G, data, root, opts = {}) {
   const getter = (S, map) => {
     const get = (kind, colored) => {
       let key, make;
-      if (kind === 'wall') { key = `wall|${S.wall.mat}|${S.wall.color}|${S.wall.scale}`; make = () => G.mats.get(S.wall.mat, { triplanar: true, scale: S.wall.scale, color: hex(S.wall.color) }); }
+      if (kind === 'wall' && S.photo) { key = `photo|${S.photo.id}`; make = () => new MeshStandardMaterial({ map: S.photo.map, roughness: 0.9, metalness: 0 }); }
+      else if (kind === 'farwall' && S.photo) { key = `farphoto|${S.photo.id}`; make = () => new MeshStandardMaterial({ color: new Color(S.photo.color), roughness: 0.9, metalness: 0 }); } // far LOD: the tile's average colour
+      else if (kind === 'wall') { key = `wall|${S.wall.mat}|${S.wall.color}|${S.wall.scale}`; make = () => G.mats.get(S.wall.mat, { triplanar: true, scale: S.wall.scale, color: hex(S.wall.color) }); }
       else if (kind === 'trim') { key = `trim|${S.trim.mat}|${S.trim.color}`; make = () => G.mats.get(S.trim.mat, { triplanar: true, scale: 2, color: hex(S.trim.color) }); }
       else if (kind === 'frame') { key = `frame|${S.frame.mat}|${S.frame.color}`; make = () => G.mats.get(S.frame.mat, { triplanar: true, ...(S.frame.color ? { color: hex(S.frame.color) } : {}) }); }
       else if (kind === 'roof') { key = `roof|${S.roof.mat}|${S.roof.color}`; make = () => G.mats.get(S.roof.mat, { triplanar: true, scale: 3, color: hex(S.roof.color) }); }
@@ -213,6 +235,9 @@ export function buildFacades(G, data, root, opts = {}) {
     if (opts.skip && opts.skip.includes(f.id)) continue; // built elsewhere (walc.js)
     const S = styleFor(f.id, styles);
     S.gc = new Color(S.glass);
+    const P = opts.photos && opts.photos[f.id]; // from public/campus/facades/manifest.json (tools/facade-extract.py)
+    if (P && P.map) S.photo = { id: f.id, map: P.map, w: P.w, h: P.h, y0: P.y0, color: P.color };
+    else if (P && P.fallback) S.wall = { ...S.wall, mat: P.mat, color: '#' + new Color(P.color).multiplyScalar(1.45).getHexString() }; // x1.45: the colour tints a mid-albedo brick/concrete texture // no usable photo: class + colour from the nearest photographed buildings
     const key = `${Math.floor((f.minX + f.maxX) / 2 / CHUNK)},${Math.floor((f.minZ + f.maxZ) / 2 / CHUNK)}`;
     const ch = chunks.get(key) || { near: new Map(), far: new Map(), pts: [] };
     chunks.set(key, ch);

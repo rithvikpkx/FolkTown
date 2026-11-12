@@ -204,7 +204,7 @@ export function buildGround(zone, mats, opts = {}) {
     aA: { value: asph.albedo },
   };
   // optional aerial orthophoto (walk mode): {texture, xMin, zMin, w, h}; blended in beyond `near` metres from the camera so PBR detail stays close
-  const o = opts.ortho, X = !!opts.decals; // X: walk extras (decals, wear, seams, leaf litter, georeferenced ortho)
+  const o = opts.ortho, F = opts.far, X = !!opts.decals; // X: walk extras (decals, wear, seams, leaf litter, georeferenced ortho)
   if (X) {
     const dc = getDecals(zone), dirt = loadSet('dirt', aniso, tiles, opts.dir, ['albedo']), lv = loadSet('leaves', aniso, tiles, opts.dir, ['albedo']);
     Object.assign(u, { uDecal: { value: dc.texture }, uDO: { value: dc.origin }, uDS: { value: dc.size }, dA: { value: dirt.albedo }, lA: { value: lv.albedo },
@@ -214,6 +214,7 @@ export function buildGround(zone, mats, opts = {}) {
     const f = o.fit, c = Math.cos(f.theta), sn = Math.sin(f.theta);
     Object.assign(u, { uOM: { value: new Matrix3().set(c, -sn, 0, sn, c, 0, 0, 0, 1) }, uOC: { value: new Vector2(f.cx, f.cz) }, uOD: { value: new Vector2(f.dx, f.dz) } });
   }
+  if (F) Object.assign(u, { uFar: { value: F.texture }, uFB: { value: new Vector4(F.xMin, F.zMin, F.w, F.h) } }); // far-field photo albedo (walk): canopy-free mosaic of the whole region
   if (o) { u.uOrtho = { value: o.texture }; u.uOB = { value: new Vector4(o.xMin, o.zMin, o.w, o.h) }; u.uONear = { value: o.near ?? 7 }; }
   const mat = new MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0 });
   mat.name = 'campus_ground';
@@ -223,7 +224,7 @@ export function buildGround(zone, mats, opts = {}) {
       .replace('#include <common>', '#include <common>\nvarying vec3 vWP;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     s.fragmentShader = s.fragmentShader
-      .replace('#include <common>', `#include <common>\nvarying vec3 vWP;\nuniform sampler2D uMask,gA,gN,pA,pN,aA; uniform vec2 uOrg,uSize;\n${o ? 'uniform sampler2D uOrtho; uniform vec4 uOB; uniform float uONear;' : ''}${o && o.fit ? 'uniform mat3 uOM; uniform vec2 uOC, uOD;' : ''}${X ? 'uniform sampler2D uDecal,dA,lA; uniform vec2 uDO,uDS; uniform float uLeaf,uDry;' : ''}\n${GLSL_NOISE}`)
+      .replace('#include <common>', `#include <common>\nvarying vec3 vWP;\nuniform sampler2D uMask,gA,gN,pA,pN,aA; uniform vec2 uOrg,uSize;\n${F ? 'uniform sampler2D uFar; uniform vec4 uFB;' : ''}${o ? 'uniform sampler2D uOrtho; uniform vec4 uOB; uniform float uONear;' : ''}${o && o.fit ? 'uniform mat3 uOM; uniform vec2 uOC, uOD;' : ''}${X ? 'uniform sampler2D uDecal,dA,lA; uniform vec2 uDO,uDS; uniform float uLeaf,uDry;' : ''}\n${GLSL_NOISE}`)
       .replace('#include <map_fragment>', /* glsl */ `
         vec2 wp = vWP.xz;
         vec4 mk = texture2D(uMask, (wp - uOrg) / uSize);
@@ -276,6 +277,11 @@ export function buildGround(zone, mats, opts = {}) {
           vec3 la = texture2D(lA, wp / 1.1).rgb;
           alb = mix(alb, mix(vec3(dot(la, vec3(0.333))), la, 0.6) * vec3(1.0, 0.82, 0.6), clamp(lf, 0.0, 0.7));
         }` : ''}
+        ${F ? `{ vec2 fu = (wp - uFB.xy) / uFB.zw;
+          float fin = step(0.0, fu.x) * step(fu.x, 1.0) * step(0.0, fu.y) * step(fu.y, 1.0);
+          vec3 fc = texture2D(uFar, clamp(fu, 0.0, 1.0)).rgb;
+          float fdl = dot(alb, vec3(0.3, 0.59, 0.11)); fc *= clamp(0.85 + 0.9 * (fdl - 0.2), 0.6, 1.35); // carry the PBR detail through
+          alb = mix(alb, fc * 0.95, fin * smoothstep(8.0, 32.0, length(vWP - cameraPosition)) * 0.85); }` : ''}
         ${o ? `{ ${o.fit ? 'vec2 wq = (uOM * vec3(wp - uOC, 0.0)).xy + uOC + uOD;' : 'vec2 wq = wp;'}
           vec2 ou = (wq - uOB.xy) / uOB.zw;
           float inb = step(0.0, ou.x) * step(ou.x, 1.0) * step(0.0, ou.y) * step(ou.y, 1.0);
@@ -295,7 +301,7 @@ export function buildGround(zone, mats, opts = {}) {
       .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = gRough;')
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n  normal = normalize((viewMatrix * vec4(gWN, 0.0)).xyz);');
   };
-  mat.customProgramCacheKey = () => 'campus_ground_v2' + (o ? 'o' : '') + (X ? 'x' : '') + (opts.paveName ?? '');
+  mat.customProgramCacheKey = () => 'campus_ground_v2' + (o ? 'o' : '') + (F ? 'f' : '') + (X ? 'x' : '') + (opts.paveName ?? '');
 
   const w = b.maxX - b.minX + 2 * FAR, h = b.maxZ - b.minZ + 2 * FAR;
   const geo = new PlaneGeometry(w, h, 1, 1).rotateX(-Math.PI / 2);

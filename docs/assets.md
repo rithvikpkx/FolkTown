@@ -181,3 +181,4 @@ Note: the brief called Elliott circular/domed; the data show a rectangular hippe
 | Asset | Used for | Source URL | Licence | Credit needed |
 |---|---|---|---|---|
 | CampusMapper Purdue campus map SVG + places JSON (not shipped; downloaded to data/raw/campusmapper/) | Cross-check of building outlines, official names and Purdue codes (docs/layout-report.md); no artwork copied, names and codes only | https://campusmapper.com/wp-content/uploads/2026/09/purdue-university-campus-map-2d.svg and https://campusmapper.com/wp-content/uploads/campusmapper-data/9332-3153f440b4d9.json | needs-clearance (unknown) | Unknown |
+| v6 roof atlas + far-field ground albedo (`public/campus/walk/roofs/atlas-*.webp`, `ground-far.jpg`) | Top-down orthographic render of the Google Photorealistic 3D Tiles mesh (`data/google/mall-area.glb`) by `tools/google-topdown.mjs`, processed by `tools/google-roofs.py` | needs-clearance | Owner states usage rights; attribution "Google" |

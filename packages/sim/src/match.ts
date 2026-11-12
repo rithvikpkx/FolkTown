@@ -100,6 +100,15 @@ export class Match {
     return st;
   }
 
+  /** Live player states in join order. Read-only by contract: bots and tools read, never write. */
+  get playerList(): readonly PlayerState[] {
+    return this.players;
+  }
+
+  get isEnded(): boolean {
+    return this.ended;
+  }
+
   getPlayer(id: number): PlayerState | undefined {
     return this.byId.get(id);
   }

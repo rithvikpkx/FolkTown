@@ -34,7 +34,7 @@ The owner asked for the MVP (end of Stage 2) to be built without check-ins, as c
 - **Fresh context per task (owner's rule, be mindful of usage):** every work package is done by a fresh subagent, never inside an orchestrator's own context. An orchestrator session handles at most 3 packages, then writes its handoff here, pushes, and ends; a new session continues from this file. Read only the files and line ranges a task needs.
 - **Models and effort (owner's rule, 12 November):** orchestrators and workers both run on Sonnet (`claude-sonnet-5-5`), in the cloud and locally. Opus only if a Sonnet worker has failed the same package twice; note it here when that happens. When spawning a worker, set effort `medium` for routine packages (ports, pipelines, data, UI, tests); leave the default effort for the hard ones: WP4 effects chain, WP8 facades, bots and navigation.
 - **Starting the local track:** a fresh local session per batch, started with `claude --model sonnet "continue the local track per docs/build-status.md"` (this repo's local settings already default to Sonnet, so plain `claude` works too). It reads this file, runs up to 3 packages through fresh workers, updates 'Local track status', pushes, and ends.
-- **Cloud lock:** the cloud track has one hourly routine. The first line of 'Cloud track status' is `Cloud lock: <UTC time>` or `Cloud lock: free`. A cloud session that finds a lock newer than 75 minutes exits at once without doing anything else. Otherwise it writes the current time as the lock, pushes, works (refreshing the lock after each package), and sets `Cloud lock: free` before it ends.
+- **Cloud lock:** the cloud track has one hourly routine. The first line of 'Cloud track status' is `Cloud lock: free time>` or `Cloud lock: free`. A cloud session that finds a lock newer than 75 minutes exits at once without doing anything else. Otherwise it writes the current time as the lock, pushes, works (refreshing the lock after each package), and sets `Cloud lock: free` before it ends.
 
 ## Benchmarks pending on the Mac
 
@@ -61,7 +61,10 @@ The client never adds rules; if it needs one, it notes it in the cloud subsectio
 Cloud lock: 2026-11-12T11:41Z
 
 - **WP12 merged** (~78k tokens Sonnet): `@folktown/shared` (contract: PlayerInput, WeaponDef/WEAPONS, ZoneData, MatchConfig/State, GameEvent, constants) and `@folktown/sim` (`stepController`, `ZoneCollision` + `raycast`, `makeSyntheticZone`). Yaw 0 looks toward -z, positive yaw turns left. 35 tests.
-- Running: WP9 bake (branch wp9-bake), Stage 2 rules (wp13-rules). Next: bots + nav, then 32-bot headless match test.
+- **WP9 merged** (~79k): `pnpm map:bake` -> `data/zones/engineering-mall.json` (109 KB; 300 m box centred (-30,-290), north of Bell Tower; 14 colliders, 296 trees, 24 spawns, 1443 nav nodes). Flat ground.
+- **WP13 merged** (~81k): `Match` class in sim (weapons, hit-scan, headshots, health, respawn, FFA/TDM, events, `snapshot()`); recoil exposed as `recoilPitch/recoilYaw` on PlayerState.
+- **WP14 merged** (~92k): `NavGraph` A*, `BotController`, 3 difficulties, `runBotMatch`. `packages/sim/test/bot-match.test.ts`: 32-bot FFA and TDM run to matchEnd headless (~2-4 s each). 72 tests pass.
+- **Cloud track step 5 done: Stage 2 sim side complete.** Client needs: feed `PlayerInput` to `Match.step`, render `snapshot()`, load zone JSON, use `BotController` for bots. Open: no hit-scan vs ground, bots have no healing, flat ground (known-gaps).
 
 ### Local track status
 

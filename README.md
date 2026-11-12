@@ -2,7 +2,7 @@
 
 A Purdue-themed first-person shooter in the browser, with the West Lafayette campus as the map.
 
-`docs/` and `reference/` are the design and reference material. The game is built in this repository alongside them; no game code exists yet.
+`docs/` and `reference/` are the design and reference material. The game is built in this repository alongside them. Run `pnpm install`, then `pnpm dev`, `pnpm test`, `pnpm lint` or `pnpm build`.
 
 ## Read in this order
 

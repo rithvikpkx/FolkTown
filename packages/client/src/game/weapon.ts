@@ -7,71 +7,78 @@ import {
   DoubleSide,
   Group,
   type Material,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
+  type Object3D,
   PlaneGeometry,
   Vector3,
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Batch } from '../batch';
 import { type MaterialName, type makeMaterials, TILING } from '../materials';
+import {
+  loadManifest,
+  type PartNames,
+  type Vec3,
+  type WeaponManifest,
+  type WeaponVariant,
+} from './weapon-assets';
 
 type Mats = Awaited<ReturnType<typeof makeMaterials>>;
 
-/** Where each weapon sits on screen: hip and aimed (camera space, metres), and the muzzle. */
+/** Where each weapon sits on screen: hip and aimed (camera space, metres), and the flash point. */
 interface Pose {
-  hip: [number, number, number];
-  ads: [number, number, number];
-  muzzle: number;
+  hip: Vec3;
+  ads: Vec3;
+  flash: Vec3;
   fov: number;
 }
-const POSES: Record<WeaponId, Pose> = {
-  rifle: { hip: [0.2, -0.22, -0.36], ads: [0, -0.064, -0.5], muzzle: 0.8, fov: 52 },
-  pistol: { hip: [0.18, -0.2, -0.34], ads: [0, -0.06, -0.42], muzzle: 0.22, fov: 62 },
-  shotgun: { hip: [0.2, -0.22, -0.36], ads: [0, -0.064, -0.5], muzzle: 0.86, fov: 60 },
+/** Poses of the generated fallback guns; a manifest variant replaces them. */
+const FALLBACK: Record<WeaponId, Pose> = {
+  rifle: { hip: [0.2, -0.22, -0.36], ads: [0, -0.064, -0.5], flash: [0, 0, -0.84], fov: 52 },
+  pistol: { hip: [0.18, -0.2, -0.34], ads: [0, -0.06, -0.42], flash: [0, 0.02, -0.26], fov: 62 },
+  shotgun: { hip: [0.2, -0.22, -0.36], ads: [0, -0.064, -0.5], flash: [0, 0, -0.9], fov: 60 },
 };
 export const HIP_FOV = 70;
 
-/**
- * Pre-made models (public/models, see docs/assets.md). `yaw` turns the file so the muzzle points
- * to -z; `len` is the target length in metres; `top` is the height of the bore below the model's
- * top edge. The model's muzzle end is placed at the pose's muzzle distance.
- */
-const MODELS: Record<WeaponId, { file: string; yaw: number; len: number; top: number }> = {
-  rifle: { file: 'Rifle_Assault_West.glb', yaw: 0, len: 0.9, top: 0.04 },
-  pistol: { file: 'Pistol_Full_West.glb', yaw: 0, len: 0.24, top: 0.03 },
-  shotgun: { file: 'Shotgun_Pump_West.glb', yaw: 0, len: 1.0, top: 0.04 },
-};
+interface Part {
+  node: Object3D;
+  base: Vector3;
+  kind: keyof PartNames;
+}
 
-/** Swap the generated gun body for the model; the generated hands stay. On any failure the generated gun stays. */
-function loadModel(id: WeaponId, g: Group) {
-  const m = MODELS[id];
+/** Swap the generated gun body for the manifest's model; the generated hands stay. On any failure the generated gun stays. */
+function loadModel(g: Group, v: WeaponVariant, pose: Pose, parts: Part[]) {
+  const old = g.getObjectByName('model');
+  if (old) g.remove(old);
+  parts.length = 0;
   new GLTFLoader()
-    .loadAsync(`${import.meta.env.BASE_URL}models/${m.file}`)
+    .loadAsync(`${import.meta.env.BASE_URL}${v.url}`)
     .then((gltf) => {
       const o = gltf.scene;
-      const wrap = new Group();
-      wrap.add(o);
-      wrap.rotation.y = m.yaw;
-      wrap.updateMatrixWorld(true);
-      const bb = new Box3().setFromObject(wrap);
-      const size = bb.getSize(new Vector3());
-      const k = m.len / Math.max(size.x, size.z);
       const root = new Group();
-      root.add(wrap);
-      root.scale.setScalar(k);
-      root.position.set(
-        -((bb.min.x + bb.max.x) / 2) * k,
-        -bb.max.y * k + m.top,
-        -POSES[id].muzzle - bb.min.z * k,
-      );
+      root.name = 'model';
+      root.add(o);
+      root.scale.setScalar(v.scale);
+      root.rotation.set(...(v.rotation.map((d) => (d * Math.PI) / 180) as Vec3));
+      root.position.set(...v.offset);
       for (const c of [...g.children]) if (c.name === 'metal' || c.name === 'polymer') g.remove(c);
       o.traverse((c) => {
         c.frustumCulled = false;
       });
+      for (const kind of Object.keys(v.parts ?? {}) as (keyof PartNames)[]) {
+        const node = o.getObjectByName(v.parts?.[kind] as string);
+        if (node) parts.push({ node, base: node.position.clone(), kind });
+        else console.warn(`weapon part "${v.parts?.[kind]}" not found in ${v.url}`);
+      }
+      pose.hip = v.hip;
+      pose.ads = v.ads;
+      pose.flash = v.flash;
+      pose.fov = v.adsFov;
       g.add(root);
     })
-    .catch((e) => console.error(`weapon model ${m.file} failed, using generated gun`, e));
+    .catch((e) => console.error(`weapon model ${v.url} failed, using generated gun`, e));
 }
 
 /**
@@ -196,19 +203,72 @@ export class ViewModel {
       side: DoubleSide,
       fog: false,
     });
-    for (const id of Object.keys(POSES) as WeaponId[]) {
+    for (const id of Object.keys(FALLBACK) as WeaponId[]) {
       const g = buildGun(id, mats);
       const f = new Mesh(new PlaneGeometry(0.28, 0.28), fm);
-      f.position.z = -POSES[id].muzzle - 0.04;
+      this.poses.set(id, { ...FALLBACK[id] });
       f.visible = false;
       g.add(f);
       g.visible = false;
-      loadModel(id, g);
       this.guns.set(id, g);
       this.flashes.set(id, f);
       this.root.add(g);
     }
     camera.add(this.root);
+    // ?variant=name previews that variant of every weapon that has it (tuning page)
+    const want = new URLSearchParams(globalThis.location?.search).get('variant');
+    void loadManifest(import.meta.env.BASE_URL, Object.keys(FALLBACK)).then((m) => {
+      this.manifest = m;
+      if (m)
+        for (const id of this.ids()) this.use(id, want && m[id]?.variants[want] ? want : undefined);
+    });
+  }
+
+  manifest: WeaponManifest | null = null;
+  private readonly poses = new Map<WeaponId, Pose>();
+  private readonly parts = new Map<WeaponId, Part[]>();
+  private readonly tmp = new Matrix4();
+
+  private ids() {
+    return [...this.guns.keys()];
+  }
+
+  /** Load a manifest variant (default: the entry's chosen one) onto a weapon. Also used by the tuning page. */
+  use(id: WeaponId, variant?: string) {
+    const e = this.manifest?.[id];
+    const v = e?.variants[variant ?? e.variant];
+    if (!v) return;
+    const parts: Part[] = [];
+    this.parts.set(id, parts);
+    loadModel(this.guns.get(id) as Group, v, this.poses.get(id) as Pose, parts);
+  }
+
+  /** Tuning aid: the loaded model's bounds in gun space ([min, max]) or null while it loads. */
+  measure(id: WeaponId, node?: string): [Vec3, Vec3] | null {
+    const g = this.guns.get(id) as Group;
+    const m = g.getObjectByName('model');
+    const t = node ? m?.getObjectByName(node) : m;
+    if (!t) return null;
+    g.updateMatrixWorld(true);
+    const b = new Box3().setFromObject(t);
+    const inv = new Matrix4().copy(g.matrixWorld).invert();
+    b.applyMatrix4(inv);
+    return [b.min.toArray(), b.max.toArray()];
+  }
+
+  /** Slide, bolt and pump kick back with the shot, the magazine drops with the reload. */
+  private animateParts(id: WeaponId, kick: number, dip: number) {
+    const g = this.guns.get(id) as Group;
+    for (const p of this.parts.get(id) ?? []) {
+      const par = p.node.parent;
+      if (!par) continue;
+      // gun-space offset -> the part's parent space
+      const d =
+        p.kind === 'magazine' ? new Vector3(0, -0.12 * dip, 0) : new Vector3(0, 0, 0.03 * kick);
+      this.tmp.copy(par.matrixWorld).invert().multiply(g.matrixWorld);
+      const o = new Vector3().applyMatrix4(this.tmp);
+      p.node.position.copy(p.base).add(d.applyMatrix4(this.tmp).sub(o));
+    }
   }
 
   /** The player fired this tick. */
@@ -220,7 +280,7 @@ export class ViewModel {
   update(dt: number, me: PlayerState, aiming: boolean) {
     const id = me.weapon;
     for (const [k, g] of this.guns) g.visible = k === id && me.alive;
-    const pose = POSES[id];
+    const pose = this.poses.get(id) as Pose;
     const reloading = me.reloadLeft > 0;
     const target = aiming && me.alive && !reloading ? 1 : 0;
     this.ads += (target - this.ads) * Math.min(1, dt * 14);
@@ -250,6 +310,11 @@ export class ViewModel {
     this.flashT = Math.max(0, this.flashT - dt);
     fl.visible = this.flashT > 0;
     fl.rotation.z = Math.random() * 6.28;
+    fl.position.set(...pose.flash);
+    // the generated sleeves would cover the sights and the model; hide them when aimed
+    const hands = g.getObjectByName('fabric');
+    if (hands) hands.visible = a < 0.6;
+    this.animateParts(id, this.flashT / 0.045, dip);
 
     const fov = HIP_FOV + (pose.fov - HIP_FOV) * a;
     if (Math.abs(fov - this.lastFov) > 0.01) {

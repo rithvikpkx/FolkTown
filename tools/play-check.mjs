@@ -10,7 +10,11 @@ const dir = new URL('shots/', import.meta.url);
 mkdirSync(dir, { recursive: true });
 const configs = process.argv.slice(2);
 if (!configs.length)
-  configs.push('mode=ffa&diff=normal&bots=7', 'mode=tdm&diff=hard&bots=7', 'mode=ffa&diff=easy&bots=7');
+  configs.push(
+    'mode=ffa&diff=normal&bots=7',
+    'mode=tdm&diff=hard&bots=7',
+    'mode=ffa&diff=easy&bots=7',
+  );
 
 const LOCK = `Object.defineProperty(document,'pointerLockElement',{get:()=>document.querySelector('canvas'),configurable:true});`;
 const H = `window.H = {
@@ -34,13 +38,17 @@ for (const [ci, query] of configs.entries()) {
 
     // 1. idle player 30 s: bot positions and states
     const snap = () =>
-      ev(`JSON.stringify(H.bots().map(b => [b.id, +b.pos.x.toFixed(0), +b.pos.z.toFixed(0), b.alive, Math.round(b.health), +Math.hypot(b.vel.x, b.vel.z).toFixed(1)]))`);
+      ev(
+        `JSON.stringify(H.bots().map(b => [b.id, +b.pos.x.toFixed(0), +b.pos.z.toFixed(0), b.alive, Math.round(b.health), +Math.hypot(b.vel.x, b.vel.z).toFixed(1)]))`,
+      );
     const first = JSON.parse(await snap());
     for (let t = 0; t < 6; t++) {
       await sleep(5000);
       if (t === 5) {
         const now = JSON.parse(await snap());
-        const moved = now.map((b, i) => Math.hypot(b[1] - first[i][1], b[2] - first[i][2]).toFixed(0));
+        const moved = now.map((b, i) =>
+          Math.hypot(b[1] - first[i][1], b[2] - first[i][2]).toFixed(0),
+        );
         console.log('bot displacement after 30 s (m):', moved.join(' '));
       }
     }
@@ -77,36 +85,57 @@ for (const [ci, query] of configs.entries()) {
       await ev(`H.me().pos.x = ${col.mx + sgn * col.nx * 4}; H.me().pos.z = ${col.mz + sgn * col.nz * 4}; H.me().pos.y = 0;
         H.g.input.yaw = Math.atan2(${sgn * col.nx}, ${sgn * col.nz}); H.g.input.keys.add('KeyW');`);
       await sleep(2500);
-      const d = await ev(`Math.hypot(H.me().pos.x - ${col.mx}, H.me().pos.z - ${col.mz}).toFixed(2)`);
-      console.log(`walk 2.5 s into wall from side ${sgn}: ends ${d} m from the wall midpoint (start 4, 0 = through)`);
+      const d = await ev(
+        `Math.hypot(H.me().pos.x - ${col.mx}, H.me().pos.z - ${col.mz}).toFixed(2)`,
+      );
+      console.log(
+        `walk 2.5 s into wall from side ${sgn}: ends ${d} m from the wall midpoint (start 4, 0 = through)`,
+      );
       await ev(`H.g.input.keys.clear()`);
     }
 
     // 4. shoot a bot: teleport 12 m from the nearest bot, aim, fire
-    await ev(`(() => { const b = H.nearest(); const m = H.me(); m.pos.x = b.pos.x + 12; m.pos.z = b.pos.z; m.pos.y = 0; m.health = 100; m.spawnProtection = 99; })()`);
+    await ev(
+      `(() => { const b = H.nearest(); const m = H.me(); m.pos.x = b.pos.x + 12; m.pos.z = b.pos.z; m.pos.y = 0; m.health = 100; m.spawnProtection = 99; })()`,
+    );
     const hp0 = await ev('Math.round(H.nearest().health)');
     await ev(`H.g.input.fire = true`);
     let killed = false;
     for (let i = 0; i < 40 && !killed; i++) {
-      await ev(`(() => { const b = H.nearest(false); window.__tgt = b; if (b.alive) H.aim(b); })()`);
+      await ev(
+        `(() => { const b = H.nearest(false); window.__tgt = b; if (b.alive) H.aim(b); })()`,
+      );
       await sleep(100);
       killed = !(await ev('window.__tgt.alive'));
     }
     await ev(`H.g.input.fire = false`);
-    console.log(`shoot: target hp ${hp0} -> ${await ev('Math.round(window.__tgt.health)')}, killed ${killed}, player kills ${await ev('H.me().kills')}`);
+    console.log(
+      `shoot: target hp ${hp0} -> ${await ev('Math.round(window.__tgt.health)')}, killed ${killed}, player kills ${await ev('H.me().kills')}`,
+    );
 
     // 5. bots chase and shoot back: put player 25 m from a bot, still, watch 20 s
-    await ev(`(() => { const b = H.nearest(); const m = H.me(); m.spawnProtection = 0; m.health = 100; m.pos.x = b.pos.x + 20; m.pos.z = b.pos.z; m.pos.y = 0; window.__tgt = b; })()`);
+    await ev(
+      `(() => { const b = H.nearest(); const m = H.me(); m.spawnProtection = 0; m.health = 100; m.pos.x = b.pos.x + 20; m.pos.z = b.pos.z; m.pos.y = 0; window.__tgt = b; })()`,
+    );
     const log = [];
-    await ev(`document.querySelectorAll('div').forEach(d => { if (d.textContent.startsWith('Click to play')) d.style.display = 'none'; }); H.aim(H.nearest())`);
+    await ev(
+      `document.querySelectorAll('div').forEach(d => { if (d.textContent.startsWith('Click to play')) d.style.display = 'none'; }); H.aim(H.nearest())`,
+    );
     for (let i = 0; i < 4; i++) {
       await sleep(i === 0 ? 700 : 500);
       await ev(`H.aim(H.nearest())`);
       if (ci === 0 && i < 2) {
         await sleep(100);
-        writeFileSync(new URL(`play-hip${i}.png`, dir), Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
+        writeFileSync(
+          new URL(`play-hip${i}.png`, dir),
+          Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+        );
       }
-      log.push(await ev(`(() => { const b = H.nearest(false), m = H.me(); return [Math.hypot(b.pos.x - m.pos.x, b.pos.z - m.pos.z).toFixed(0), Math.round(m.health)].join('/'); })()`));
+      log.push(
+        await ev(
+          `(() => { const b = H.nearest(false), m = H.me(); return [Math.hypot(b.pos.x - m.pos.x, b.pos.z - m.pos.z).toFixed(0), Math.round(m.health)].join('/'); })()`,
+        ),
+      );
     }
     console.log('nearest-bot distance/player hp each 1.5 s:', log.join('  '));
 
@@ -120,7 +149,12 @@ for (const [ci, query] of configs.entries()) {
     console.log('player died:', died, 'deaths', await ev('H.me().deaths'));
     if (died) {
       for (let i = 0; i < 40 && !(await ev('H.me().alive')); i++) await sleep(250);
-      console.log('respawned alive:', await ev('H.me().alive'), 'hp', await ev('Math.round(H.me().health)'));
+      console.log(
+        'respawned alive:',
+        await ev('H.me().alive'),
+        'hp',
+        await ev('Math.round(H.me().health)'),
+      );
     }
 
     // 7. match end: shrink the time limit and look for the match-over panel
@@ -128,7 +162,11 @@ for (const [ci, query] of configs.entries()) {
     await sleep(2500);
     const over = await ev(`document.body.innerText.match(/Victory|Defeat|Draw/)?.[0] ?? null`);
     console.log('match over panel:', over, 'ended', await ev('H.g.session.match.isEnded'));
-    if (ci === 0) writeFileSync(new URL('play-over.png', dir), Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
+    if (ci === 0)
+      writeFileSync(
+        new URL('play-over.png', dir),
+        Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+      );
     console.log('page errors:', logs.length ? logs.slice(0, 5) : 'none');
   });
 }

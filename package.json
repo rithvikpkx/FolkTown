@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "pnpm --filter @folktown/client dev",
     "build": "pnpm -r build",
+    "bench": "node tools/bench.mjs",
+    "shoot": "node tools/shoot.mjs",
     "test": "vitest run",
     "lint": "biome check . && pnpm -r typecheck"
   },

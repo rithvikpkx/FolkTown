@@ -2,6 +2,29 @@
 
 The handoff file. Update it at the end of every work package, so a session that hits a usage limit or loses its transcript loses nothing.
 
+## HANDOFF, end of session 12 November 2026 (read this first)
+
+**Pivot done.** The game base is now **Saltline** (`packages/saltline`, owner-approved; the old `packages/client` stays untouched). On `mvp`: Saltline base, Mall level, landmarks, ground/veg, lab weapons (M4A1, pistol), FFA/TDM modes with bots, FolkTown UI wipe, Vercel serves Saltline (https://folktown.vercel.app, default build `pnpm --filter @folktown/saltline build`). Enterable buildings, vehicles, multiplayer, shotgun and the bolt rifle are cut or pushed later; Google 3D tiles export is no longer tabled (see below).
+
+**Walk prototype (visual-fidelity track), branch `v2-walk` (pushed to origin; NOT merged into `mvp` on purpose: it ships about 40 MB of assets).** `?walk=1` mode: a walkable campus region x -200..320, z -350..365 from the Bell Tower with hero buildings WALC, Bell Tower, Memorial Union, Elliott Hall, Memorial Mall, massing for every other building, photo facades, Google-derived roofs and ground. Versions 1 to 6 were published as one private artifact, **https://claude.ai/artifact/Q2H24oddSYNjYo2kpPPfma** (Version 6 is current). To rebuild and republish: `pnpm saltline:walk-build` in the `v2-walk` checkout (`.claude/worktrees/v2-walk`), copy `packages/saltline/dist-walk` to the scratchpad, delete `models/` (the artifact host cannot serve `.glb`), strip the `<!doctype>/<html>/<head>/<body>` wrappers from `index.html`, set `<title>WALC Walk</title>`, then publish the same path with an explicit `files` list (every file extension must be a served type). Run locally: `pnpm saltline` then open `/?walk=1`; options `?tod=`, `?season=`, `?tower=scan|code`, `?facades=0`, `?ctx=0`.
+
+**Merged into `v2-walk` and all workers finished (nothing is running):** v2 (photo textures, WALC, Bell Tower, environment), v3 (WALC from the design render, plaza, context/horizon, Sketchfab Bell Tower comparison: code tower is better, scan available via `?tower=scan`), v4 (WALC textured from Street View), v5 (hole fixes, Union, Elliott, Memorial Mall, campus region loader `src/campus/region.js`, hotspot modules `src/campus/hotspots/*.js` with `build(G, zone)`), v6 (layout fixes `packages/map-tools/data/footprint-fixes.json`, Google roofs/ground `tools/google-topdown.mjs`, Street View Tiles facades `tools/facade-extract.py`, hero duplicate-facade rule, `tools/hotspot-holes.mjs`). Reports: `docs/layout-report.md`, `docs/walc-holes.md`, `docs/hotspot-holes.md`, `docs/pilot-data.md`, images in `docs/img/`.
+
+**Rules the owner set this session:** take the Street View facade(s) we have and **duplicate onto all sides** of a building; hotspots high fidelity, buildings between them rough massing is fine; keep it single player and contained; prefer free options before paid; keep Google spend low (owner has a $300 free-trial credit, 90 days from about 12 Nov 2026; do not click Upgrade).
+
+**Google setup:** project "My First Project"; `GOOGLE_MAPS_API_KEY` and `MAPILLARY_TOKEN` are in the repo-root `.env.local` (gitignored; copy it into any worktree you use; never print or commit it). Enabled: Street View Static API, Map Tiles API (3D tiles and Street View Tiles). Owner should lower the Street View Static daily quota (default 25,000) to about 500 in the console. Spend so far: 3D tiles 1,544 requests (about $9.3 worst case, likely about $0), Street View Static 100 + 132 images (about $1.6, inside the free 10,000/month), Street View Tiles 6,934 tiles (free under 100,000/month, $13.87 worst case). Check the billing report for the real number.
+
+**Gitignored data that only exists on this Mac (now consolidated in the main checkout `data/`):** `data/google/` (Google mesh `mall-area.glb` 72 MB, tiles, top-down rasters), `data/raw/streetview/` (132 images, manifest), `data/raw/streetview-tiles/` (521 MB, 77 zoom-4 panoramas), `data/raw/campusmapper/`, `data/raw/ortho/`. All of it is needs-clearance (see `docs/assets.md`); do not commit it. Regenerate with `pnpm map:tiles --zone mall-union`, `pnpm map:streetview`, `pnpm map:bake-region`.
+
+**Known problems / next steps (owner's walk-test comes first):**
+1. Owner to walk Version 6 and list the worst buildings; 31 of 56 non-hotspot buildings still use a fallback wall (about 20, for example Hovde, look unchanged).
+2. Plaza paving is flat saturated red (real: grey-brown herringbone); trees are low-poly; skyline is plain grey boxes; lamps/benches only near WALC.
+3. Union south and west faces, tower, west pavilion are guessed; Elliott brick is procedural; WALC north/east are copies of the west layout.
+4. Facade photo buildings lose window geometry (flat photo walls); pose-fit confidence saturates at 1.0 (not meaningful); courtyard `holes` in the baked data are not rendered yet; Street View panos near Mechanical Engineering suggest a missing path.
+5. Hybrid Bell Tower (scan belfry/clock stage widened 1.375x onto our brick shaft) was proposed, not built. Shotgun slot not added. Pistol ADS not aligned.
+6. When the walk scene is accepted: merge `v2-walk` into `mvp` as the playable map (check Vercel bundle size, `pnpm lint` already fails on old client files and several new ones), then phase 2 items from the owner: quality tiers, KTX2 and LOD, more campus.
+7. Vercel sometimes skips intermediate commits when pushes land close together (not an error). Sketchfab Bell Tower credit (CC BY 4.0, Olivia Bultinck) is shown only in `?tower=scan` mode.
+
 ## Where things stand (12 November 2026)
 
 - Planning is finished. All decisions are in `docs/decisions.md`; the plan is `docs/implementation-plan.md`.

@@ -1,0 +1,59 @@
+{
+  "_doc": "Per-building facade styles. buildings is keyed by zone collider id (the zone has no names; name is for humans, from docs/campus-building-list.md). A building = default < presets[style] < its own fields. Colours are hex strings; sizes in metres.",
+  "default": {
+    "wall": { "mat": "brick", "color": "#f3d2c4", "scale": 2 },
+    "trim": { "mat": "concrete", "color": "#d8d0bc" },
+    "frame": { "mat": "anodized_black" },
+    "glass": "#7b9bb6",
+    "floorH": 4, "bay": 3.6, "winW": 1.5, "winH": 1.9, "sill": 0.95, "depth": 0.28, "panes": [2, 1],
+    "base": { "h": 0.8 },
+    "cornice": { "h": 0.5, "out": 0.15 },
+    "parapet": 0.5,
+    "roof": { "type": "flat", "mat": "concrete_dirty", "color": "#8d8a84" }
+  },
+  "presets": {
+    "default": {},
+    "walc": {
+      "wall": { "color": "#eebfae" }, "frame": { "mat": "aluminium", "color": "#e8dcc0" }, "reveal": "trim",
+      "floorH": 6.7, "bay": 3.6, "winW": 2.3, "winH": 4.1, "sill": 0.9, "panes": [3, 2],
+      "base": { "h": 0.9 }, "cornice": { "h": 0.35, "out": 0.5 }, "parapet": 0,
+      "roof": { "type": "eave", "mat": "steel_dark", "color": "#4a4f55", "eave": 1.2, "rise": 1.3, "inset": 3 }
+    },
+    "collegiate": {
+      "wall": { "color": "#f2cbbb" },
+      "reveal": "trim", "floorH": 4.4, "bay": 3.9, "winW": 1.5, "winH": 2.5, "sill": 0.9, "panes": [2, 1],
+      "base": { "h": 1.1 }, "cornice": { "h": 0.9, "out": 0.45 }, "parapet": 0.7,
+      "roof": { "type": "flat", "mat": "concrete_dirty", "color": "#7e7a74" }
+    },
+    "modern": {
+      "wall": { "color": "#efc8b8" },
+      "floorH": 4.3, "bay": 3, "winW": 2, "winH": 2.4, "sill": 0.8, "panes": [2, 1],
+      "base": { "h": 0.5 }, "cornice": { "h": 0.4, "out": 0.1 }, "parapet": 0.8
+    },
+    "residence": {
+      "wall": { "color": "#f0c6b6" },
+      "floorH": 3.3, "bay": 3.1, "winW": 1.2, "winH": 1.7, "sill": 0.95, "panes": [1, 2],
+      "base": { "h": 0.9 }, "cornice": { "h": 0.45, "out": 0.2 }, "parapet": 0.6
+    },
+    "tower": {
+      "wall": { "color": "#efc6b6" },
+      "floorH": 3.6, "bay": 5.2, "winW": 1.1, "winH": 3.0, "sill": 0.35, "panes": [1, 2],
+      "base": { "h": 0.3 }, "cornice": { "h": 0.4, "out": 0.1 }, "parapet": 0.4
+    }
+  },
+  "buildings": {
+    "way/508846031": { "name": "Wilmeth Active Learning Center (WALC)", "style": "walc" },
+    "way/74151922": { "name": "Elliott Hall of Music (ELLT)", "style": "collegiate" },
+    "way/75498146": { "name": "Hovde Hall of Administration (HOVD)", "style": "collegiate" },
+    "relation/3759822": { "name": "Stanley Coulter Hall (SC)", "style": "collegiate" },
+    "way/117147173": { "name": "Psychological Sciences Building (PSYC)", "style": "modern" },
+    "way/117146492": { "name": "Hall of Data Science and AI (DSAI)", "style": "modern" },
+    "way/117146497": { "name": "Forney Hall of Chemical Engineering (FRNY)", "style": "collegiate" },
+    "way/866802210": { "name": "Chaney-Hale Hall of Science (CHAS)", "style": "modern" },
+    "way/158307862": { "name": "Mechanical Engineering (ME)", "style": "modern" },
+    "way/158307858": { "name": "Materials Science and Electrical Engineering (MSEE)", "style": "modern" },
+    "way/158307860": { "name": "Brown Family Hall of Electrical Engineering (BHEE)", "style": "modern" },
+    "demo/honors": { "name": "Honors College and Residences (demo footprint)", "style": "residence" },
+    "demo/math": { "name": "Mathematical Sciences Building (demo footprint)", "style": "tower" }
+  }
+}

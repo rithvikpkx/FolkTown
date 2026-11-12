@@ -4,6 +4,7 @@
 //   export function build(G, zone, root) -> void | Object3D   (called after the base level is assembled)
 import { BufferGeometry, BufferAttribute, ExtrudeGeometry, Group, InstancedMesh, Matrix4, Mesh, PlaneGeometry, Shape, CylinderGeometry, Vector3 } from 'three';
 import { Kn, Z0 } from '../game/common.js';
+import { buildFacades } from './facades.js';
 
 const CHUNK = 64;
 const optional = import.meta.glob('./{ground,vegetation,landmarks}.js', { eager: true });
@@ -77,6 +78,7 @@ function toGeometry(floats) {
 }
 
 export function buildBuildings(G, data, root) {
+  try { return buildFacades(G, data, root); } catch (err) { console.error('[campus] facades failed, plain extrusion', err); }
   const chunks = new Map();
   for (const f of data.footprints) {
     let e;

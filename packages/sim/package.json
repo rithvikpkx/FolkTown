@@ -1,0 +1,13 @@
+{
+  "name": "@folktown/sim",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@folktown/shared": "workspace:*"
+  }
+}

@@ -1,5 +1,10 @@
 {
   "name": "@folktown/tools",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "sharp": "^0.35.5"
+  }
 }

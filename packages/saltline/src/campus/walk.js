@@ -14,6 +14,9 @@ import roofs from '../../../../data/pilot/roofs.json';
 import { applyEarly, installSky } from './env/sky.js';
 import { S as SEASON } from './env/season.js';
 import { buildPlaza, inPlaza, plazaFloor, plazaTrees } from './env/plaza.js';
+import { loadBellTowerScan, SCAN_CREDIT } from './env/belltower-scan.js';
+
+const TOWER = (typeof location !== 'undefined' && /[?&]tower=(scan|code)/.exec(location.search)?.[1]) || 'code'; // ?tower=scan|code; code wins the comparison (docs/assets.md)
 
 // sun/fog constants are cloned by render init, so they must change at import time, and only in walk mode
 if (typeof location !== 'undefined' && (import.meta.env.VITE_WALK ? !/[?&]walk=0/.test(location.search) : /[?&]walk=(?!0)/.test(location.search))) applyEarly();
@@ -96,11 +99,11 @@ export async function buildWalk(G) {
   const paths = (await (await fetch(BASE + 'mall-paths.json')).json()).paths
     .flatMap((p) => clipPath(p.points).map((points) => ({ ...p, points })));
   const walc = roofs.buildings.find((b) => b.id === 'way/508846031');
-  const colliders = zone.colliders.filter((c) => KEEP.includes(c.id)).map((c) => (c.id === KEEP[1] ? { ...c, topY: walc.eaveH } : c));
+  const colliders = zone.colliders.filter((c) => KEEP.includes(c.id) && !(TOWER === 'scan' && c.id === KEEP[0])).map((c) => (c.id === KEEP[1] ? { ...c, topY: walc.eaveH } : c));
   const z = {
     ...zone, bounds: BOX, colliders, paths,
     props: zone.props.filter((t) => inBox(t.x, t.z) && !inPlaza(t.x, t.z, 1)).concat(plazaTrees()),
-    landmarks: { bellTower: zone.landmarks.bellTower }, // no fountain
+    landmarks: TOWER === 'code' ? { bellTower: zone.landmarks.bellTower } : {}, // no fountain; scan mode draws its own tower below
     spawns: [{ x: 8, z: 0, yaw: -Math.PI / 2, team: 0 }],
   };
   vegMode.walk = true;
@@ -109,6 +112,12 @@ export async function buildWalk(G) {
   G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: { skip: [KEEP[1]] } };
   const level = await buildCampus(G, z);
   level.root.add(await buildWalc(G, colliders.find((c) => c.id === KEEP[1]).poly)); // code-generated WALC (walc.js); facades.js skips it
+  let scanHalf = BELLTOWER_HALF;
+  if (TOWER === 'scan') {
+    const bt = zone.landmarks.bellTower, t = await loadBellTowerScan(G, [bt.x, 0, bt.z], { rotY: Number(/[?&]trot=(-?[\d.]+)/.exec(location.search)?.[1] || 0), model: /[?&]tex=model/.test(location.search) });
+    level.root.add(t.group); scanHalf = t.half; G.walkTower = t;
+    console.log('[walk] tower scan tris', t.tris, 'far', t.trisFar);
+  }
   try { await installSky(G); } catch (e) { console.error('[walk] sky failed', e); }
   G.walkCrossings = getDecals(z).crossings;
   G.plazaExclude = (x, z) => inPlaza(x, z, 1.5); G.walkFloor = plazaFloor;
@@ -124,7 +133,7 @@ export async function buildWalk(G) {
   G.walkSolids = [
     ...ctx.solids,
     ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),
-    [[-BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, BELLTOWER_HALF], [-BELLTOWER_HALF, BELLTOWER_HALF]],
+    [[-scanHalf, -scanHalf], [scanHalf, -scanHalf], [scanHalf, scanHalf], [-scanHalf, scanHalf]],
     ...plaza.solids,
   ];
   G.walkTrees = z.props;
@@ -154,7 +163,7 @@ export function walkInput() {
   addEventListener('keyup', (e) => keys.delete(e.code));
   addEventListener('blur', () => keys.clear());
   addEventListener('mousemove', (e) => { if (document.pointerLockElement === el()) { look.dx += e.movementX; look.dy += e.movementY; } });
-  const hint = Object.assign(document.createElement('div'), { textContent: 'Click to look around  ·  WASD walk  ·  Shift run  ·  Space jump  ·  Esc releases the mouse' });
+  const hint = Object.assign(document.createElement('div'), { textContent: 'Click to look around  ·  WASD walk  ·  Shift run  ·  Space jump  ·  Esc releases the mouse' + (TOWER === 'scan' ? '  ·  ' + SCAN_CREDIT : '') });
   hint.style.cssText = 'position:absolute;left:50%;bottom:6%;transform:translateX(-50%);z-index:60;padding:8px 16px;border-radius:4px;background:rgba(0,0,0,.55);color:#eee;font:13px system-ui,sans-serif;pointer-events:none;transition:opacity 1.5s;white-space:nowrap';
   document.getElementById('app').appendChild(hint);
   const fade = () => (hint.style.opacity = 0);

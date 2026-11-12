@@ -138,3 +138,4 @@ Ortho georeference fit lives in pilot/ortho.json (fit). Trees, shrubs, grasses, 
 | File | Use | Source | Licence | needs-clearance |
 |---|---|---|---|---|
 | public/campus/walk/brick-{albedo,normal,rough}.jpg (2K, red_brick_pavers) | WALC plaza brick paving, env/plaza.js (anti-tiled in shader) | https://polyhaven.com/a/red_brick_pavers | CC0 | No |
+- public/campus/walk/belltower-scan.json + belltower-scan-{0,1}.webp: Sketchfab "Purdue University Bell Tower" by Olivia Bultinck, CC BY 4.0, https://sketchfab.com/3d-models/purdue-university-bell-tower-37db7dfc51c347849b8e5975d8a89812 (original in reference/models/, 20,844 tris, 87 meshes). Converted by tools/glb-to-web.mjs, loaded by src/campus/env/belltower-scan.js behind ?tower=scan (default is the code tower). Attribution is shown in the walk hint when ?tower=scan; keep it wherever the scan ships. Not needs-clearance (CC BY credit only).

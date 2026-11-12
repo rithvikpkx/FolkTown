@@ -1,0 +1,28 @@
+{
+  "rifle": {
+    "url": "models/lab/m4a1.glb",
+    "length": 0.72,
+    "alignNode": "Sight",
+    "alignZ": -0.03,
+    "frontZ": -0.531,
+    "topY": 0.08,
+    "x": 0,
+    "rotationY": 0,
+    "magazine": "Magazine",
+    "maps": {
+      "DefaultMaterial": { "map": "models/lab/m4a1_0.webp", "normal": "models/lab/m4a1_1.webp", "orm": "models/lab/m4a1_2.webp" }
+    }
+  },
+  "pistol": {
+    "url": "models/lab/pistol.glb",
+    "length": 0.185,
+    "frontZ": -0.1075,
+    "topY": 0.022,
+    "x": 0,
+    "rotationY": 90,
+    "maps": {
+      "service_pistol": { "map": "models/lab/pistol_1.webp", "normal": "models/lab/pistol_0.webp", "orm": "models/lab/pistol_2.webp" }
+    }
+  },
+  "_notes": "Models swap by editing this file. length/frontZ/topY fit the glb into the rig's gun space (metres, -z forward, y up). Shotgun (client package lab/shotgun.glb) has no slot: Saltline is a two-weapon rig. Sources and licences: docs/assets.md."
+}

@@ -60,7 +60,8 @@ The client never adds rules; if it needs one, it notes it in the cloud subsectio
 
 Cloud lock: 2026-11-12T11:41Z
 
-- First cloud session starts 11:40 UTC.
+- **WP12 merged** (~78k tokens Sonnet): `@folktown/shared` (contract: PlayerInput, WeaponDef/WEAPONS, ZoneData, MatchConfig/State, GameEvent, constants) and `@folktown/sim` (`stepController`, `ZoneCollision` + `raycast`, `makeSyntheticZone`). Yaw 0 looks toward -z, positive yaw turns left. 35 tests.
+- Running: WP9 bake (branch wp9-bake), Stage 2 rules (wp13-rules). Next: bots + nav, then 32-bot headless match test.
 
 ### Local track status
 

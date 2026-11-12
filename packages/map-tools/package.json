@@ -7,10 +7,18 @@
     "project": "node src/run-project.ts",
     "heights": "uv run --with rasterio --with numpy --with 'laspy[lazrs]' --with pyproj python src/heights.py && node src/merge-heights.ts",
     "bake": "node src/run-bake.ts",
-    "typecheck": "tsc -p ."
+    "typecheck": "tsc -p .",
+    "tiles": "node src/tiles/fetch-tiles.ts",
+    "tiles-convert": "node src/tiles/convert.ts",
+    "streetview": "node src/tiles/streetview.ts"
   },
   "dependencies": {
-    "@folktown/shared": "workspace:*"
+    "@folktown/shared": "workspace:*",
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "draco3dgltf": "^1.5.9",
+    "meshoptimizer": "^1.3.0"
   },
   "devDependencies": {
     "@folktown/sim": "workspace:*",

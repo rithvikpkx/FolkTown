@@ -13,7 +13,10 @@
     "map:fetch": "pnpm --filter @folktown/map-tools run fetch-osm",
     "map:project": "pnpm --filter @folktown/map-tools run project",
     "map:bake": "pnpm --filter @folktown/map-tools run bake",
-    "map:heights": "pnpm --filter @folktown/map-tools run heights"
+    "map:heights": "pnpm --filter @folktown/map-tools run heights",
+    "map:tiles": "pnpm --filter @folktown/map-tools run tiles",
+    "map:tiles:convert": "pnpm --filter @folktown/map-tools run tiles-convert",
+    "map:streetview": "pnpm --filter @folktown/map-tools run streetview"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.7",

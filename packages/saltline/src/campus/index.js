@@ -6,6 +6,7 @@ import { BufferGeometry, BufferAttribute, ExtrudeGeometry, Group, InstancedMesh,
 import { Kn, Z0 } from '../game/common.js';
 import { buildGround, withPaths } from './ground.js';
 import { buildGrass, buildTrees } from './vegetation.js';
+import { buildNav } from '../modes/nav.js';
 
 const CHUNK = 64;
 const optional = import.meta.glob('./{ground,vegetation,landmarks}.js', { eager: true });
@@ -162,6 +163,10 @@ export async function buildCampus(G, zone) {
 
   const stats = buildBuildings(G, data, root);
   addCollision(G.physics, data);
+  const nav = buildNav(data);
+  G.physics.nav = nav; // campus-sized grid replaces the harbour's
+  const spawnPos = (p) => ({ pos: new Vector3(p.x, 0, p.z), type: 'ground' });
+  const enemySpawns = [...data.spawns.filter((s) => nav.isWalkable(s.x, s.z)).map(spawnPos), ...nav.lattice(40).map(spawnPos)];
 
   for (const mod of Object.values(optional)) {
     try { mod.build && mod.build(G, zone, root); } catch (e) { console.error('[campus] optional module failed', e); }
@@ -176,7 +181,7 @@ export async function buildCampus(G, zone) {
     spawns: data.spawns,
     objectives: [],
     extraction: null,
-    enemySpawns: [], // shortcut: nav grid is still harbour-sized, bots need a campus nav pass
+    enemySpawns,
     zones: [],
     interiorBoxes: [],
     cinematicPath: [],

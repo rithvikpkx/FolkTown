@@ -11,10 +11,17 @@ The handoff file. Update it at the end of every work package, so a session that 
 - Commands from the root: `pnpm dev`, `pnpm build`, `pnpm test`, `pnpm lint` (Biome plus `tsc` per package).
 - Tooling notes: the shell lazy-loads nvm, so in scripts call pnpm as `npx -y pnpm@12.18.0`. Biome skips `*.md` because it rewrites the doc tables. pnpm 12 refuses very new releases; it listed Biome in `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`.
 
+## Branches and deploys
+
+- `mvp` is the dev branch. Each work package is a branch off `mvp`, merged back by the main session. **Nothing merges into `main`** until the owner has played and approved the MVP.
+- Deploy: `npx -y vercel@latest` (logged in) from the built client. `folktown.rithvik.si` needs a CNAME at the domain's DNS host (Hostinger), which only the owner can add; until then use the `*.vercel.app` link.
+- This machine is the baseline (MacBook Air M1, 16 GB), so benchmarks run here.
+- LiDAR step: Python through `uv run --with rasterio` (no system GDAL needed).
+
 ## Next
 
-1. Review and merge `wp1-skeleton`.
-2. Then two tracks in parallel, one subagent each, at most two running at once.
+1. WP1 merged to `main` (PR #1); `mvp` branched from it.
+2. Two tracks in parallel, one Sonnet subagent each, at most two running at once.
 
 | Track | Packages, in order | Touches |
 |---|---|---|
@@ -26,7 +33,7 @@ Work package numbers are from section 8 of the plan.
 ## Rules for subagents, to keep usage low
 
 - **One work package per subagent,** in its own git worktree and branch. The main session reviews the diff and merges.
-- **Cheapest model that can do it.** Sonnet for ports and pipelines (packages 2, 3, 5, 6, 7). The session's own model only for the two hard ones: the effects chain (4) and the footprint facade generator (8). Haiku for lookups.
+- **Cheapest model that can do it.** Sonnet for ports and pipelines (packages 2, 3, 5, 6, 7). Sonnet for the effects chain (4) and facade generator (8) too; escalate to the session model only if Sonnet fails (owner asked for lowest cost). Haiku for lookups.
 - **Briefs point at files, they do not paste them.** Each brief names the work package, the files to read (with line ranges where known), the deliverable, and the check that proves it.
 - **Reports are ten lines or fewer:** what was built, the command that proves it, its output, anything logged to `docs/known-gaps.md`.
 - **Every package ends with its test or benchmark passing.** No report of success without the command output.

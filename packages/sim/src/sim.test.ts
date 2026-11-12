@@ -230,7 +230,9 @@ describe('shotSpread', () => {
       def.spreadHip + def.spreadMove,
     );
     expect(shotSpread(def, { ...still, speed: 99 })).toBeCloseTo(def.spreadHip + def.spreadMove);
-    expect(shotSpread(def, { ...still, onGround: false })).toBeCloseTo(def.spreadHip + def.spreadAir);
+    expect(shotSpread(def, { ...still, onGround: false })).toBeCloseTo(
+      def.spreadHip + def.spreadAir,
+    );
     expect(shotSpread(def, { ...still, crouching: true })).toBeCloseTo(
       def.spreadHip - def.spreadCrouch,
     );

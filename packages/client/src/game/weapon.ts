@@ -190,6 +190,8 @@ export class ViewModel {
   private phase = 0;
   private flashT = 0;
   private lastFov = HIP_FOV;
+  /** Degrees added to the field of view (sprint kick from CameraFeel). */
+  fovKick = 0;
 
   constructor(
     mats: Mats,
@@ -317,7 +319,7 @@ export class ViewModel {
     if (hands) hands.visible = a < 0.6;
     this.animateParts(id, this.flashT / 0.045, dip);
 
-    const fov = HIP_FOV + (pose.fov - HIP_FOV) * a;
+    const fov = HIP_FOV + (pose.fov - HIP_FOV) * a + this.fovKick;
     if (Math.abs(fov - this.lastFov) > 0.01) {
       this.lastFov = fov;
       this.camera.fov = fov;

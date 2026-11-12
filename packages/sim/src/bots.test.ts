@@ -104,24 +104,27 @@ describe('bot perception upgrades', () => {
   });
 
   it('caps how many bots fire at one target at once', () => {
+    type Probe = { wasAlive: boolean; burstLeft: number; visible: boolean; targetId: number };
+    type Shooters = { shootersOn(t: number): number };
     const peers = new Map<number, BotBrain>();
     const mk = (id: number) => {
       const b = new BotBrain(id, 'normal', zone, col, 'ffa', 1);
       b.peers = peers;
       peers.set(id, b);
-      return b as unknown as Record<string, unknown> & BotBrain;
+      return b;
     };
-    const [a, b, c] = [mk(1), mk(2), mk(3)];
-    for (const x of [b, c]) {
-      x.wasAlive = true;
-      x.burstLeft = 1;
-      x.visible = true;
-      x.targetId = 9;
-    }
-    const count = (a as unknown as { shootersOn(t: number): number }).shootersOn(9);
-    expect(count).toBe(2);
-    expect(count).toBeGreaterThanOrEqual(BOT_PARAMS.normal.maxShooters);
-    (c as Record<string, unknown>).targetId = 5;
-    expect((a as unknown as { shootersOn(t: number): number }).shootersOn(9)).toBe(1);
+    const [a, b, c] = [mk(1), mk(2), mk(3)] as [BotBrain, BotBrain, BotBrain];
+    for (const x of [b, c])
+      Object.assign(x as unknown as Probe, {
+        wasAlive: true,
+        burstLeft: 1,
+        visible: true,
+        targetId: 9,
+      });
+    const on = (t: number) => (a as unknown as Shooters).shootersOn(t);
+    expect(on(9)).toBe(2);
+    expect(on(9)).toBeGreaterThanOrEqual(BOT_PARAMS.normal.maxShooters);
+    (c as unknown as Probe).targetId = 5;
+    expect(on(9)).toBe(1);
   });
 });

@@ -326,10 +326,7 @@ export class BotBrain {
       if (time >= this.aimOffUntil) {
         this.aimOffUntil = time + 0.25;
         const g = () => this.rng.next() + this.rng.next() + this.rng.next() - 1.5;
-        const scale = aimErrorScale(
-          this.exposure,
-          Math.hypot(aimTarget.vel.x, aimTarget.vel.z),
-        );
+        const scale = aimErrorScale(this.exposure, Math.hypot(aimTarget.vel.x, aimTarget.vel.z));
         this.aimOffYaw = g() * p.aimError * 2 * scale;
         this.aimOffPitch = g() * p.aimError * 2 * scale;
       }

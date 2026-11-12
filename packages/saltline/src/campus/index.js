@@ -81,7 +81,7 @@ function toGeometry(floats) {
 }
 
 export function buildBuildings(G, data, root) {
-  try { return buildFacades(G, data, root); } catch (err) { console.error('[campus] facades failed, plain extrusion', err); }
+  try { return buildFacades(G, data, root, G.walk && G.walk.facades); } catch (err) { console.error('[campus] facades failed, plain extrusion', err); }
   const chunks = new Map();
   for (const f of data.footprints) {
     let e;
@@ -158,8 +158,8 @@ export async function buildCampus(G, zone) {
     const extra = await (await fetch(`${import.meta.env.BASE_URL}campus/mall-paths.json`)).json();
     zoneP = withPaths(zone, extra);
   } catch (e) { console.warn('[campus] no derived paths', e); }
-  root.add(buildGround(zoneP, G.mats));
-  const grass = buildGrass(zoneP), trees = buildTrees(zoneP);
+  root.add(buildGround(zoneP, G.mats, G.walk && G.walk.ground));
+  const grass = buildGrass(zoneP, G.walk && G.walk.grass), trees = buildTrees(zoneP);
   root.add(grass, trees);
   (G.campusTick = G.campusTick || []).push((t) => { grass.update(G.camera, t); trees.update(G.camera); });
 

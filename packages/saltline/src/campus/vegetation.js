@@ -73,7 +73,7 @@ export function buildGrass(zone, opts = {}) {
         float vnz(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
           return mix(mix(h3(i).x, h3(i+vec2(1,0)).x, f.x), mix(h3(i+vec2(0,1)).x, h3(i+vec2(1,1)).x, f.x), f.y); }`)
       .replace('#include <beginnormal_vertex>', `
-        float GN = ${GRASS_N}.0, GS = ${GRASS_S.toFixed(3)};
+        float GN = ${GRASS_N}.0, GS = ${(opts.step ?? GRASS_S).toFixed(3)};
         vec2 base = floor(uCam.xz / GS) - GN * 0.5;
         vec2 cell = base + mod(aCell - base, GN);
         vec3 r = h3(cell), r2 = h3(cell + 91.7);

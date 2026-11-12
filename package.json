@@ -12,6 +12,7 @@
     "lint": "biome check . && pnpm -r typecheck",
     "map:fetch": "pnpm --filter @folktown/map-tools run fetch-osm",
     "map:project": "pnpm --filter @folktown/map-tools run project",
+    "map:bake": "pnpm --filter @folktown/map-tools run bake",
     "map:heights": "pnpm --filter @folktown/map-tools run heights"
   },
   "devDependencies": {

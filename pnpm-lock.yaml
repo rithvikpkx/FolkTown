@@ -190,7 +190,14 @@ importers:
         version: 8.3.8(@types/node@24.10.1)
 
   packages/map-tools:
+    dependencies:
+      '@folktown/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
+      '@folktown/sim':
+        specifier: workspace:*
+        version: link:../sim
       '@types/node':
         specifier: 24.10.1
         version: 24.10.1

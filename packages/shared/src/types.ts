@@ -17,11 +17,16 @@ export interface WeaponDef {
   minDamageFraction: number;
   rpm: number;
   mag: number;
-  /** Seconds. */
+  /** Seconds, tactical reload (rounds left in the magazine). An empty reload takes reloadTimeEmpty. */
   reloadTime: number;
+  reloadTimeEmpty: number;
   /** Cone half-angle, radians. */
   spreadHip: number;
   spreadAds: number;
+  /** Extra hip spread at full run speed (aiming down sights keeps 30% of it), when airborne, and the hip spread crouching removes. */
+  spreadMove: number;
+  spreadAir: number;
+  spreadCrouch: number;
   pellets: number;
   auto: boolean;
   /** [pitch, yaw] radians per consecutive shot. */

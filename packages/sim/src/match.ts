@@ -25,7 +25,7 @@ import {
 import { ZoneCollision } from './collision.ts';
 import { createPlayerState, stepController } from './controller.ts';
 import { Rng } from './rng.ts';
-import { falloffFactor, offsetCone, rayCylinder, viewDir } from './weapons.ts';
+import { falloffFactor, offsetCone, rayCylinder, shotSpread, viewDir } from './weapons.ts';
 
 export interface NewPlayer {
   id: number;
@@ -184,7 +184,7 @@ export class Match {
       (input.reload || (input.fire && p.ammo[p.weapon] <= 0)) &&
       p.ammo[p.weapon] < def.mag
     ) {
-      p.reloadLeft = def.reloadTime;
+      p.reloadLeft = p.ammo[p.weapon] <= 0 ? def.reloadTimeEmpty : def.reloadTime;
     }
 
     const pressed = input.fire && (def.auto || !it.prevFire);
@@ -221,7 +221,13 @@ export class Match {
     // Recoil yaw is to the right, which is negative yaw.
     const base = viewDir(p.yaw - p.recoilYaw, p.pitch + p.recoilPitch);
     const growth = 1 + SPREAD_GROWTH * Math.min(p.shotsInBurst, SPREAD_MAX_SHOTS);
-    const spread = (input.ads ? def.spreadAds : def.spreadHip) * growth;
+    const spread = shotSpread(def, {
+      ads: input.ads,
+      speed: Math.hypot(p.vel.x, p.vel.z),
+      onGround: p.onGround,
+      crouching: p.crouching,
+      growth,
+    });
     events.push({
       type: 'shot',
       tick: this.tick,

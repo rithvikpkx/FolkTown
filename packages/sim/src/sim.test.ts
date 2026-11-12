@@ -7,12 +7,15 @@ import {
   COYOTE_TIME,
   DECEL_GROUND,
   PLAYER_RADIUS,
+  SPREAD_FULL_SPEED,
   SPRINT_SPEED,
   TICK_DT,
   WALK_SPEED,
+  WEAPONS,
 } from '@folktown/shared';
 import { describe, expect, it } from 'vitest';
 import { createPlayerState, makeSyntheticZone, stepController, ZoneCollision } from './index.ts';
+import { shotSpread } from './weapons.ts';
 
 const zone = new ZoneCollision(makeSyntheticZone());
 
@@ -214,5 +217,32 @@ describe('raycast', () => {
     const tree = zone.raycast({ x: 0, y: 1, z: 0 }, { x: 0, y: 0, z: -1 }, 100);
     expect(tree?.id).toBe('prop:0');
     expect(tree?.t).toBeCloseTo(19.5, 5);
+  });
+});
+
+describe('shotSpread', () => {
+  const def = WEAPONS.rifle;
+  const still = { ads: false, speed: 0, onGround: true, crouching: false };
+  it('grows with speed and air, shrinks crouched and aiming', () => {
+    const base = shotSpread(def, still);
+    expect(base).toBe(def.spreadHip);
+    expect(shotSpread(def, { ...still, speed: SPREAD_FULL_SPEED })).toBeCloseTo(
+      def.spreadHip + def.spreadMove,
+    );
+    expect(shotSpread(def, { ...still, speed: 99 })).toBeCloseTo(def.spreadHip + def.spreadMove);
+    expect(shotSpread(def, { ...still, onGround: false })).toBeCloseTo(def.spreadHip + def.spreadAir);
+    expect(shotSpread(def, { ...still, crouching: true })).toBeCloseTo(
+      def.spreadHip - def.spreadCrouch,
+    );
+    const ads = shotSpread(def, { ...still, ads: true });
+    expect(ads).toBeCloseTo(def.spreadAds);
+    // moving while aiming costs 30% of the hip movement penalty, and crouching no longer helps
+    expect(shotSpread(def, { ...still, ads: true, speed: SPREAD_FULL_SPEED })).toBeCloseTo(
+      def.spreadAds + def.spreadMove * 0.3,
+    );
+    expect(shotSpread(def, { ...still, ads: true, crouching: true })).toBeCloseTo(ads);
+  });
+  it('an empty weapon takes longer to reload than a tactical reload', () => {
+    for (const w of Object.values(WEAPONS)) expect(w.reloadTimeEmpty).toBeGreaterThan(w.reloadTime);
   });
 });

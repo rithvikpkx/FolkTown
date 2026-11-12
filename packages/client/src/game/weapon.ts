@@ -294,7 +294,8 @@ export class ViewModel {
 
     let dip = 0;
     if (reloading) {
-      const p = 1 - me.reloadLeft / WEAPONS[id].reloadTime;
+      const w = WEAPONS[id];
+      const p = 1 - me.reloadLeft / (me.ammo[id] <= 0 ? w.reloadTimeEmpty : w.reloadTime);
       dip = Math.sin(Math.PI * Math.min(1, Math.max(0, p)));
     }
     const kick = me.recoilPitch;

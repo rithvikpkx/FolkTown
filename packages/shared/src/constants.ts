@@ -37,6 +37,9 @@ export const ADS_SPEED = 3;
 
 export const MAX_HEALTH = 100;
 
+/** Speed (m/s) at which movement spread is full. */
+export const SPREAD_FULL_SPEED = 6;
+
 /** Recoil entries are [pitch up, yaw right] in radians added per shot, repeating the last. */
 export const WEAPONS: Record<WeaponId, WeaponDef> = {
   rifle: {
@@ -48,8 +51,12 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     rpm: 650,
     mag: 30,
     reloadTime: 2.2,
+    reloadTimeEmpty: 2.7,
     spreadHip: 0.03,
     spreadAds: 0.006,
+    spreadMove: 0.015,
+    spreadAir: 0.025,
+    spreadCrouch: 0.005,
     pellets: 1,
     auto: true,
     recoil: [
@@ -69,8 +76,12 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     rpm: 360,
     mag: 12,
     reloadTime: 1.5,
+    reloadTimeEmpty: 1.9,
     spreadHip: 0.02,
     spreadAds: 0.004,
+    spreadMove: 0.01,
+    spreadAir: 0.02,
+    spreadCrouch: 0.003,
     pellets: 1,
     auto: false,
     recoil: [[0.008, 0]],
@@ -84,8 +95,12 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     rpm: 70,
     mag: 6,
     reloadTime: 3,
+    reloadTimeEmpty: 3.4,
     spreadHip: 0.07,
     spreadAds: 0.045,
+    spreadMove: 0.02,
+    spreadAir: 0.03,
+    spreadCrouch: 0.01,
     pellets: 8,
     auto: false,
     recoil: [[0.03, 0]],

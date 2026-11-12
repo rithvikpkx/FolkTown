@@ -172,9 +172,9 @@ export function buildWalkTrees(zone) {
   const src = zone.trees?.length ? zone.trees : zone.props ?? [];
   const y0 = zone.ground?.heights?.[0] ?? 0, pick = (h) => { let a = 0; for (const k of NAMES) { a += SPECIES[k].w; if (h < a) return k; } return 'oak'; };
   const trees = src.map((t) => {
-    const h = hash2(t.x, t.z), h2 = hash2(t.z, t.x), sp = pick(h2 * 0.999), s = SPECIES[sp];
+    const h = hash2(t.x, t.z), h2 = hash2(t.z, t.x), sp = t.sp || pick(h2 * 0.999), s = SPECIES[sp];
     const hold = h < (s.evergreen ? 2 : S.cover * s.hold + (SEASON === 'summer' || SEASON === 'spring' ? 1 : 0));
-    return { x: t.x, z: t.z, y: y0, sp, s: 0.75 + h * 0.5, sx: 0.85 + hash2(t.x + 9, t.z) * 0.35, yaw: (h * 25.13) % 6.2832, leaves: hold, tint: new Color().setHSL(0, 0, 0.85 + h2 * 0.3) };
+    return { x: t.x, z: t.z, y: t.y ?? y0, sp, s: t.scale ?? 0.75 + h * 0.5, sx: 0.85 + hash2(t.x + 9, t.z) * 0.35, yaw: (h * 25.13) % 6.2832, leaves: t.sp ? true : hold, tint: new Color().setHSL(0, 0, 0.85 + h2 * 0.3) };
   });
   const N = trees.length, time = windTime, bark = barkTexture();
   const woodM = patch(new MeshStandardMaterial({ vertexColors: false, map: bark, roughness: 0.95, side: DoubleSide }), false);

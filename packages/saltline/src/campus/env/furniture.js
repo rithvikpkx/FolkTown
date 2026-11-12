@@ -15,7 +15,7 @@ const distSeg = (x, z, a, b) => { const dx = b[0] - a[0], dz = b[1] - a[1], t = 
 const BOX = { minX: -50, maxX: 160, minZ: -70, maxZ: 50 };
 const inBox = (x, z) => x > BOX.minX + 2 && x < BOX.maxX - 2 && z > BOX.minZ + 2 && z < BOX.maxZ - 2;
 
-const MATS = {
+export const MATS = {
   dark: () => new MeshStandardMaterial({ color: 0x1b1c1e, roughness: 0.45, metalness: 0.7 }),
   wood: () => new MeshStandardMaterial({ color: 0x86603a, roughness: 0.8 }),
   stone: () => new MeshStandardMaterial({ color: 0xcdc3ad, roughness: 0.92 }),
@@ -41,7 +41,7 @@ const T = (g, x, y, z) => g.translate(x, y, z);
 const nonIdx = (g) => (g.index ? g.toNonIndexed() : g);
 
 // prototypes: name -> { matKey: [geometries] }; each is merged to one geometry per material
-const PROTO = {
+export const PROTO = {
   lamp: { dark: [T(new CylinderGeometry(0.075, 0.1, 3.9, 8), 0, 1.95, 0), T(new CylinderGeometry(0.2, 0.26, 0.7, 8), 0, 0.35, 0), T(new CylinderGeometry(0.15, 0.15, 0.1, 8), 0, 3.95, 0), T(new ConeGeometry(0.3, 0.32, 8), 0, 4.74, 0), T(new SphereGeometry(0.05, 6, 6), 0, 4.95, 0), T(new TorusGeometry(0.27, 0.015, 4, 12).rotateX(Math.PI / 2), 0, 4.55, 0)],
     glass: [T(new SphereGeometry(0.21, 10, 8).scale(1, 1.55, 1), 0, 4.3, 0)] },
   bench: { wood: [0, 0.07, 0.14, 0.21].map((z) => T(new BoxGeometry(1.8, 0.04, 0.09), 0, 0.46, z - 0.1)).concat([0.7, 0.84].map((y) => T(new BoxGeometry(1.8, 0.1, 0.035), 0, y, -0.2))),
@@ -70,7 +70,7 @@ export function buildFurniture(G, zone, paths, trees) {
   const R = rng(4242), mats = {}, place = {}, Q = new Quaternion(), E = new Euler(), M = new Matrix4(), Sc = new Vector3(1, 1, 1), P = new Vector3();
   const walc = zone.colliders.find((c) => c.id === 'way/508846031'), poly = walc && walc.poly;
   const solids = [[[-4.6, -4.6], [4.6, -4.6], [4.6, 4.6], [-4.6, 4.6]], ...(poly ? [poly] : [])];
-  const free = (x, z, m = 0.6) => inBox(x, z) && !solids.some((s) => inPoly(x, z, s) || s.some((p, i) => distSeg(x, z, p, s[(i + 1) % s.length]) < m));
+  const free = (x, z, m = 0.6) => inBox(x, z) && !(G.plazaExclude && G.plazaExclude(x, z)) && !solids.some((s) => inPoly(x, z, s) || s.some((p, i) => distSeg(x, z, p, s[(i + 1) % s.length]) < m));
   const on = (name, x, z, yaw = 0, s = 1, y = 0, color) => { (place[name] = place[name] || []).push({ x, z, yaw, s, y, color }); };
   const walks = paths.filter((p) => ['footway', 'pedestrian', 'path', 'cycleway'].includes(p.hw));
   const roads = paths.filter((p) => !['footway', 'pedestrian', 'path', 'cycleway', 'corridor', 'track', 'steps'].includes(p.hw));

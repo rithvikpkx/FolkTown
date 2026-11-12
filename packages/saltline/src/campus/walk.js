@@ -13,6 +13,7 @@ import { vegMode } from './vegetation.js';
 import roofs from '../../../../data/pilot/roofs.json';
 import { applyEarly, installSky } from './env/sky.js';
 import { S as SEASON } from './env/season.js';
+import { buildPlaza, inPlaza, plazaFloor, plazaTrees } from './env/plaza.js';
 
 // sun/fog constants are cloned by render init, so they must change at import time, and only in walk mode
 if (typeof location !== 'undefined' && (import.meta.env.VITE_WALK ? !/[?&]walk=0/.test(location.search) : /[?&]walk=(?!0)/.test(location.search))) applyEarly();
@@ -98,7 +99,7 @@ export async function buildWalk(G) {
   const colliders = zone.colliders.filter((c) => KEEP.includes(c.id)).map((c) => (c.id === KEEP[1] ? { ...c, topY: walc.eaveH } : c));
   const z = {
     ...zone, bounds: BOX, colliders, paths,
-    props: zone.props.filter((t) => inBox(t.x, t.z)),
+    props: zone.props.filter((t) => inBox(t.x, t.z) && !inPlaza(t.x, t.z, 1)).concat(plazaTrees()),
     landmarks: { bellTower: zone.landmarks.bellTower }, // no fountain
     spawns: [{ x: 8, z: 0, yaw: -Math.PI / 2, team: 0 }],
   };
@@ -110,11 +111,13 @@ export async function buildWalk(G) {
   level.root.add(await buildWalc(G, colliders.find((c) => c.id === KEEP[1]).poly)); // code-generated WALC (walc.js); facades.js skips it
   try { await installSky(G); } catch (e) { console.error('[walk] sky failed', e); }
   G.walkCrossings = getDecals(z).crossings;
+  G.plazaExclude = (x, z) => inPlaza(x, z, 1.5); G.walkFloor = plazaFloor;
   try {
     const fur = buildFurniture(G, z, paths, z.props);
     level.root.add(fur, buildUnderstory(G, z, fur.planters));
     console.log('[walk] furniture', JSON.stringify(fur.counts));
   } catch (e) { console.error('[walk] furniture failed', e); level.root.add(furniture(G, paths)); }
+  const plaza = buildPlaza(G, z); level.root.add(plaza);
   // collision shapes: building polygons, tower plinth, tree trunks
   let ctx = { solids: [] };
   if (!/[?&]ctx=0/.test(location.search)) try { ctx = buildContext(G, zone, level.root, { box: BOX, keep: KEEP, ortho }); console.log('[walk] context', JSON.stringify({ ...ctx, solids: ctx.solids.length })); } catch (e) { console.error('[walk] context failed', e); }
@@ -122,6 +125,7 @@ export async function buildWalk(G) {
     ...ctx.solids,
     ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),
     [[-BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, BELLTOWER_HALF], [-BELLTOWER_HALF, BELLTOWER_HALF]],
+    ...plaza.solids,
   ];
   G.walkTrees = z.props;
   return level;
@@ -181,7 +185,8 @@ export function walkPlayer(G) {
       p.speed = f || r ? sp / 1 : 0;
       if (p.onGround && keys.has('Space')) { p.vel.y = 5; p.onGround = false; }
       p.vel.y -= 14 * dt; p.pos.y += p.vel.y * dt;
-      if (p.pos.y <= 0) { p.pos.y = 0; p.vel.y = 0; p.onGround = true; }
+      const fl = G.walkFloor ? G.walkFloor(p.pos.x, p.pos.z) : 0;
+      if (p.pos.y <= fl) { p.pos.y = fl; p.vel.y = 0; p.onGround = true; }
       for (let k = 0; k < 2; k++) {
         for (const poly of G.walkSolids || []) pushOut(p.pos, poly);
         for (const t of G.walkTrees || []) {

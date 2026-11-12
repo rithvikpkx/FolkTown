@@ -6,9 +6,14 @@
     "fetch-osm": "node src/fetch.ts",
     "project": "node src/run-project.ts",
     "heights": "uv run --with rasterio --with numpy --with 'laspy[lazrs]' --with pyproj python src/heights.py && node src/merge-heights.ts",
+    "bake": "node src/run-bake.ts",
     "typecheck": "tsc -p ."
   },
+  "dependencies": {
+    "@folktown/shared": "workspace:*"
+  },
   "devDependencies": {
+    "@folktown/sim": "workspace:*",
     "@types/node": "24.10.1"
   }
 }

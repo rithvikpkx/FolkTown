@@ -3,6 +3,7 @@
 // Reuses buildCampus (ground, grass, trees, facades, Bell Tower, sun-follow); everything else (weapons, bots, HUD, menus) is stubbed in boot.
 // Pilot data: ortho.jpg is blended into the ground beyond ~7 m (ground.js opts.ortho); LiDAR roof shapes/plant boxes of WALC from data/pilot/roofs.json.
 import { BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, SRGBColorSpace, TextureLoader, LinearMipmapLinearFilter, Vector3 } from 'three';
+import { BELLTOWER_HALF } from './belltower.js';
 import { fetchZone, buildCampus } from './index.js';
 import { buildWalc } from './walc.js';
 import roofs from '../../../../data/pilot/roofs.json';
@@ -93,6 +94,7 @@ export async function buildWalk(G) {
     spawns: [{ x: 8, z: 0, yaw: -Math.PI / 2, team: 0 }],
   };
   const ortho = await loadOrtho();
+  G.bellShaftTexture = await new Promise((r) => new TextureLoader().load(BASE + 'walk/tex/bell-shaft.jpg', (t) => { t.colorSpace = SRGBColorSpace; t.anisotropy = 8; r(t); }, undefined, () => r(null)));
   G.walk = { ground: { dir: 'walk/', aniso: 16, ortho }, grass: { step: 0.17, far: 14 }, facades: { skip: [KEEP[1]] } };
   const level = await buildCampus(G, z);
   level.root.add(await buildWalc(G, colliders.find((c) => c.id === KEEP[1]).poly)); // code-generated WALC (walc.js); facades.js skips it
@@ -100,7 +102,7 @@ export async function buildWalk(G) {
   // collision shapes: building polygons, tower plinth, tree trunks
   G.walkSolids = [
     ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),
-    [[-4.4, -4.4], [4.4, -4.4], [4.4, 4.4], [-4.4, 4.4]],
+    [[-BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, -BELLTOWER_HALF], [BELLTOWER_HALF, BELLTOWER_HALF], [-BELLTOWER_HALF, BELLTOWER_HALF]],
   ];
   G.walkTrees = z.props;
   return level;

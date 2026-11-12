@@ -22,6 +22,7 @@ export function loadCampus(zone) {
   const footprints = [];
   for (const c of zone.colliders) {
     if (!c.poly || c.poly.length < 3) continue;
+    if (zone.landmarks && zone.landmarks.bellTower && c.id === zone.landmarks.bellTower.id) continue; // drawn and collided by belltower.js
     const poly = new Array(c.poly.length * 2);
     let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
     c.poly.forEach(([x, z], i) => {

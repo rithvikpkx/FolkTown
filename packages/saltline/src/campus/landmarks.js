@@ -1,4 +1,4 @@
-// Purdue landmarks for Saltline: buildBellTower(at, mats) and buildFountain(at, mats).
+// Purdue landmarks for Saltline: buildBellTower (now in belltower.js) and buildFountain(at, mats).
 // Each returns { group, colliders, update(t), tris }. group origin = `at` (ground centre, y = 0);
 // colliders are world-space AABBs [{min:[x,y,z], max:[x,y,z]}]. mats defaults to window.__G.mats
 // (Saltline's material set, src/game/mats.js); lighting comes from the host scene (sun + sky).
@@ -16,6 +16,7 @@ import {
   BoxGeometry, CylinderGeometry, LatheGeometry, BufferGeometry, Float32BufferAttribute, Group, Mesh,
   MeshStandardMaterial, CanvasTexture, RepeatWrapping, Euler, Matrix4, Vector3, Quaternion,
 } from 'three';
+import { buildBellTower } from './belltower.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 const flat = (g) => { const n = g.index ? g.toNonIndexed() : g; n.computeVertexNormals(); return n; };
@@ -59,65 +60,7 @@ const LIME = { color: 0xe9e1cf };     // limestone: tinted white paint set (conc
 const SLATE = { color: 0x4a4466 };    // cap: dark slate-purple (the photo, not green verdigris)
 const rotY = (k) => new Matrix4().makeRotationY((k * Math.PI) / 2);
 
-export function buildBellTower(at = [0, 0, 0], mats) {
-  mats = getMats(mats);
-  const P = new Parts(mats), group = new Group();
-  const H = 48.8, SHAFT = 3.2, CLK = 3.6;           // half widths
-  const y0 = 0.9, yShaft = 25.5, yClock = 32.0, yBelfry = 38.5, yCap = 47.4;
-
-  // Plinth + shaft + bands (symmetric, no per-face work)
-  P.box('paint_white', -4.4, 0, -4.4, 4.4, 0.9, 4.4, LIME);
-  P.box('brick', -SHAFT, y0, -SHAFT, SHAFT, yShaft, SHAFT);
-  for (const y of [0.9, 6.5, 12.2, 17.9, 23.4]) P.box('paint_white', -SHAFT - 0.12, y, -SHAFT - 0.12, SHAFT + 0.12, y + 0.35, SHAFT + 0.12, LIME);
-  P.box('paint_white', -CLK - 0.2, yShaft, -CLK - 0.2, CLK + 0.2, yShaft + 0.6, CLK + 0.2, LIME);
-
-  // Clock stage: limestone block, cornice on top
-  P.box('paint_white', -CLK, yShaft + 0.6, -CLK, CLK, yClock, CLK, LIME);
-  P.box('paint_white', -CLK - 0.35, yClock, -CLK - 0.35, CLK + 0.35, yClock + 0.5, CLK + 0.35, LIME);
-
-  // Belfry: white core, corner piers, centre mullions, warm lit arched openings
-  const b0 = yClock + 0.5, hw = 0.85, spring = yBelfry - 2.6;
-  P.box('paint_white', -CLK + 0.4, b0, -CLK + 0.4, CLK - 0.4, yBelfry, CLK - 0.4, LIME);
-  const lamp = mats.emissive(0xffd9a0, 3);
-  const dark = 'steel_dark';
-  for (let k = 0; k < 4; k++) {
-    const m = rotY(k), face = new Parts(mats);
-    for (const x of [-1.55, 1.55]) {                // two openings per face
-      face.box(lamp, x - hw, b0 + 0.9, CLK - 0.42, x + hw, spring, CLK - 0.36);
-      const a = new CylinderGeometry(hw, hw, 0.06, 16, 1, false, 0, Math.PI); a.rotateX(Math.PI / 2); a.translate(x, spring, CLK - 0.39);
-      face.add(lamp, a);
-    }
-    face.box('paint_white', -0.2, b0 + 0.9, CLK - 0.45, 0.2, yBelfry - 0.4, CLK - 0.3, LIME); // mullion
-    // clock dial
-    const cy = (yShaft + 0.6 + yClock) / 2 + 0.2;
-    face.disc('paint_white', 0, cy, CLK, CLK + 0.08, 2.55, LIME);          // surround
-    face.disc('paint_white', 0, cy, CLK + 0.08, CLK + 0.16, 2.3, { color: 0xffffff });       // dial
-    for (let i = 0; i < 12; i++) {
-      const a = (i * Math.PI) / 6, big = i % 3 === 0, r0 = big ? 1.65 : 1.85;
-      const g = new BoxGeometry(big ? 0.14 : 0.07, big ? 0.45 : 0.25, 0.05);
-      g.translate(0, (r0 + 2.15) / 2 + 0.0, 0); g.rotateZ(-a); g.translate(0, cy, CLK + 0.18);
-      face.add(dark, g);
-    }
-    for (const [len, ang, w] of [[1.9, -2.0, 0.1], [1.3, 0.5, 0.14]]) {
-      const g = new BoxGeometry(w, len, 0.06); g.translate(0, len / 2, 0); g.rotateZ(-ang); g.translate(0, cy, CLK + 0.22);
-      face.add(dark, g);
-    }
-    for (const v of face.m.values()) for (const g of v.geos) { g.applyMatrix4(m); P.add(v.key, g, v.opts); }
-  }
-  P.box('paint_white', -CLK - 0.3, yBelfry, -CLK - 0.3, CLK + 0.3, yBelfry + 0.6, CLK + 0.3, LIME); // eaves
-
-  // Cap: concave 4-sided pyramid, ribs, finial
-  const prof = [];
-  for (let i = 0; i <= 12; i++) { const t = i / 12; prof.push(new Vector3(0.001 + 4.7 * (1 - t) * (1 - t * 0.45) , yBelfry + 0.6 + t * (yCap - yBelfry - 0.6), 0)); }
-  const cap = new LatheGeometry(prof.map((p) => ({ x: p.x, y: p.y })), 4); cap.rotateY(Math.PI / 4);
-  P.add('paint_grey', flat(cap), SLATE);
-  P.add('brass', new CylinderGeometry(0.1, 0.18, H - yCap + 0.3, 8).translate(0, (H + yCap) / 2 - 0.15, 0));
-
-  const tris = P.build(group);
-  group.position.set(...at);
-  const colliders = [{ min: [at[0] - 4.4, at[1], at[2] - 4.4], max: [at[0] + 4.4, at[1] + H, at[2] + 4.4] }];
-  return { group, colliders, update() {}, tris, height: H };
-}
+export { buildBellTower };
 
 // Streaky tileable water texture, scrolled in update().
 function waterTex() {
@@ -192,7 +135,7 @@ export function buildFountain(at = [0, 0, 0], mats) {
 export function build(G, zone, root) {
   const L = zone.landmarks || {};
   const items = [];
-  if (L.bellTower) items.push(buildBellTower([L.bellTower.x, 0, L.bellTower.z], G.mats));
+  if (L.bellTower) items.push(buildBellTower([L.bellTower.x, 0, L.bellTower.z], G.mats, { shaftTexture: G.bellShaftTexture, night: typeof location !== 'undefined' && /[?&]night=1/.test(location.search) }));
   if (L.fountain) items.push(buildFountain([L.fountain.x, 0, L.fountain.z], G.mats));
   for (const it of items) {
     root.add(it.group);

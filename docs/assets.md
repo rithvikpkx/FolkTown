@@ -88,3 +88,5 @@ Both are gitignored and not part of any shipped build until cleared.
 | Saltline, a single-file procedural FPS, forked into `packages/saltline` (code only; models, textures and audio are generated in code) | Distributed as a single HTML file; source URL not recorded in the file (supplied by the owner, see `docs/saltline-deep-findings.md`) | Reuse permission granted by Saltline's owner to the FolkTown owner; no licence text in the source. Mark `needs-clearance` until the permission is written down | Credit Saltline's author; the original's page title is "Saltline" |
 | Three.js r180 (`three@0.180.0`) used by it | https://github.com/mrdoob/three.js | MIT | Retain the MIT notice (in the npm package) |
 | Fonts it loads from Google Fonts: Big Shoulders Display, IBM Plex Mono, Barlow Condensed | https://fonts.google.com | SIL OFL 1.1 | None required |
+
+- Purdue exterior reference photos (35, from Purdue pages; provenance in reference/purdue-photos/manifest.json): owner states Purdue reuse rights; status needs-clearance for non-Purdue images. Purdue ArcGIS building layer (data/raw/purdue-historic-buildings.geojson, reference only).

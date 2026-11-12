@@ -21,3 +21,6 @@ Reproduce: `pnpm map:pilot-ortho`, `pnpm map:pilot-roofs` (LiDAR tiles cached un
 
 ## Gaps / guessed
 - No facade imagery, no wall data, no tree heights separable from roofs. Roof materials/colours are not extracted (read from the ortho if wanted). Nothing was invented; thresholds above (3 m, 1.5 m, 2.5 m, 0.25 m) are heuristics.
+
+## 4. Ortho georeference fit (v2-environment)
+Grid search (shift +-5 m, rotation +-1.5 deg, then refined) maximising mean ortho edge gradient along ~3,500 sample points on the 5 OSM building footprints inside the ortho: score 7.8 (unshifted) to 13.2. Result: sample the ortho at R(-0.65 deg)(p-c)+c+(1.9,-1.4) m about c=(70,-80); stored as fit in ortho.json, applied in ground.js. Outline based, so roof lean and shadows bias it by well under a metre; not checked against surveyed points.

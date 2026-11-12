@@ -19,7 +19,7 @@ export function styleFor(id, styles = STYLES) {
 }
 
 // ---------- merged geometry buckets ----------
-class Bucket {
+export class Bucket {
   constructor(mat, colored) { this.mat = mat; this.p = []; this.n = []; this.uv = []; this.c = colored ? [] : null; }
   // quad a,b,c,d (counter-clockwise from the visible side); optional colour and uv corners
   q(a, b, c, d, col, uvs) {
@@ -53,7 +53,7 @@ class Bucket {
 }
 
 // ---------- footprint helpers ----------
-function ring(poly) { // [[x,z]...] counter-clockwise (area > 0 in x,z), no repeats
+export function ring(poly) { // [[x,z]...] counter-clockwise (area > 0 in x,z), no repeats
   const r = [];
   for (let i = 0; i < poly.length; i += 2) {
     const p = [poly[i], poly[i + 1]], q = r[r.length - 1];
@@ -65,14 +65,14 @@ function ring(poly) { // [[x,z]...] counter-clockwise (area > 0 in x,z), no repe
 }
 const edgeNorm = (p, q) => { const dx = q[0] - p[0], dz = q[1] - p[1], l = Math.hypot(dx, dz) || 1; return [dz / l, -dx / l]; };
 // miter offset (outward positive); falls back to a plain normal offset at spikes
-function offset(r, dist) {
+export function offset(r, dist) {
   return r.map((p, i) => {
     const a = edgeNorm(r[(i + r.length - 1) % r.length], p), b = edgeNorm(p, r[(i + 1) % r.length]);
     const k = 1 + a[0] * b[0] + a[1] * b[1];
     return k < 0.25 ? [p[0] + b[0] * dist, p[1] + b[1] * dist] : [p[0] + (a[0] + b[0]) / k * dist, p[1] + (a[1] + b[1]) / k * dist];
   });
 }
-function cap(bucket, r, y) {
+export function cap(bucket, r, y) {
   const s = new Shape();
   r.forEach((p, i) => (i ? s.lineTo(p[0], -p[1]) : s.moveTo(p[0], -p[1])));
   const g = new ShapeGeometry(s), pos = g.attributes.position, ix = g.index.array;
@@ -210,6 +210,7 @@ export function buildFacades(G, data, root, opts = {}) {
   };
   let tris = 0, maxB = 0;
   for (const f of data.footprints) {
+    if (opts.skip && opts.skip.includes(f.id)) continue; // built elsewhere (walc.js)
     const S = styleFor(f.id, styles);
     S.gc = new Color(S.glass);
     const key = `${Math.floor((f.minX + f.maxX) / 2 / CHUNK)},${Math.floor((f.minZ + f.maxZ) / 2 / CHUNK)}`;

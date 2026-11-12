@@ -12,3 +12,5 @@ When you hit one during a work package: add a row, move on.
 | 2 | Lens polish not ported | No lens dirt, horizontal streak, colour fringing or motion blur | Port those passes from Saltline's chain | 12 Nov 2026 |
 | 3 | 24 of the OSM multipolygon relations fail to assemble | A few buildings or lawns are missing (members outside the fetch box have no geometry) | Widen the box or fetch relation members by id with `out geom` unclipped | 12 Nov 2026 |
 | 4 | `map:fetch` depends on busy public Overpass servers | Fetch may need retries; the committed cache avoids it. The cached file was obtained with the same query via curl after the script's retries timed out | Add a longer-lived retry or a self-hosted mirror | 12 Nov 2026 |
+| 5 | Haze and occlusion upsample is plain bilinear | A thin bright fringe on silhouettes against the sky | Depth-weighted upsample of the half-size buffers, as Saltline does | 12 Nov 2026 |
+| 6 | Sun shadow map is one fixed 80-90 m area, rendered once | Shadows stop at the edge of the map; shafts treat everything outside as lit | Re-centre the map on the player in chunks, or cascade it | 12 Nov 2026 |

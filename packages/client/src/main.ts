@@ -1,18 +1,20 @@
-import { WebGLRenderer } from 'three';
+import { Vector3 } from 'three';
+import { createRenderer, parseFx } from './render';
 import { createScene } from './scene';
 
-const renderer = new WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
-document.body.appendChild(renderer.domElement);
+const canvas = document.createElement('canvas');
+document.body.appendChild(canvas);
 const { scene, camera } = createScene(innerWidth / innerHeight);
-
-function resize() {
-  renderer.setPixelRatio(1); // pixel budget: 1x by default, dynamic scale comes with WP4
-  renderer.setSize(innerWidth, innerHeight);
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-}
-addEventListener('resize', resize);
-resize();
+const fxOpts = parseFx(location.search);
+const fx = createRenderer(canvas, scene, camera, {
+  ...fxOpts,
+  shadow: { center: new Vector3(0, 0, -20), size: 90 },
+});
+addEventListener('resize', () => fx.resize());
+// F toggles the whole chain on and off
+addEventListener('keydown', (e) => {
+  if (e.code === 'KeyF' && !e.repeat) fx.setEnabled(!fx.state.enabled);
+});
 
 // ?cam=x,y,z,yaw,pitch (degrees) places the camera; used by tools/ for benches and shots
 const cam = new URLSearchParams(location.search).get('cam')?.split(',').map(Number);
@@ -25,12 +27,12 @@ if (cam?.length === 5 && cam.every(Number.isFinite)) {
 // frame-time ring buffer (ms) for the bench harness
 const ft = { times: new Float32Array(600), n: 0, renderer: '' };
 (window as unknown as { __ft: typeof ft }).__ft = ft;
-const gl = renderer.getContext();
+const gl = fx.webgl.getContext();
 const dbg = gl.getExtension('WEBGL_debug_renderer_info');
 ft.renderer = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : 'unknown';
 let last = performance.now();
-renderer.setAnimationLoop((now: number) => {
+fx.webgl.setAnimationLoop((now: number) => {
   ft.times[ft.n++ % ft.times.length] = now - last;
+  fx.render(Math.min((now - last) / 1000, 0.1));
   last = now;
-  renderer.render(scene, camera);
 });

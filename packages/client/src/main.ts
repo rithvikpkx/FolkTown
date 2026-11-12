@@ -1,6 +1,7 @@
 import { Vector3 } from 'three';
+import { makeMaterials } from './materials';
 import { createRenderer, parseFx } from './render';
-import { createScene } from './scene';
+import { buildPlaza, createScene } from './scene';
 
 const canvas = document.createElement('canvas');
 document.body.appendChild(canvas);
@@ -25,11 +26,15 @@ if (cam?.length === 5 && cam.every(Number.isFinite)) {
 }
 
 // frame-time ring buffer (ms) for the bench harness
-const ft = { times: new Float32Array(600), n: 0, renderer: '' };
+const ft = { times: new Float32Array(600), n: 0, renderer: '', texMs: 0 };
 (window as unknown as { __ft: typeof ft }).__ft = ft;
 const gl = fx.webgl.getContext();
 const dbg = gl.getExtension('WEBGL_debug_renderer_info');
 ft.renderer = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : 'unknown';
+const t0 = performance.now();
+buildPlaza(scene, await makeMaterials(fx.webgl));
+fx.invalidateShadow();
+ft.texMs = Math.round(performance.now() - t0);
 let last = performance.now();
 fx.webgl.setAnimationLoop((now: number) => {
   ft.times[ft.n++ % ft.times.length] = now - last;

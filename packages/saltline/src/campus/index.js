@@ -4,6 +4,8 @@
 //   export function build(G, zone, root) -> void | Object3D   (called after the base level is assembled)
 import { BufferGeometry, BufferAttribute, ExtrudeGeometry, Group, InstancedMesh, Matrix4, Mesh, PlaneGeometry, Shape, CylinderGeometry, Vector3 } from 'three';
 import { Kn, Z0 } from '../game/common.js';
+import { buildGround, withPaths } from './ground.js';
+import { buildGrass, buildTrees } from './vegetation.js';
 
 const CHUNK = 64;
 const optional = import.meta.glob('./{ground,vegetation,landmarks}.js', { eager: true });
@@ -147,29 +149,20 @@ export async function buildCampus(G, zone) {
   G.physics.bounds.max.copy(Kn.max);
   G.physics.resetGrid();
 
-  // ground: one plane at zone size, UVs in metres (same convention as the harbour's fg() planes)
-  const gg = new PlaneGeometry(size.x, size.z).rotateX(-Math.PI / 2);
-  const uv = gg.attributes.uv;
-  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * size.x, uv.getY(i) * size.z);
-  const ground = new Mesh(gg, G.mats.get('concrete'));
-  ground.position.set(center.x, 0, center.z);
-  ground.receiveShadow = true;
-  root.add(ground);
+  // ground, grass and trees from ground.js / vegetation.js (paths derived from campus.json highways)
+  let zoneP = zone;
+  try {
+    const extra = await (await fetch(`${import.meta.env.BASE_URL}campus/mall-paths.json`)).json();
+    zoneP = withPaths(zone, extra);
+  } catch (e) { console.warn('[campus] no derived paths', e); }
+  root.add(buildGround(zoneP, G.mats));
+  const grass = buildGrass(zoneP), trees = buildTrees(zoneP);
+  root.add(grass, trees);
+  (G.campusTick = G.campusTick || []).push((t) => { grass.update(G.camera, t); trees.update(G.camera); });
 
   const stats = buildBuildings(G, data, root);
   addCollision(G.physics, data);
 
-  const hasVeg = !!optional['./vegetation.js'];
-  if (!hasVeg && data.trees.length) {
-    // stand-in trunks until vegetation.js exists
-    const geo = new CylinderGeometry(1, 1, 1, 8).translate(0, 0.5, 0);
-    const im = new InstancedMesh(geo, G.mats.get('steel_dark'), data.trees.length);
-    const m = new Matrix4();
-    data.trees.forEach((t, i) => im.setMatrixAt(i, m.makeScale(t.radius, t.topY - t.baseY, t.radius).setPosition(t.x, t.baseY, t.z)));
-    im.castShadow = im.receiveShadow = true;
-    im.frustumCulled = false;
-    root.add(im);
-  }
   for (const mod of Object.values(optional)) {
     try { mod.build && mod.build(G, zone, root); } catch (e) { console.error('[campus] optional module failed', e); }
   }

@@ -90,7 +90,7 @@ __late_level.y1(y1);
       a = "rgba(206,198,160,0.92)",
       l = "rgba(196,52,36,0.95)";
     (t("model", "PAC-9", `700 104px ${o}`, r),
-      t("maker", "LONGSHORE ARMS WORKS  \xB7  SALTLINE", `600 44px ${i}`, r),
+      t("maker", "FOLKTOWN ARMS  \xB7  WEST LAFAYETTE", `600 44px ${i}`, r),
       t("cal", "CAL 5.8\xD740   SN PA-004217", `500 38px ${s}`, r),
       t("prop", "PROPERTY OF PORT AUTHORITY \u2014 BERTH 4 ARMOURY", `600 40px ${i}`, r),
       t("sn", "PA-004217", `500 40px ${s}`, r, "center"),
@@ -103,11 +103,11 @@ __late_level.y1(y1);
     (t("optic", "HX-2 REFLEX", `700 62px ${i}`, r, "center"),
       t("light", "900 LM  IPX8", `600 56px ${i}`, r, "center"),
       t("p_model", "PAC-4", `700 104px ${o}`, r),
-      t("p_name", "BOSUN", `600 70px ${i}`, r),
+      t("p_name", "BLACK", `600 70px ${i}`, r),
       t("p_cal", "9\xD719  PA-SVC", `500 38px ${s}`, r),
       t("p_sn", "SN PB-011902", `500 38px ${s}`, r),
       t("p_rack", "B4-11", `800 112px ${o}`, a, "center"),
-      t("p_maker", "LONGSHORE ARMS WORKS  \xB7  SALTLINE", `600 44px ${i}`, r),
+      t("p_maker", "FOLKTOWN ARMS  \xB7  WEST LAFAYETTE", `600 44px ${i}`, r),
       t("p_prop", "PROPERTY OF PORT AUTHORITY \u2014 BERTH 4", `600 40px ${i}`, r));
     {
       let [h, p] = Qo.warn;
@@ -1249,7 +1249,7 @@ vObjP = position; vONrm = normal; vWNrm = normalize(mat3(modelMatrix) * normal);
       return 1 - u5(0, c, Math.hypot(u, f, h));
     },
     wn = {
-      name: "PAC-9 Longshore",
+      name: "PAC-9 Gold",
       muzzle: [0, 0, -0.531],
       eject: [0.023, 0.004, -0.028],
       sightY: 0.069,

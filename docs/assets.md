@@ -36,3 +36,19 @@ All are ambientCG sets (CC0, no credit needed), 1K JPG from `https://ambientcg.c
 | metal | Metal063 | 1 | Roughness remapped to 0.25-0.85; metalness stays the constant 0.85 |
 
 Not sourced: concrete and roof shingle, because the material table has no such materials yet (add to the table with a procedural fallback first). The AO slot in the manifest is supported but no set uses it.
+
+## Sound effects (local-audio)
+
+All files are in `packages/client/public/audio/` (about 0.5 MB of mono Ogg Vorbis, trimmed with ffmpeg from the originals) and are mapped by `manifest.json` (sound id -> files, volume, rate, pitch spread, max voices, loop). To swap a sound, replace the file or edit the manifest; a missing file is silent. Master volume and mute persist in localStorage (`M` mute, `[` and `]` volume). No sound was synthesised in code.
+
+| Asset | Used for | Source URL | Licence | Credit needed |
+|---|---|---|---|---|
+| sks.wav, cz.wav, shotty.wav (first shot only) | rifle-shot, pistol-shot, shotgun-shot | https://opengameart.org/content/gunshot-sounds (Tabasco) | Page says CC0; the zip's creativecommons.txt says CC-BY 3.0, copyright 2009 Vincent Sevedge. Treated as CC-BY | Yes: "Gunshot sounds, Vincent Sevedge, CC-BY 3.0" (add to a credits screen) |
+| assaultriflereload1_0.wav, reload.wav, Shell in Chamber.mp3 | rifle, pistol, shotgun reload | https://opengameart.org/content/gun-reload-sounds, /content/handgun-reload-sound-effect, /content/shotgun-reload-sound-effects | CC0 | No |
+| equipmentclicks.wav (first 0.3 s) | dry-fire, weapon switch | https://opengameart.org/content/equipment-clicks-ii | CC0 | No |
+| bfh1_rock_falling_02, bfh1_misc_03, bfh1_metal_hit_05, bfh1_metal_hit_03 | impact-concrete, impact-dirt, hit-tick, headshot | https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx | CC0 | No |
+| 01-04-footstep.ogg | footsteps | https://opengameart.org/content/footsteps-0 | CC0 | No |
+| hit3.ogg, die1.ogg | player hurt, death | https://opengameart.org/content/5-hit-sounds-dying | CC0 | No |
+| qubodup-click1.wav | ui-click, respawn, match start and end (pitched, echoed) | https://opengameart.org/content/button-click-sound-effect-cc0public-domain | CC0 | No |
+| windy_ambiance_0.ogg (24 s cut) | wind loop | https://opengameart.org/content/windy-ambient-noise | CC0 | No |
+| birds-isaiah658.ogg | birds loop | https://opengameart.org/content/ambient-bird-sounds | CC0 | No |

@@ -80,3 +80,11 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
 };
 
 export const WEAPON_ORDER: readonly WeaponId[] = ['rifle', 'pistol', 'shotgun'];
+
+/** Seconds a dead player waits before respawning. */
+export const RESPAWN_DELAY = 3;
+/** Seconds of damage immunity after spawning. */
+export const SPAWN_PROTECTION = 2;
+/** Headshot damage multiplier, and the height of the head zone below the top of the body (metres). */
+export const HEADSHOT_MULTIPLIER = 2;
+export const HEAD_ZONE = 0.25;

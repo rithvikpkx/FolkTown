@@ -45,6 +45,9 @@ export function createPlayerState(
     fireCooldown: 0,
     shotsInBurst: 0,
     respawnIn: 0,
+    spawnProtection: 0,
+    recoilPitch: 0,
+    recoilYaw: 0,
     kills: 0,
     deaths: 0,
   };

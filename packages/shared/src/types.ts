@@ -73,6 +73,11 @@ export interface PlayerState {
   shotsInBurst: number;
   /** Seconds until respawn while dead. */
   respawnIn: number;
+  /** Seconds of damage immunity left after a spawn. */
+  spawnProtection: number;
+  /** Accumulated recoil the client adds to its view: pitch up and yaw to the right, radians. Decays when not firing. */
+  recoilPitch: number;
+  recoilYaw: number;
   kills: number;
   deaths: number;
 }
@@ -147,7 +152,15 @@ export interface MatchState {
 
 export type GameEvent =
   | { type: 'shot'; tick: number; shooter: number; weapon: WeaponId; origin: Vec3; dir: Vec3 }
-  | { type: 'hit'; tick: number; shooter: number; target: number; damage: number; point: Vec3 }
+  | {
+      type: 'hit';
+      tick: number;
+      shooter: number;
+      target: number;
+      damage: number;
+      point: Vec3;
+      headshot?: boolean;
+    }
   | { type: 'kill'; tick: number; killer: number; victim: number; weapon: WeaponId }
   | { type: 'respawn'; tick: number; player: number; pos: Vec3 }
   | { type: 'matchEnd'; tick: number; winner: number | null };

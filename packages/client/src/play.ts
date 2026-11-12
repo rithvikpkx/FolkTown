@@ -121,6 +121,7 @@ function startGame() {
     for (const h of hooks) h(events);
     hud.onEvents(events);
     snd.onEvents(events, PLAYER_ID);
+    figures.onEvents(events, PLAYER_ID);
     const eye = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
     for (const i of impactsFor(
       events,
@@ -143,7 +144,7 @@ function startGame() {
     camera.position.set(pose.x, pose.y, pose.z);
     camera.rotation.set(pose.pitch, pose.yaw, 0, 'YXZ');
     snd.frame(dt, pose, pose.yaw, session.match.playerList, me, locked && input.fire);
-    figures.update(session.match.playerList, (p) => session.lerpPos(p), PLAYER_ID);
+    figures.update(session.match.playerList, (p) => session.lerpPos(p), PLAYER_ID, dt);
     lodT -= dt;
     if (lodT <= 0) {
       lodT = 0.5;

@@ -136,6 +136,13 @@ describe('raycast', () => {
     expect(zone.raycast({ x: 0, y: 12, z: -5 }, { x: 1, y: 0, z: 0 }, 100)).toBeNull();
   });
 
+  it('stops at the flat ground', () => {
+    const hit = zone.raycast({ x: 50, y: 2, z: 50 }, { x: 0, y: -1, z: 0 }, 100);
+    expect(hit?.id).toBe('ground');
+    expect(hit?.t).toBeCloseTo(2, 5);
+    expect(zone.raycast({ x: 50, y: 2, z: 50 }, { x: 0, y: 1, z: 0 }, 100)).toBeNull();
+  });
+
   it('hits a roof from above and a prop', () => {
     const roof = zone.raycast({ x: 15, y: 20, z: -5 }, { x: 0, y: -1, z: 0 }, 100);
     expect(roof?.t).toBeCloseTo(10, 5);

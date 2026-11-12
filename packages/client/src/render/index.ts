@@ -43,7 +43,8 @@ export interface RendererOptions {
 const TUNE = {
   hazeSun: 0.85,
   hazeAmbient: 0.2,
-  hazeSigma: 0.006,
+  // Dev default is 20% of the full haze so shots are readable; `?haze=1` restores the look, to be the default near release.
+  hazeSigma: 0.006 * Number(new URLSearchParams(globalThis.location?.search).get('haze') ?? 0.2),
   hazeMaxDist: 170,
   hazeFalloff: 0.03,
   aoRadius: 0.9,

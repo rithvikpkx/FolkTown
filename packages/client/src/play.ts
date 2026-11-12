@@ -1,8 +1,9 @@
-import type { GameEvent, MatchConfig, ZoneData } from '@folktown/shared';
+import type { GameEvent, MatchConfig, MatchState, ZoneData } from '@folktown/shared';
 import { Vector3 } from 'three';
 import zoneJson from '../../../data/zones/engineering-mall.json';
 import { cameraPose } from './game/camera';
 import { Figures } from './game/figures';
+import { Hud } from './game/hud';
 import { impactsFor } from './game/impacts';
 import { attachInput, InputState } from './game/input';
 import { ImpactMarks } from './game/marks';
@@ -55,6 +56,8 @@ function startGame() {
   const figures = new Figures(scene, config.mode === 'tdm');
   const viewModel = new ViewModel(mats, camera);
   const marks = new ImpactMarks(scene);
+  const hud = new Hud(PLAYER_ID, (id) => session.match.getPlayer(id)?.name ?? `#${id}`);
+  const state = () => session.match.snapshot();
 
   const overlay = document.createElement('div');
   overlay.style.cssText =
@@ -72,6 +75,8 @@ function startGame() {
 
   let last = performance.now();
   let lodT = 0;
+  let hudT = 0;
+  let matchState: MatchState | null = null;
   fx.webgl.setAnimationLoop((now: number) => {
     const dt = Math.min((now - last) / 1000, 0.1);
     last = now;
@@ -79,6 +84,7 @@ function startGame() {
     session.advance(dt, () => input.sample());
     const events = session.drainEvents();
     for (const h of hooks) h(events);
+    hud.onEvents(events);
     const eye = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
     for (const i of impactsFor(
       events,
@@ -105,6 +111,12 @@ function startGame() {
       view.updateLod(pose.x, pose.z);
     }
     viewModel.update(dt, me, input.ads);
+    hudT -= dt;
+    if (hudT <= 0) {
+      hudT = 0.2;
+      matchState = state();
+    }
+    hud.update(dt, me, matchState, input.ads);
     if (!locked) input.fire = false;
     fx.render(dt);
   });

@@ -84,6 +84,8 @@ Client lock: 2026-11-12T12:16Z
 
 - **Bell Tower + Engineering Fountain redone and merged** (~64k, ~59k Sonnet). Wikimedia/Wikipedia were blocked from the cloud, so only search snippets were used: proportions, cap pitch, slab lean are estimates (known-gaps 12, 30, 40). Bell Tower: brick shaft, clock stage with 4 dials, arched belfry, verdigris pointed cap (`verdigris` in materials). Fountain: four leaning concrete slabs, mirror-steel jet cylinder, animated water shader (`landmarks/fountainMaterials.ts`). Lint import-order error in scene.ts fixed. Not visually checked. Benchmarks pending on the Mac: landmark triangle cost, water shader cost.
 
+- **Cloud client, Stage 2 pass (branch cloud/stage2, ~no GPU, nothing seen on screen):** `packages/client/play.html` (+`src/play.ts`): renders `data/zones/engineering-mall.json` (`src/zone/build.ts`: ground, `buildFacade` within 150 m else `buildLowDetail`, instanced trees, Bell Tower, Fountain), runs a single-player `Match` + `BotController` (`src/game/session.ts`, 60 Hz fixed step, interpolated), pointer-lock WASD/mouse (`input.ts`), capsule bots (`figures.ts`), generated rifle/pistol/shotgun with hands, ADS, kick, reload dip, flash (`weapon.ts`), bullet marks (`marks.ts`, `impacts.ts`), DOM HUD (`hud.ts`). URL: `/play.html?mode=ffa|tdm&diff=easy|normal|hard&bots=7`; `?cam=x,y,z,yaw,pitch` gives a fixed camera without the game. Gaps 50-53. To check on the Mac: look and feel, view-model poses, benchmark of zone (14 near facades + trees).
+
 Work package numbers are from section 8 of the plan.
 
 ## Rules for subagents, to keep usage low

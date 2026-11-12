@@ -58,7 +58,8 @@ The client never adds rules; if it needs one, it notes it in the cloud subsectio
 
 ### Local track status
 
-- WP4 and WP8 running.
+- **WP4 effects chain merged** (~130k tokens, Sonnet). `packages/client/src/render/`: `createRenderer(canvas, scene, camera, opts)` -> `{render(dt), setPreset, setEnabled, resize, invalidateShadow, state, webgl}`. Presets `?q=low|medium|high` (default medium, 1.2 MP), `?fx=0` or F toggles the chain, dynamic scale 0.6-1.0, start-up self test with fallbacks. Static shadow map once; `high` refreshes every second frame. `pnpm bench` on M1 (test boxes scene): median 263 fps, 1% low 185-192. Known gaps 6, 7.
+- WP8 facades running; WP3 GPU textures next, then WP10, WP11.
 
 Work package numbers are from section 8 of the plan.
 

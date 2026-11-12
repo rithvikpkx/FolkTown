@@ -3,8 +3,11 @@ import { Vector3 } from 'three';
 import zoneJson from '../../../data/zones/engineering-mall.json';
 import { cameraPose } from './game/camera';
 import { Figures } from './game/figures';
+import { impactsFor } from './game/impacts';
 import { attachInput, InputState } from './game/input';
+import { ImpactMarks } from './game/marks';
 import { GameSession, PLAYER_ID } from './game/session';
+import { ViewModel } from './game/weapon';
 import { makeMaterials } from './materials';
 import { createRenderer, parseFx } from './render';
 import { createScene } from './scene';
@@ -23,7 +26,8 @@ const fx = createRenderer(canvas, scene, camera, {
   shadow: { center: new Vector3(cx, 0, cz), size: 340 },
 });
 addEventListener('resize', () => fx.resize());
-const view = buildZone(scene, await makeMaterials(fx.webgl), zone);
+const mats = await makeMaterials(fx.webgl);
+const view = buildZone(scene, mats, zone);
 fx.invalidateShadow();
 
 // ?cam=x,y,z,yaw,pitch: a fixed camera over the zone with no game (screenshots, benches).
@@ -49,6 +53,8 @@ function startGame() {
   const session = new GameSession(zone, config);
   const input = new InputState(session.player.yaw);
   const figures = new Figures(scene, config.mode === 'tdm');
+  const viewModel = new ViewModel(mats, camera);
+  const marks = new ImpactMarks(scene);
 
   const overlay = document.createElement('div');
   overlay.style.cssText =
@@ -73,6 +79,15 @@ function startGame() {
     session.advance(dt, () => input.sample());
     const events = session.drainEvents();
     for (const h of hooks) h(events);
+    const eye = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
+    for (const i of impactsFor(
+      events,
+      zone,
+      (o, d, m) => session.match.collision.raycast(o, d, m),
+      eye,
+    ))
+      marks.add(i.x, i.y, i.z, i.nx, i.ny, i.nz);
+    if (events.some((e) => e.type === 'shot' && e.shooter === PLAYER_ID)) viewModel.fired();
 
     const me = session.player;
     const pos = session.lerpPos(me);
@@ -89,6 +104,7 @@ function startGame() {
       lodT = 0.5;
       view.updateLod(pose.x, pose.z);
     }
+    viewModel.update(dt, me, input.ads);
     if (!locked) input.fire = false;
     fx.render(dt);
   });

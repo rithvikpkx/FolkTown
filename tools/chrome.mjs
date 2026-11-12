@@ -89,8 +89,9 @@ export async function withPage(pose, { uncapped }, fn) {
         logs.push(d.params.args.map((a) => a.value ?? a.description).join(' '));
     };
     const send = (method, params) =>
-      new Promise((r) => {
+      new Promise((r, rej) => {
         pend[++id] = r;
+        setTimeout(() => rej(new Error(`CDP ${method} timed out`)), 60_000); // a dead page used to hang forever
         ws.send(JSON.stringify({ id, method, params }));
       });
     const ev = async (expression) => {

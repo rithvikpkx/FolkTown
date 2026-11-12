@@ -81,7 +81,11 @@ function startGame() {
   const viewModel = new ViewModel(mats, camera);
   const feel = new CameraFeel();
   const marks = new ImpactMarks(scene);
-  const hud = new Hud(PLAYER_ID, (id) => session.match.getPlayer(id)?.name ?? `#${id}`);
+  const hud = new Hud(
+    PLAYER_ID,
+    (id) => session.match.getPlayer(id)?.name ?? `#${id}`,
+    (id) => session.match.getPlayer(id)?.pos,
+  );
   const ui = mountUi(zone, PLAYER_ID);
   const state = () => session.match.snapshot();
 

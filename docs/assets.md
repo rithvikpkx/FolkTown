@@ -175,3 +175,15 @@ Code-generated scenes `packages/saltline/src/campus/hotspots/{elliott,memorial-m
 | Not found | monuments on Memorial Mall: none in OSM or in the 5 frames, none drawn | | | |
 
 Note: the brief called Elliott circular/domed; the data show a rectangular hipped-roof hall with a half-round rotunda. Raw frames for memorial-mall were read from a sibling worktree (gitignored, not committed).
+
+## v6-heroes (Union, Elliott, WALC north/east, Memorial Mall polish)
+All Street View sources below are Google frames (c) 2026 Google, downloaded by the owner with their own key; raw jpgs stay gitignored (data/raw/streetview/*) and are never committed. **All needs-clearance.**
+
+| File / data | Use | Source | Needs clearance |
+|---|---|---|---|
+| public/campus/hotspots/union/brick-tile-large.jpg (tools/union-brick-mosaic.py) | 9.2 x 7.0 m brick tile built from the rectified east-gable brick patch (8 x 8 flipped/jittered copies); replaces the 1.15 m repeating tile | Street View pano 11UvcOX8EMp8eaLSIDAdCA (2017-07, heading 270) | Yes |
+| public/campus/hotspots/union/north-wing.jpg | now also the far-LOD (> 140 m) wall texture on every Union face | Street View pano -6pw5fD2pW12NluOYWf8SQ (2009-06, heading 180) | Yes |
+| Union face layouts (3-light hall windows; arched triple + window pairs) | measured layout duplicated onto every main wall and bay | same two panos | Yes |
+| Elliott brick/stone colours (photo-sampled mean (96,80,73) with mortar, std 25) and the stepped cornice, quoin, pilaster-strip, lot-marking and tree observations | colour tuning and detail placement, no photo is mapped | Street View panos gd8RfryM02nVN5eF4Kj7Sg (2019-08) and HwF9pEOA_GGsn7OmyaXn2A (2007-09) | Yes |
+| WALC north and east faces | duplicate the measured west-pavilion layout and rectified tile (public/campus/walk/walc/west-pavilion.jpg, already logged) | Street View CAoSF0NJ...TbWdF (2021-09) | Yes (as before) |
+| Memorial Mall lawn patches, expansion joints, extra trees along the walks | procedural, tuned by eye to the 2019 frames; no new files | Street View panos edsyJrqna9EH1j_glWMayw, G1TnVsgNtp47PJz65TM4_g (2019-08) | Yes |

@@ -74,7 +74,27 @@ export async function build(G, zone) {
     const xs = g.outer.map((p) => p[0]), zs = g.outer.map((p) => p[1]);
     for (let i = 0; i < 90; i++) { const x = Math.min(...xs) + rr() * (Math.max(...xs) - Math.min(...xs)), z = Math.min(...zs) + rr() * (Math.max(...zs) - Math.min(...zs)); if (!inPoly(x, z, g.outer)) continue; (rr() < 0.35 ? shrubs : flowers).push([x, z]); }
   }
+  // ---- lawn polish (m: 2019 Street View frames show mottled turf: mown tone patches, dry tan spots, and walks with saw-cut expansion joints every ~3 m) ----
+  const patchG = new Buf(std({ color: 0x4f7a2c, roughness: 1, transparent: true, opacity: 0.22, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })),
+    patchT = new Buf(std({ color: 0xa89a58, roughness: 1, transparent: true, opacity: 0.2, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })),
+    joint = new Buf(std({ color: 0x8f8b80, roughness: 1, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 }));
+  const rp = rng(41);
+  for (let n = 0, k = 0; n < 90 && k < 2000; k++) {
+    const x = BOX[0] + rp() * (BOX[1] - BOX[0]), z = BOX[2] + rp() * (BOX[3] - BOX[2]); if (!inPoly(x, z, data.park)) continue;
+    const r = 3 + rp() * 9, sx = 0.6 + rp() * 0.8, a0 = rp() * 3.14, B = rp() < 0.7 ? patchG : patchT, N = 12; n++;
+    for (let i = 0; i < N; i++) { const t0 = (i / N) * 6.2832, t1 = ((i + 1) / N) * 6.2832, P = (t) => [x + Math.cos(t + a0) * r * sx, 0.036, z + Math.sin(t + a0) * r]; B.tri([x, 0.036, z], P(t1), P(t0), [0, 0], [1, 0], [0, 1]); }
+  }
+  for (const p of paths) {
+    if (p.kind === 'road' || p.hw === 'steps' || p.hw === 'service') continue;
+    const w = p.hw === 'pedestrian' ? 4.5 : p.name === 'Hello Walk' ? 3.5 : p.hw === 'cycleway' ? 2.6 : 2.6; let acc = 0;
+    for (let i = 0; i + 1 < p.points.length; i++) {
+      const [x0, z0] = p.points[i], [x1, z1] = p.points[i + 1], Ls = Math.hypot(x1 - x0, z1 - z0); if (Ls < 1) continue; const ux = (x1 - x0) / Ls, uz = (z1 - z0) / Ls;
+      for (let t = 3 - (acc % 3); t < Ls; t += 3) { const cx = x0 + ux * t, cz = z0 + uz * t, a = [cx - uz * w / 2, 0.06, cz + ux * w / 2], b = [cx + uz * w / 2, 0.06, cz - ux * w / 2], d = 0.02; joint.q(a, b, [b[0] + ux * d, 0.06, b[2] + uz * d], [a[0] + ux * d, 0.06, a[2] + uz * d], 1, 1); }
+      acc += Ls;
+    }
+  }
   const group = new Group(); group.name = 'memorial-mall';
+  for (const b of [patchG, patchT, joint]) if (b.p.length) group.add(b.mesh());
   for (const b of [L, ML, WK, PV, RD, CB, IR, WD, LP]) if (b.p.length) group.add(b.mesh());
   const mk = (geo, mat, pts, sc, tintF) => {
     const m = new InstancedMesh(geo, mat, Math.max(1, pts.length)), M = new Matrix4(), Q = new Quaternion(), c = new Color(); m.castShadow = true; m.receiveShadow = true;
@@ -85,10 +105,24 @@ export async function build(G, zone) {
   if (shrubs.length) group.add(mk(new SphereGeometry(0.55, 7, 6), new MeshStandardMaterial({ roughness: 0.9 }), shrubs, 1, () => (rr() < 0.5 ? 0x2d5a30 : 0x3f6b32)));
   // ---- trees: OSM nodes, species from env/trees.js ----
   const treePts = data.trees.filter(([x, z]) => inBox(x, z) && !paths.some((p) => (p.kind === 'road') && distPath(x, z, p.points) < 3.5));
+  // more trees (m: 2019 frames show double rows of mature trees lining the long walks): both sides of every walk > 2.5 m wide at ~15 m spacing, inside the park, clear of drive and existing nodes
+  const rt = rng(53), extra = [];
+  for (const p of paths) {
+    if (p.kind === 'road' || p.hw === 'steps' || p.hw === 'service') continue; let acc = rt() * 8;
+    for (let i = 0; i + 1 < p.points.length; i++) {
+      const [x0, z0] = p.points[i], [x1, z1] = p.points[i + 1], Ls = Math.hypot(x1 - x0, z1 - z0); if (Ls < 1) continue; const ux = (x1 - x0) / Ls, uz = (z1 - z0) / Ls;
+      for (let t = 0; t < Ls; t += 2.5) {
+        acc += 2.5; if (acc < 15) continue; acc = rt() * 4;
+        const sd = rt() < 0.5 ? 1 : -1, o = (p.hw === 'pedestrian' ? 5.5 : 4) * sd, x = x0 + ux * t - uz * o, z = z0 + uz * t + ux * o;
+        if (inPoly(x, z, data.park) && !paths.some((q) => q.kind === 'road' && distPath(x, z, q.points) < 6) && !paths.some((q) => q.kind !== 'road' && distPath(x, z, q.points) < 2.2) && ![...treePts, ...extra].some(([a, b]) => Math.hypot(a - x, b - z) < 7)) extra.push([x, z]);
+      }
+    }
+  }
+  treePts.push(...extra.slice(0, 120));
   const trees = buildWalkTrees({ trees: treePts.map(([x, z]) => ({ x, z })) });
   const pump = new Mesh(new SphereGeometry(0.01), new MeshBasicMaterial({ colorWrite: false, depthWrite: false })); pump.frustumCulled = false; pump.onBeforeRender = (r, s, camera) => trees.update(camera);
   group.add(trees, pump);
   for (const [x, z] of treePts) { const r = 0.45; solids.push([[x - r, z - r], [x + r, z - r], [x + r, z + r], [x - r, z + r]]); }
-  const tris = [L, ML, WK, PV, RD, CB, IR, WD, LP].reduce((s, b) => s + b.tris, 0);
-  return { id: 'memorial-mall', group, solids, stats: { tris, trees: treePts.length, lamps: lampAt.length, benches: benchAt.length, flowers: flowers.length, shrubs: shrubs.length }, update() {} };
+  const tris = [L, ML, WK, PV, RD, CB, IR, WD, LP, patchG, patchT, joint].reduce((s, b) => s + b.tris, 0);
+  return { id: 'memorial-mall', group, solids, stats: { tris, trees: treePts.length, extraTrees: extra.length, lamps: lampAt.length, benches: benchAt.length, flowers: flowers.length, shrubs: shrubs.length }, update() {} };
 }

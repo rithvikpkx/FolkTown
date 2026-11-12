@@ -82,6 +82,8 @@ Cloud lock: done
 
 Client lock: 2026-11-12T12:16Z
 
+- **Bell Tower + Engineering Fountain redone and merged** (~64k, ~59k Sonnet). Wikimedia/Wikipedia were blocked from the cloud, so only search snippets were used: proportions, cap pitch, slab lean are estimates (known-gaps 12, 30, 40). Bell Tower: brick shaft, clock stage with 4 dials, arched belfry, verdigris pointed cap (`verdigris` in materials). Fountain: four leaning concrete slabs, mirror-steel jet cylinder, animated water shader (`landmarks/fountainMaterials.ts`). Lint import-order error in scene.ts fixed. Not visually checked. Benchmarks pending on the Mac: landmark triangle cost, water shader cost.
+
 Work package numbers are from section 8 of the plan.
 
 ## Rules for subagents, to keep usage low

@@ -58,7 +58,7 @@ The client never adds rules; if it needs one, it notes it in the cloud subsectio
 
 ### Cloud track status
 
-Cloud lock: 2026-11-12T12:07Z
+Cloud lock: done
 
 - **WP12 merged** (~78k tokens Sonnet): `@folktown/shared` (contract: PlayerInput, WeaponDef/WEAPONS, ZoneData, MatchConfig/State, GameEvent, constants) and `@folktown/sim` (`stepController`, `ZoneCollision` + `raycast`, `makeSyntheticZone`). Yaw 0 looks toward -z, positive yaw turns left. 35 tests.
 - **WP9 merged** (~79k): `pnpm map:bake` -> `data/zones/engineering-mall.json` (109 KB; 300 m box centred (-30,-290), north of Bell Tower; 14 colliders, 296 trees, 24 spawns, 1443 nav nodes). Flat ground.

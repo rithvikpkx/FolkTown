@@ -1290,7 +1290,13 @@ ${ge}`,
     ((f.name = "sun"), (f.castShadow = !0));
     let h = ZM(f, new K(-41, -0.2, -33), new K(37, 32, 31), new K(-41, -3, -64), new K(72, 36, 34)),
       p = () => Math.min(n.quality.shadow || 2048, i.capabilities.maxTextureSize);
-    (f.shadow.mapSize.set(p(), p()),
+    (e.level !== "harbour" &&
+      ((h = ZM(f, new K(-40, -2, -40), new K(40, 44, 40), new K(-40, -2, -40), new K(40, 44, 40))),
+      (f.shadow.camera.near = 1),
+      (f.shadow.camera.far = 420),
+      (h.depth = 419),
+      f.shadow.camera.updateProjectionMatrix()),
+      f.shadow.mapSize.set(p(), p()),
       (f.shadow.bias = -12e-5),
       (f.shadow.normalBias = 0.02),
       (f.shadow.radius = 1),

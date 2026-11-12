@@ -2,6 +2,7 @@ import { NeutralToneMapping as fx, Vector3 as K, PlaneGeometry as w0, Vector2 as
 import * as ut from 'three';
 import { cv, lv, v_ } from './mats.js';
 import { Av, Pg } from './level.js';
+import { buildCampus } from '../campus/index.js';
 import { zv, dt, Iv } from './backdrop.js';
 import { Lv, Vg } from './ground.js';
 import { Wv, f1 } from './fx.js';
@@ -147,12 +148,12 @@ __late_audio.vT(vT); __late_audio.gT(gT);
     } else {
       if (
         (await fa("Stacking containers", 0.34),
-        await r("level", "level", () => Pg(t), !0),
+        await r("level", "level", () => (n.level === "harbour" ? Pg(t) : buildCampus(t)), !0),
         await fa("Raising the cranes", 0.5),
-        await r("backdrop", "backdrop", () => Iv(t)),
+        await r("backdrop", "backdrop", () => (n.level === "harbour" ? Iv(t) : Sr.backdrop())),
         await fa("Flooding the apron", 0.58),
-        await r("ground", "ground", () => Vg(t)),
-        t.ground.stub)
+        await r("ground", "ground", () => (n.level === "harbour" ? Vg(t) : Sr.ground())),
+        t.ground.stub && n.level === "harbour")
       ) {
         let p = ns(new w0(400, 400).rotateX(-Math.PI / 2), t.mats.get("asphalt"), { cast: !1 });
         t.scene.add(p);

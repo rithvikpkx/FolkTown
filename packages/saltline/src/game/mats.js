@@ -2179,11 +2179,25 @@ float metalnessFactor = metalness * slORM.b;
               bulletOnly: !!T.bulletOnly,
               playerOnly: !!T.playerOnly,
             };
-          return (e.push(R), (t = !0), R);
+          return (e.push(R), (t = !0), gIns(R), R);
+        },
+        // vertical prism over an xz polygon (flat [x0,z0,x1,z1,...]); the AABB feeds the grid and the broad phase
+        addPrism(M, _, T, w = {}) {
+          let S = Infinity, R = Infinity, z = -Infinity, I = -Infinity;
+          for (let L = 0; L < M.length; L += 2) {
+            S = Math.min(S, M[L]); z = Math.max(z, M[L]);
+            R = Math.min(R, M[L + 1]); I = Math.max(I, M[L + 1]);
+          }
+          let L = o.addBox([S, _, R], [z, T, I], w);
+          return ((L.poly = M), L);
         },
         removeBox(M) {
           let _ = e.indexOf(M);
-          _ >= 0 && (e.splice(_, 1), (t = !0));
+          _ >= 0 && (e.splice(_, 1), (t = !0), gDel(M));
+        },
+        // drop the grid so it is rebuilt over the current bounds (call after changing o.bounds)
+        resetGrid() {
+          gc = !1;
         },
         build() {
           a();
@@ -2211,10 +2225,17 @@ float metalnessFactor = metalness * slORM.b;
           }
           let H = C === 0 ? 1 / 0 : 1 / C,
             N = A === 0 ? 1 / 0 : 1 / A,
-            Z = F === 0 ? 1 / 0 : 1 / F;
-          for (let J = 0; J < e.length; J++) {
-            let G = e[J];
+            Z = F === 0 ? 1 / 0 : 1 / F,
+            cf = !1,
+            cn = [0, 0, 0],
+            cd = gRay(L, k, C, F, w);
+          for (let J = 0; J < cd.length; J++) {
+            let G = cd[J];
             if (G.playerOnly) continue;
+            if (G.poly) {
+              polyRay(G, L, U, k, C, A, F, w) && ((w = pr.t), (S = G), (I = 0), (cf = !0), (cn = [pr.nx, pr.ny, pr.nz]));
+              continue;
+            }
             let te = 0,
               oe = w,
               ee = -1,
@@ -2248,7 +2269,7 @@ float metalnessFactor = metalness * slORM.b;
               }
               if ((xe > te && ((te = xe), (ee = 2), (le = O)), j < oe && (oe = j), te > oe)) continue;
             } else if (k < G.min.z || k > G.max.z) continue;
-            ee < 0 || ((w = te), (S = G), (R = ee), (z = le), (I = 0));
+            ee < 0 || ((w = te), (S = G), (R = ee), (z = le), (I = 0), (cf = !1));
           }
           if (!S && !I) return null;
           let Q = new K(L + C * w, U + A * w, k + F * w);
@@ -2261,7 +2282,7 @@ float metalnessFactor = metalness * slORM.b;
               box: null,
             };
           let W = new K();
-          return (W.setComponent(R, z), { dist: w, point: Q, normal: W, surface: S.surface, box: S });
+          return (cf ? W.set(cn[0], cn[1], cn[2]) : W.setComponent(R, z), { dist: w, point: Q, normal: W, surface: S.surface, box: S });
         },
         lineOfSight(M, _) {
           s.subVectors(_, M);
@@ -2270,9 +2291,11 @@ float metalnessFactor = metalness * slORM.b;
         },
         groundHeight(M, _, T = 50) {
           let w = M <= Kn.quayX ? Kn.groundY : Kn.seaY;
-          for (let S = 0; S < e.length; S++) {
-            let R = e[S];
-            R.bulletOnly || (M >= R.min.x && M <= R.max.x && _ >= R.min.z && _ <= R.max.z && R.max.y <= T && R.max.y > w && (w = R.max.y));
+          let cd = gPt(M, _);
+          for (let S = 0; S < cd.length; S++) {
+            let R = cd[S];
+            R.bulletOnly ||
+              (M >= R.min.x && M <= R.max.x && _ >= R.min.z && _ <= R.max.z && R.max.y <= T && R.max.y > w && (!R.poly || inPoly(R.poly, M, _)) && (w = R.max.y));
           }
           return w;
         },
@@ -2281,14 +2304,22 @@ float metalnessFactor = metalness * slORM.b;
             I = _.x * T,
             L = _.z * T,
             U = Math.max(1, Math.ceil(Math.hypot(I, L) / (w * 0.6))),
-            k = M.y;
+            k = M.y,
+            cd = gRect(Math.min(M.x, M.x + I) - w - 0.2, Math.min(M.z, M.z + L) - w - 0.2, Math.max(M.x, M.x + I) + w + 0.2, Math.max(M.z, M.z + L) + w + 0.2);
           for (let Q = 0; Q < U; Q++) {
             ((M.x += I / U), (M.z += L / U));
             for (let W = 0; W < 3; W++) {
               let J = !1;
-              for (let G = 0; G < e.length; G++) {
-                let te = e[G];
+              for (let G = 0; G < cd.length; G++) {
+                let te = cd[G];
                 if (te.bulletOnly || te.max.y <= M.y + (R ? hg : 0.08) || te.min.y >= M.y + S) continue;
+                if (te.poly) {
+                  if (!polyPush(te, M.x, M.z, w)) continue;
+                  ((M.x += pp.nx * pp.q), (M.z += pp.nz * pp.q));
+                  let ue = _.x * pp.nx + _.z * pp.nz;
+                  (ue < 0 && ((_.x -= pp.nx * ue), (_.z -= pp.nz * ue)), (J = !0), (z.hitWall = !0));
+                  continue;
+                }
                 let oe = Math.max(te.min.x, Math.min(te.max.x, M.x)),
                   ee = Math.max(te.min.z, Math.min(te.max.z, M.z)),
                   le = M.x - oe,
@@ -2327,13 +2358,15 @@ float metalnessFactor = metalness * slORM.b;
             H = null,
             N = 1 / 0,
             Z = k + (R ? hg : 0.08) + 1e-4;
-          for (let Q = 0; Q < e.length; Q++) {
-            let W = e[Q];
+          cd = gRect(M.x - A, M.z - A, M.x + A, M.z + A);
+          for (let Q = 0; Q < cd.length; Q++) {
+            let W = cd[Q];
             W.bulletOnly ||
               M.x + A < W.min.x ||
               M.x - A > W.max.x ||
               M.z + A < W.min.z ||
               M.z - A > W.max.z ||
+              (W.poly && !polyPush(W, M.x, M.z, A)) ||
               (W.max.y <= Z && W.max.y > F && ((F = W.max.y), (H = W.surface)), W.min.y >= k + S - 0.05 && W.min.y < N && (N = W.min.y));
           }
           return (
@@ -2400,6 +2433,137 @@ float metalnessFactor = metalness * slORM.b;
       };
     function r() {
       t && a();
+    }
+
+    // ---- uniform spatial grid over xz (a box sits in every cell its AABB touches) ----
+    let gc = !1, gx0 = 0, gz0 = 0, gw = 1, gh = 1, gcells = [], gst = 0, gcand = [];
+    const gcell = 16, pr = { t: 0, nx: 0, ny: 0, nz: 0 }, pp = { nx: 0, nz: 0, q: 0 }, gxs = [];
+    function gInit() {
+      let M = o.bounds.min.x, _ = o.bounds.min.z, T = o.bounds.max.x, w = o.bounds.max.z;
+      for (let S of e) ((M = Math.min(M, S.min.x)), (_ = Math.min(_, S.min.z)), (T = Math.max(T, S.max.x)), (w = Math.max(w, S.max.z)));
+      ((gx0 = M), (gz0 = _), (gw = Math.max(1, Math.ceil((T - M) / gcell) + 1)), (gh = Math.max(1, Math.ceil((w - _) / gcell) + 1)));
+      gcells = Array.from({ length: gw * gh }, () => []);
+      gc = !0;
+      for (let S of e) gIns(S);
+    }
+    const gci = (v) => Math.max(0, Math.min(gw - 1, Math.floor((v - gx0) / gcell))),
+      gri = (v) => Math.max(0, Math.min(gh - 1, Math.floor((v - gz0) / gcell)));
+    function gIns(M) {
+      if (!gc) return;
+      for (let _ = gri(M.min.z), T = gri(M.max.z); _ <= T; _++) for (let w = gci(M.min.x), S = gci(M.max.x); w <= S; w++) gcells[_ * gw + w].push(M);
+    }
+    function gDel(M) {
+      if (!gc) return;
+      for (let _ = gri(M.min.z), T = gri(M.max.z); _ <= T; _++)
+        for (let w = gci(M.min.x), S = gci(M.max.x); w <= S; w++) {
+          let R = gcells[_ * gw + w], z = R.indexOf(M);
+          z >= 0 && R.splice(z, 1);
+        }
+    }
+    function gPt(M, _) {
+      gc || gInit();
+      return gcells[gri(_) * gw + gci(M)];
+    }
+    function gRect(M, _, T, w) {
+      gc || gInit();
+      gcand.length = 0;
+      gst++;
+      for (let S = gri(_), R = gri(w); S <= R; S++)
+        for (let z = gci(M), I = gci(T); z <= I; z++) {
+          let L = gcells[S * gw + z];
+          for (let U = 0; U < L.length; U++) L[U]._s !== gst && ((L[U]._s = gst), gcand.push(L[U]));
+        }
+      return gcand;
+    }
+    // boxes in the cells a ray crosses (Amanatides-Woo); unclamped so rays starting outside the grid still work
+    function gRay(M, _, T, w, S) {
+      gc || gInit();
+      gcand.length = 0;
+      gst++;
+      let R = Math.floor((M - gx0) / gcell),
+        z = Math.floor((_ - gz0) / gcell),
+        I = Math.floor((M + T * S - gx0) / gcell),
+        L = Math.floor((_ + w * S - gz0) / gcell),
+        U = T > 0 ? 1 : -1,
+        k = w > 0 ? 1 : -1,
+        C = T !== 0 ? gcell / Math.abs(T) : 1 / 0,
+        A = w !== 0 ? gcell / Math.abs(w) : 1 / 0,
+        F = T !== 0 ? (gx0 + (T > 0 ? R + 1 : R) * gcell - M) / T : 1 / 0,
+        H = w !== 0 ? (gz0 + (w > 0 ? z + 1 : z) * gcell - _) / w : 1 / 0;
+      for (let N = Math.abs(I - R) + Math.abs(L - z); ; N--) {
+        if (R >= 0 && R < gw && z >= 0 && z < gh) {
+          let Z = gcells[z * gw + R];
+          for (let Q = 0; Q < Z.length; Q++) Z[Q]._s !== gst && ((Z[Q]._s = gst), gcand.push(Z[Q]));
+        }
+        if (N <= 0) break;
+        F < H ? ((F += C), (R += U)) : ((H += A), (z += k));
+      }
+      return gcand;
+    }
+    // ---- polygon prisms ----
+    function inPoly(M, _, T) {
+      let w = !1;
+      for (let S = 0, R = M.length - 2; S < M.length; R = S, S += 2)
+        M[S + 1] > T != M[R + 1] > T && _ < ((M[R] - M[S]) * (T - M[S + 1])) / (M[R + 1] - M[S + 1]) + M[S] && (w = !w);
+      return w;
+    }
+    // circle (x,z,r) vs polygon: writes outward push direction and depth into pp; false if clear
+    function polyPush(M, _, T, w) {
+      if (_ + w < M.min.x || _ - w > M.max.x || T + w < M.min.z || T - w > M.max.z) return !1;
+      let S = M.poly, R = 1 / 0, z = 0, I = 0;
+      for (let k = 0, C = S.length - 2; k < S.length; C = k, k += 2) {
+        let A = S[k] - S[C], F = S[k + 1] - S[C + 1], H = A * A + F * F,
+          N = H > 0 ? Math.max(0, Math.min(1, ((_ - S[C]) * A + (T - S[C + 1]) * F) / H)) : 0,
+          Z = S[C] + A * N, Q = S[C + 1] + F * N, W = (_ - Z) ** 2 + (T - Q) ** 2;
+        W < R && ((R = W), (z = Z), (I = Q));
+      }
+      let L = Math.sqrt(R), U = inPoly(S, _, T);
+      if (!U && L >= w) return !1;
+      return (
+        L < 1e-6 ? ((pp.nx = 1), (pp.nz = 0)) : U ? ((pp.nx = (z - _) / L), (pp.nz = (I - T) / L)) : ((pp.nx = (_ - z) / L), (pp.nz = (T - I) / L)),
+        (pp.q = U ? w + L : w - L),
+        !0
+      );
+    }
+    // ray vs prism: earliest entry through a wall or the top/bottom face within (0, wmax]; fills pr
+    function polyRay(M, _, T, w, S, R, z, I) {
+      let L = -1 / 0, U = 1 / 0, k = 0;
+      if (R !== 0) {
+        let q = (M.min.y - T) / R, ue = (M.max.y - T) / R;
+        q < ue ? ((L = q), (U = ue), (k = -1)) : ((L = ue), (U = q), (k = 1));
+      } else if (T < M.min.y || T > M.max.y) return !1;
+      if (U < 0 || L > I) return !1;
+      let C = M.poly;
+      gxs.length = 0;
+      for (let q = 0, ue = C.length - 2; q < C.length; ue = q, q += 2) {
+        let de = C[q] - C[ue], $ = C[q + 1] - C[ue + 1], se = S * $ - z * de;
+        if (se === 0) continue;
+        let fe = C[ue] - _, he = C[ue + 1] - w, ne = (fe * $ - he * de) / se, ye = (fe * z - he * S) / se;
+        if (ye >= 0 && ye < 1 && ne > 0 && ne <= I) {
+          let Te = gxs.length - 2;
+          for (; Te >= 0 && gxs[Te] > ne; Te -= 2) ((gxs[Te + 2] = gxs[Te]), (gxs[Te + 3] = gxs[Te + 1]));
+          ((gxs[Te + 2] = ne), (gxs[Te + 3] = ue));
+        }
+      }
+      let A = inPoly(C, _, w), F = 0, H = -1;
+      const N = (q, ue, de) => {
+        let $ = q, se = ue;
+        if ((L > $ && (($ = L), (se = -2)), $ > Math.min(de, U) || $ > I || se === -1)) return !1;
+        if (((pr.t = $), se === -2)) ((pr.nx = 0), (pr.ny = k), (pr.nz = 0));
+        else {
+          let nx = se === C.length - 2 ? 0 : se + 2, fe = C[nx] - C[se], he = C[nx + 1] - C[se + 1], ne = Math.hypot(fe, he) || 1;
+          ((pr.nx = he / ne), (pr.nz = -fe / ne), pr.nx * S + pr.nz * z > 0 && ((pr.nx = -pr.nx), (pr.nz = -pr.nz)), (pr.ny = 0));
+        }
+        return !0;
+      };
+      for (let q = 0; q < gxs.length; q += 2) {
+        if (!A) ((A = !0), (F = gxs[q]), (H = gxs[q + 1]));
+        else {
+          if (N(F, H, gxs[q])) return !0;
+          A = !1;
+        }
+      }
+      return A ? N(F, H, I) : !1;
     }
     function a() {
       ((i = new Uint8Array(f0 * co)), (t = !1));

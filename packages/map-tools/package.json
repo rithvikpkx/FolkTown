@@ -1,0 +1,13 @@
+{
+  "name": "@folktown/map-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch-osm": "node src/fetch.ts",
+    "project": "node src/run-project.ts",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1"
+  }
+}

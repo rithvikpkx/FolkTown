@@ -7,7 +7,9 @@
     "dev": "pnpm --filter @folktown/client dev",
     "build": "pnpm -r build",
     "test": "vitest run",
-    "lint": "biome check . && pnpm -r typecheck"
+    "lint": "biome check . && pnpm -r typecheck",
+    "map:fetch": "pnpm --filter @folktown/map-tools run fetch-osm",
+    "map:project": "pnpm --filter @folktown/map-tools run project"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.7",

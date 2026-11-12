@@ -1,6 +1,7 @@
 import { Color, PerspectiveCamera, Scene } from 'three';
 import { Batch, UP } from './batch';
 import { buildFountain } from './landmarks/fountain';
+import { buildBellTower } from './landmarks/belltower';
 import { MATERIAL_NAMES, type MaterialName, type makeMaterials, TILING } from './materials';
 
 type Mats = Awaited<ReturnType<typeof makeMaterials>>;
@@ -23,6 +24,7 @@ export function buildPlaza(scene: Scene, mats: Mats) {
   const t = (n: MaterialName) => TILING[n].tile;
 
   b.grass.box(-120, -0.5, -140, 120, 0, 100, t('grass'));
+  buildBellTower(scene, mats);
   b.pavers.box(-16, 0, -38, 12, 0.05, -7, t('pavers'));
   b.asphalt.box(-120, 0, -7, 120, 0.03, 8, t('asphalt'));
 

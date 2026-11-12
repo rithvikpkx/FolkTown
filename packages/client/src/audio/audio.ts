@@ -8,6 +8,37 @@ import {
 } from './manifest';
 import { RECIPES, renderSynth } from './synth';
 
+/**
+ * Safari has no AudioParam positions (`positionX` is undefined on its listener and panners), only
+ * setPosition/setOrientation. Reading or writing `.value` there throws, which used to kill the whole
+ * frame loop (sky only, no movement).
+ */
+export function placeNode(
+  n: Partial<Pick<PannerNode, 'positionX' | 'positionY' | 'positionZ' | 'setPosition'>>,
+  x: number,
+  y: number,
+  z: number,
+) {
+  if (n.positionX && n.positionY && n.positionZ) {
+    n.positionX.value = x;
+    n.positionY.value = y;
+    n.positionZ.value = z;
+  } else n.setPosition?.(x, y, z);
+}
+
+export function orientListener(l: Partial<AudioListener>, yaw: number) {
+  const fx = -Math.sin(yaw);
+  const fz = -Math.cos(yaw);
+  if (l.forwardX && l.forwardY && l.forwardZ && l.upX && l.upY && l.upZ) {
+    l.forwardX.value = fx;
+    l.forwardY.value = 0;
+    l.forwardZ.value = fz;
+    l.upX.value = 0;
+    l.upY.value = 1;
+    l.upZ.value = 0;
+  } else l.setOrientation?.(fx, 0, fz, 0, 1, 0);
+}
+
 const KEY = 'folktown.audio';
 const STEP_STRIDE = 2.1; // metres of walking per footstep
 
@@ -48,6 +79,8 @@ export class AudioSystem {
   private readonly stride = new Map<number, number>();
   private prev = { weapon: '' as string, reloading: false, dry: 0 };
   private loopsOn = false;
+  /** Listener position, kept here because Safari cannot read it back from the listener. */
+  private eye: Vec3 = { x: 0, y: 0, z: 0 };
 
   constructor(private readonly baseUrl = import.meta.env.BASE_URL) {
     try {
@@ -193,12 +226,7 @@ export class AudioSystem {
     if (!buf) return;
     let dist = 0;
     if (at) {
-      const l = ctx.listener;
-      dist = Math.hypot(
-        at.x - l.positionX.value,
-        at.y - l.positionY.value,
-        at.z - l.positionZ.value,
-      );
+      dist = Math.hypot(at.x - this.eye.x, at.y - this.eye.y, at.z - this.eye.z);
       if (dist > this.manifest.cullDistance) return;
     }
     const release = this.limiter.acquire(id, def.maxVoices);
@@ -217,9 +245,7 @@ export class AudioSystem {
       p.refDistance = 4;
       p.maxDistance = this.manifest.cullDistance;
       p.rolloffFactor = 1.2;
-      p.positionX.value = at.x;
-      p.positionY.value = at.y;
-      p.positionZ.value = at.z;
+      placeNode(p, at.x, at.y, at.z);
       g.connect(p);
       p.connect(this.master);
     } else g.connect(this.master);
@@ -258,15 +284,9 @@ export class AudioSystem {
   ) {
     const l = this.ctx?.listener;
     if (!l) return;
-    l.positionX.value = eye.x;
-    l.positionY.value = eye.y;
-    l.positionZ.value = eye.z;
-    l.forwardX.value = -Math.sin(yaw);
-    l.forwardY.value = 0;
-    l.forwardZ.value = -Math.cos(yaw);
-    l.upX.value = 0;
-    l.upY.value = 1;
-    l.upZ.value = 0;
+    placeNode(l, eye.x, eye.y, eye.z);
+    this.eye = eye;
+    orientListener(l, yaw);
 
     for (const p of players) {
       const speed = Math.hypot(p.vel.x, p.vel.z);

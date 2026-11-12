@@ -31,20 +31,25 @@ export async function withPage(pose, { uncapped }, fn) {
   }).listen(0, '127.0.0.1');
   await new Promise((r) => server.once('listening', r));
   const base = `http://127.0.0.1:${server.address().port}/`;
-  const url = process.env.PAGE ? base + process.env.PAGE : `${base}?cam=${pose.join(',')}`;
+  const url = process.env.PAGE?.startsWith('http')
+    ? process.env.PAGE
+    : process.env.PAGE
+      ? base + process.env.PAGE
+      : `${base}?cam=${pose.join(',')}`;
   const prof = mkdtempSync(join(tmpdir(), 'ft-'));
   const port = 9300 + Math.floor(Math.random() * 600);
   const chrome = spawn(
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     [
-      '--headless=new',
+      ...(process.env.HEADFUL ? [] : ['--headless=new']),
       '--use-angle=metal',
       '--enable-webgl',
       '--ignore-gpu-blocklist',
       ...(uncapped ? ['--disable-gpu-vsync', '--disable-frame-rate-limit'] : []),
       '--hide-scrollbars',
+      '--autoplay-policy=no-user-gesture-required',
       '--window-size=1440,900',
-      '--force-device-scale-factor=1',
+      `--force-device-scale-factor=${process.env.DPR ?? 1}`,
       `--remote-debugging-port=${port}`,
       `--user-data-dir=${prof}`,
       '--no-first-run',
@@ -58,7 +63,7 @@ export async function withPage(pose, { uncapped }, fn) {
       await sleep(250);
       try {
         const list = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-        target = list.find((x) => x.type === 'page' && x.url.startsWith('http://127'));
+        target = list.find((x) => x.type === 'page' && x.url.startsWith('http'));
       } catch {}
     }
     if (!target) throw new Error('chrome did not start');

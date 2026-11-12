@@ -475,18 +475,21 @@ __late_weapon.rb(rb);
     return (document.open(), document.write(s), document.close(), !0);
   }
   export var lT = "saltline.settings.v1",
-    tL = { quality: "auto", sens: 1, invertY: !1, volume: 0.8, fov: zi.fov, difficulty: "hard", mode: "mission", view: 1 },
+    tL = { quality: "auto", sens: 1, invertY: !1, volume: 0.8, fov: zi.fov, difficulty: "hard", mode: "ffa", bots: 8, view: 1 },
     cT = [
       [1, "Close"],
       [2, "Three-quarter"],
       [3, "Compact"],
     ],
     uT = [
-      ["mission", "Mission"],
+      ["ffa", "Free-for-all"],
+      ["tdm", "Team deathmatch"],
       ["holdout", "Holdout"],
     ],
+    botOpts = [4, 8, 16, 31],
     nL = {
-      mission: "Cut three relays and reach the boat. About five minutes.",
+      ffa: "Everyone for themselves on the Mall. First to 30 kills or the most when ten minutes run out.",
+      tdm: "Old Gold against Black. First team to 50 kills, or the lead at ten minutes. Hold Tab for the scoreboard.",
       holdout: "Endless waves that keep growing. Resupply between waves. How long can you hold?",
     },
     ab = [
@@ -509,6 +512,7 @@ __late_weapon.ab(ab);
         Number.isFinite(e.fov) && (n.fov = Math.min(95, Math.max(60, e.fov))),
         ab.some((t) => t[0] === e.difficulty) && (n.difficulty = e.difficulty),
         uT.some((t) => t[0] === e.mode) && (n.mode = e.mode),
+        botOpts.includes(e.bots) && (n.bots = e.bots),
         cT.some((t) => t[0] === e.view) && (n.view = e.view));
     } catch {}
     return n;
@@ -526,7 +530,6 @@ __late_weapon.ab(ab);
     <div><dt>Aim</dt><dd>Right button</dd></div>
     <div><dt>Reload</dt><dd><kbd>R</kbd></dd></div>
     <div><dt>Swap weapon</dt><dd><kbd>Q</kbd>, wheel, or <kbd>1</kbd> <kbd>2</kbd></dd></div>
-    <div><dt>Cut relay</dt><dd>Hold <kbd>E</kbd></dd></div>
     <div><dt>Jump</dt><dd><kbd>Space</kbd></dd></div>
     <div><dt>Sprint</dt><dd><kbd>Shift</kbd></dd></div>
     <div><dt>Crouch</dt><dd><kbd>C</kbd> or <kbd>Ctrl</kbd></dd></div>
@@ -538,7 +541,6 @@ __late_weapon.ab(ab);
     <div><dt>Move \xB7 Look</dt><dd>Left stick \xB7 Right stick</dd></div>
     <div><dt>Fire \xB7 Aim</dt><dd><kbd>RT</kbd> \xB7 <kbd>LT</kbd></dd></div>
     <div><dt>Reload</dt><dd><kbd>X</kbd></dd></div>
-    <div><dt>Cut relay</dt><dd>Hold <kbd>X</kbd> at a relay</dd></div>
     <div><dt>Swap weapon</dt><dd><kbd>Y</kbd> or D-pad</dd></div>
     <div><dt>Jump</dt><dd><kbd>A</kbd></dd></div>
     <div><dt>Crouch</dt><dd><kbd>B</kbd> or <kbd>LB</kbd></dd></div>
@@ -554,7 +556,6 @@ __late_weapon.ab(ab);
     <div><dt>Aim</dt><dd>AIM toggles</dd></div>
     <div><dt>Reload</dt><dd>RLD</dd></div>
     <div><dt>Jump</dt><dd>JUMP</dd></div>
-    <div><dt>Cut relay</dt><dd>Hold USE at a relay</dd></div>
     <div><dt>Sprint</dt><dd>Push the stick fully forward</dd></div>
   </dl>`;
 __late_enemies.sL(sL);
@@ -572,7 +573,7 @@ __late_enemies.sL(sL);
       <div class="m-title-main">
         <div class="m-eyebrow"><span class="m-tag">B4</span><span>Port Authority Breach Unit</span><span class="m-dim">Saltline Terminal \xB7 05:42</span></div>
         <h1 class="m-word">SALTLINE</h1>
-        <p class="m-premise">The port\u2019s security net has gone feral. Cut its three uplinks. Reach the boat.</p>
+        <p class="m-premise">Purdue Mall, loaded with hostile machines. Pick a mode, pick your bots, last gun standing.</p>
         <div class="m-actions">
           <button class="btn primary" data-act="deploy">Deploy</button>
           <button class="btn" data-act="settings">Settings</button>
@@ -581,13 +582,14 @@ __late_enemies.sL(sL);
         <div class="m-pick">
           <label id="l-tm">Mode</label><div class="seg" role="group" aria-labelledby="l-tm">${uT.map((W) => `<button data-m="${W[0]}" aria-pressed="false">${W[1]}</button>`).join("")}</div>
           <label id="l-td">Difficulty</label><div class="seg" role="group" aria-labelledby="l-td">${ab.map((W) => `<button data-d="${W[0]}" aria-pressed="false">${W[1]}</button>`).join("")}</div>
+          <label id="l-tb">Bots</label><div class="seg" role="group" aria-labelledby="l-tb">${botOpts.map((W) => `<button data-b="${W}" aria-pressed="false">${W}</button>`).join("")}</div>
           <div class="m-pick-note" data-f="modenote"></div>
         </div>
         <p class="m-note">Every surface, machine and sound is generated in your browser. Nothing is downloaded.</p>
       </div>
       <aside class="m-legend" aria-label="Controls at a glance">
         <div><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span><span><kbd>Mouse</kbd> Look</span><span><kbd>LMB</kbd> Fire</span><span><kbd>RMB</kbd> Aim</span><span><kbd>R</kbd> Reload</span></div>
-        <div><span><kbd>Q</kbd> Sidearm</span><span><kbd>E</kbd> Cut relay</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>C</kbd> Crouch</span><span><kbd>Esc</kbd> Pause</span></div>
+        <div><span><kbd>Q</kbd> Sidearm</span><span><kbd>Tab</kbd> Scores</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>C</kbd> Crouch</span><span><kbd>Esc</kbd> Pause</span></div>
         <div class="lg-pad"><em>Controller</em><span>Sticks move and look</span><span><kbd>RT</kbd> Fire</span><span><kbd>LT</kbd> Aim</span><span><kbd>X</kbd> Reload / cut</span><span><kbd>Y</kbd> Sidearm</span><span><kbd>A</kbd> Deploy</span></div>
         <div class="lg-touch"><em>Touch</em><span>Left thumb moves</span><span>Right thumb looks</span><span>Fire \xB7 Aim \xB7 Reload \xB7 Jump on screen</span></div>
       </aside>
@@ -714,6 +716,7 @@ __late_enemies.sL(sL);
       for (let G of r(".seg button[data-d]")) G.setAttribute("aria-pressed", String(G.dataset.d === i.difficulty));
       for (let G of r(".seg button[data-v]")) G.setAttribute("aria-pressed", String(+G.dataset.v === i.view));
       for (let G of r(".seg button[data-m]")) G.setAttribute("aria-pressed", String(G.dataset.m === i.mode));
+      for (let G of r(".seg button[data-b]")) G.setAttribute("aria-pressed", String(+G.dataset.b === i.bots));
       ((s.dataset.mode = i.mode),
         (c("modenote").textContent = nL[i.mode] || ""),
         (u.value = i.sens),
@@ -818,6 +821,10 @@ __late_enemies.sL(sL);
       }
       if (J.dataset.m) {
         ((i.mode = J.dataset.m), x(), cc(i));
+        return;
+      }
+      if (J.dataset.b) {
+        ((i.bots = +J.dataset.b), x(), cc(i));
         return;
       }
       if (J.dataset.d) {

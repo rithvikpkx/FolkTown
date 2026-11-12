@@ -4,6 +4,7 @@
 //   export function build(G, zone, root) -> void | Object3D   (called after the base level is assembled)
 import { BufferGeometry, BufferAttribute, ExtrudeGeometry, Group, InstancedMesh, Matrix4, Mesh, PlaneGeometry, Shape, CylinderGeometry, Vector3 } from 'three';
 import { Kn, Z0 } from '../game/common.js';
+import { buildNav } from '../modes/nav.js';
 
 const CHUNK = 64;
 const optional = import.meta.glob('./{ground,vegetation,landmarks}.js', { eager: true });
@@ -158,6 +159,10 @@ export async function buildCampus(G, zone) {
 
   const stats = buildBuildings(G, data, root);
   addCollision(G.physics, data);
+  const nav = buildNav(data);
+  G.physics.nav = nav; // campus-sized grid replaces the harbour's
+  const spawnPos = (p) => ({ pos: new Vector3(p.x, 0, p.z), type: 'ground' });
+  const enemySpawns = [...data.spawns.filter((s) => nav.isWalkable(s.x, s.z)).map(spawnPos), ...nav.lattice(40).map(spawnPos)];
 
   const hasVeg = !!optional['./vegetation.js'];
   if (!hasVeg && data.trees.length) {
@@ -183,7 +188,7 @@ export async function buildCampus(G, zone) {
     spawns: data.spawns,
     objectives: [],
     extraction: null,
-    enemySpawns: [], // shortcut: nav grid is still harbour-sized, bots need a campus nav pass
+    enemySpawns,
     zones: [],
     interiorBoxes: [],
     cinematicPath: [],

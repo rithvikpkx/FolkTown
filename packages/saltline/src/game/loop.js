@@ -3,6 +3,7 @@ import { hT, xi, lb, cs, dT, Vu } from './hud.js';
 import { at } from './fx.js';
 import { Hn, ou, Is, j0 } from './common.js';
 import { __late as __late_audio } from './audio.js';
+import { createModes, MODES, DIFFICULTY } from '../modes/index.js';
 __late_audio.pT(pT);
 
 export function pT(n) {
@@ -40,6 +41,7 @@ export function pT(n) {
         },
       });
     l.applySettings();
+    const modes = (n.modes = createModes(n));
     let c = (Y) => JSON.parse(JSON.stringify(Y)),
       u = () => (n.enemies && n.enemies.TUNE) || null,
       f = { flow: c(xi), player: i.tuning ? c(i.tuning) : null, enemies: null };
@@ -187,7 +189,7 @@ export function pT(n) {
         difficulty: "hard",
         setDifficulty: (Y) => h(Y),
         start(Y = {}) {
-          G({ skipIntro: !!Y.skipIntro, quick: !!Y.quick, mode: Y.mode || (n.params.mode === "holdout" ? "holdout" : null) });
+          G({ skipIntro: !!Y.skipIntro, quick: !!Y.quick, mode: Y.mode || null });
         },
         pause() {
           le();
@@ -290,7 +292,7 @@ export function pT(n) {
         for (let Y of g.relays) W(Y.o, "cut");
         g.relays = [];
       }
-      (J(), o.setRelays && o.setRelays(0, g.relays.length), o.setTally && o.setTally(p() ? "Stand by" : null), p() || ue());
+      (J(), o.setRelays && o.setRelays(0, g.relays.length), o.setTally && o.setTally(p() ? "Stand by" : null), p() || (MODES[g.mode] ? modes.start(g.mode, { bots: n.params.bots ?? l.settings.bots, time: n.params.time, killLimit: n.params.killlimit }) : modes.stop(), MODES[g.mode] || ue()));
     }
     function W(Y, he) {
       try {
@@ -310,7 +312,8 @@ export function pT(n) {
     }
     function G({ skipIntro: Y = !1, quick: he = !1, keepRetries: V = !1, mode: ne = null } = {}) {
       if (
-        ((g.mode = ne || (V || he ? g.mode : l.settings.mode) || "mission"),
+        (n.params.difficulty && DIFFICULTY[n.params.difficulty] && h(DIFFICULTY[n.params.difficulty]),
+        (g.mode = (MODES[n.params.mode] || n.params.mode === "holdout" ? n.params.mode : null) || ne || (V || he ? g.mode : l.settings.mode) || "ffa"),
         V || (g.retries = 0),
         l.show("none"),
         l.locationCard(!1),
@@ -338,6 +341,7 @@ export function pT(n) {
       ((i.enabled = !0), o.show(!0), r.setGameplay && r.setGameplay(!0), o.setObjective(oe()), A("playing"), ee(!0));
     }
     function oe() {
+      if (modes.active) return modes.objective();
       if (p()) return g.waveOn ? "Hold the berth" : g.wave ? "Catch your breath" : "Machines inbound";
       if (g.allCut) return "Get to the boat";
       let Y = g.relays.length - g.cut;
@@ -577,7 +581,11 @@ export function pT(n) {
         o.setObjective(oe()),
         J());
     }
+    modes.onEnd = () => {
+      (i.enabled = !1, r.setGameplay && r.setGameplay(!1), r.exitLock(), o.setPrompt && o.setPrompt(null), o.show(!1), A("ended"));
+    };
     n.events.on("player:dead", () => {
+      if (modes.active) return void (C.state === "playing" && modes.onPlayerDead());
       (C.state !== "playing" && C.state !== "paused") ||
         (r.setGameplay && r.setGameplay(!1),
         r.exitLock(),
@@ -660,7 +668,7 @@ export function pT(n) {
         case "playing": {
           if (((g.time += Y), (e.fade = j0(e.fade || 0, 0, 6, Y)), w > 0 && (w -= Y), r.pressed("pause"))) return (le(), !1);
           if ((ge(Y), C.state !== "playing")) return !0;
-          ($(Y), p() && y(Y), (g.alertT = Math.max(0, g.alertT - Y)), (g.waveHot = Math.max(0, g.waveHot - Y)));
+          (modes.update(Y), $(Y), p() && y(Y), (g.alertT = Math.max(0, g.alertT - Y)), (g.waveHot = Math.max(0, g.waveHot - Y)));
           let he = se();
           g.waveHot > 0 && he === 0 && !g.queue.length && g.waveHot < 24 && (g.waveHot = 0);
           let V = g.allCut || g.queue.length || (g.waveHot > 0 && he > 0) ? 1 : g.alertT > 0 || (he > 0 && fe(26)) ? 0.6 : 0.15;
@@ -683,6 +691,8 @@ export function pT(n) {
             E > 1.5 && l.screen !== "dead" && (l.show("dead"), a(n.audio, "setIntensity", 0.15)),
             !0
           );
+        case "ended":
+          return (e.fade = j0(e.fade || 0, 0.3, 1, Y), !1);
         case "complete":
           return (
             (e.fade = j0(e.fade || 0, 0.72, 0.9, Y)),

@@ -1,6 +1,7 @@
 import { type PlayerState, WEAPONS, type WeaponId } from '@folktown/shared';
 import {
   AdditiveBlending,
+  Box3,
   type Camera,
   CanvasTexture,
   DoubleSide,
@@ -9,7 +10,9 @@ import {
   Mesh,
   MeshBasicMaterial,
   PlaneGeometry,
+  Vector3,
 } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Batch } from '../batch';
 import { type MaterialName, type makeMaterials, TILING } from '../materials';
 
@@ -28,6 +31,48 @@ const POSES: Record<WeaponId, Pose> = {
   shotgun: { hip: [0.2, -0.22, -0.36], ads: [0, -0.064, -0.5], muzzle: 0.86, fov: 60 },
 };
 export const HIP_FOV = 70;
+
+/**
+ * Pre-made models (public/models, see docs/assets.md). `yaw` turns the file so the muzzle points
+ * to -z; `len` is the target length in metres; `top` is the height of the bore below the model's
+ * top edge. The model's muzzle end is placed at the pose's muzzle distance.
+ */
+const MODELS: Record<WeaponId, { file: string; yaw: number; len: number; top: number }> = {
+  rifle: { file: 'Rifle_Assault_West.glb', yaw: 0, len: 0.9, top: 0.04 },
+  pistol: { file: 'Pistol_Full_West.glb', yaw: 0, len: 0.24, top: 0.03 },
+  shotgun: { file: 'Shotgun_Pump_West.glb', yaw: 0, len: 1.0, top: 0.04 },
+};
+
+/** Swap the generated gun body for the model; the generated hands stay. On any failure the generated gun stays. */
+function loadModel(id: WeaponId, g: Group) {
+  const m = MODELS[id];
+  new GLTFLoader()
+    .loadAsync(`${import.meta.env.BASE_URL}models/${m.file}`)
+    .then((gltf) => {
+      const o = gltf.scene;
+      const wrap = new Group();
+      wrap.add(o);
+      wrap.rotation.y = m.yaw;
+      wrap.updateMatrixWorld(true);
+      const bb = new Box3().setFromObject(wrap);
+      const size = bb.getSize(new Vector3());
+      const k = m.len / Math.max(size.x, size.z);
+      const root = new Group();
+      root.add(wrap);
+      root.scale.setScalar(k);
+      root.position.set(
+        -((bb.min.x + bb.max.x) / 2) * k,
+        -bb.max.y * k + m.top,
+        -POSES[id].muzzle - bb.min.z * k,
+      );
+      for (const c of [...g.children]) if (c.name === 'metal' || c.name === 'polymer') g.remove(c);
+      o.traverse((c) => {
+        c.frustumCulled = false;
+      });
+      g.add(root);
+    })
+    .catch((e) => console.error(`weapon model ${m.file} failed, using generated gun`, e));
+}
 
 /**
  * Gun models generated in code, in "gun space": the bore is the z axis, +s is forward (toward
@@ -110,6 +155,7 @@ function buildGun(id: WeaponId, mats: Mats): Group {
   for (const k of ['metal', 'polymer', 'fabric'] as const) {
     const m = b[k].mesh(mats[k] as Material, false);
     m.frustumCulled = false;
+    m.name = k;
     g.add(m);
   }
   return g;
@@ -157,6 +203,7 @@ export class ViewModel {
       f.visible = false;
       g.add(f);
       g.visible = false;
+      loadModel(id, g);
       this.guns.set(id, g);
       this.flashes.set(id, f);
       this.root.add(g);

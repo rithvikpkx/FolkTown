@@ -12,6 +12,8 @@ import { ViewModel } from './game/weapon';
 import { makeMaterials } from './materials';
 import { createRenderer, parseFx } from './render';
 import { createScene } from './scene';
+import { mountUi } from './ui';
+import { needsMenu, showMenu } from './ui/menu';
 import { buildZone } from './zone/build';
 
 const q = new URLSearchParams(location.search);
@@ -39,6 +41,8 @@ if (cam?.length === 5 && cam.every(Number.isFinite)) {
   camera.rotation.set((pitch * Math.PI) / 180, (yaw * Math.PI) / 180, 0, 'YXZ');
   view.updateLod(x, z);
   fx.webgl.setAnimationLoop((now: number) => fx.render(Math.min(now / 1000, 0.1)));
+} else if (needsMenu(location.search)) {
+  showMenu();
 } else {
   startGame();
 }
@@ -57,6 +61,7 @@ function startGame() {
   const viewModel = new ViewModel(mats, camera);
   const marks = new ImpactMarks(scene);
   const hud = new Hud(PLAYER_ID, (id) => session.match.getPlayer(id)?.name ?? `#${id}`);
+  const ui = mountUi(zone, PLAYER_ID);
   const state = () => session.match.snapshot();
 
   const overlay = document.createElement('div');
@@ -117,6 +122,7 @@ function startGame() {
       matchState = state();
     }
     hud.update(dt, me, matchState, input.ads);
+    ui(matchState, me, pos);
     if (!locked) input.fire = false;
     fx.render(dt);
   });

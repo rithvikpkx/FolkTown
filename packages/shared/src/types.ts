@@ -60,6 +60,9 @@ export interface PlayerState {
   yaw: number;
   pitch: number;
   onGround: boolean;
+  /** Seconds a jump is still allowed after leaving the ground, and seconds a jump press stays queued. */
+  coyote: number;
+  jumpBuffer: number;
   crouching: boolean;
   health: number;
   alive: boolean;

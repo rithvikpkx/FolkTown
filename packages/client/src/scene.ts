@@ -1,5 +1,6 @@
 import { Color, PerspectiveCamera, Scene } from 'three';
 import { Batch, UP } from './batch';
+import { buildFountain } from './landmarks/fountain';
 import { MATERIAL_NAMES, type MaterialName, type makeMaterials, TILING } from './materials';
 
 type Mats = Awaited<ReturnType<typeof makeMaterials>>;
@@ -55,4 +56,5 @@ export function buildPlaza(scene: Scene, mats: Mats) {
   b.fabric.rect([-2.9, 2.6, -8.95], [1, 0, 0], UP, 0.6, 1.6, t('fabric')); // banner
 
   for (const n of MATERIAL_NAMES) scene.add(b[n].mesh(mats[n]));
+  scene.add(buildFountain(mats, 0, 40)); // WP11: Engineering Fountain, 40 m south of origin
 }

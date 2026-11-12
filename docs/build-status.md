@@ -40,14 +40,25 @@ The owner asked for the MVP (end of Stage 2) to be built without check-ins, as c
 
 ## Next
 
-1. **Next packages:** WP4 effects chain (track A, running) and WP8 footprint facades (track B, running).
-2. **Persistence (owner travels, laptop goes offline):** move orchestration to a cloud session on `mvp`, and connect Vercel to the GitHub repo so pushes to `mvp` deploy previews. Benchmarks need this Mac's GPU; queue them for when it is online.
-3. Two tracks in parallel, one Sonnet subagent each, at most two running at once.
+### Cloud / local split (from 12 November)
 
-| Track | Packages, in order | Touches |
+Two orchestrators work on `mvp` at once. Each owns its own folders and its own subsection below, and never edits the other's. Before every push: `git pull --rebase origin mvp`; if this file conflicts, keep both sides.
+
+| | Cloud (always on, no GPU) | Local (owner's Mac, online in windows) |
 |---|---|---|
-| A. Rendering and gameplay | 5 harness, 2 batching helper, 4 effects chain, 3 GPU textures, then Stage 2 on the prototype plaza | `packages/client`, `tools/`, later `packages/sim` |
-| B. Campus pipeline | 6 map fetch and projection, 7 LiDAR heights, 8 footprint facades, 9 Engineering Mall bake | `packages/map-tools`, `data/` |
+| Owns | `packages/sim`, `packages/shared`, `packages/map-tools`, `data/` | `packages/client`, `tools/` |
+| Order | 1. `sim` contract (types for inputs, state, zone collision, weapons) pushed first so the client can build against it. 2. WP12 controller + collision on synthetic footprints, then on campus data. 3. WP9 Engineering Mall bake (zone file: ground, footprints with heights, collision, spawns, nav graph). 4. Stage 2 rules: rifle/pistol/shotgun (hit-scan, spread, recoil pattern, falloff), health, damage, respawn, FFA and TDM, bots (patrol/chase/attack/cover, three difficulties). 5. Headless bot-only match test with 32 bots. | WP4 effects chain, WP8 facades (running), WP3 GPU textures, WP10 Bell Tower, WP11 fountain, render the baked zone, then client side of Stage 2: input to `sim`, rifle and hands, ADS, hit marks and feedback, sounds, HUD (health, ammo, kill feed, scoreboard, minimap), bot rendering, menus for mode and difficulty. Runs all Mac benchmarks. |
+| Checks | unit tests, headless match | `pnpm shoot` images, `pnpm bench` |
+
+The client never adds rules; if it needs one, it notes it in the cloud subsection and stubs it.
+
+### Cloud track status
+
+- Not started.
+
+### Local track status
+
+- WP4 and WP8 running.
 
 Work package numbers are from section 8 of the plan.
 

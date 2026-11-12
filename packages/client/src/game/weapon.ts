@@ -23,9 +23,9 @@ interface Pose {
   fov: number;
 }
 const POSES: Record<WeaponId, Pose> = {
-  rifle: { hip: [0.2, -0.22, -0.36], ads: [0, -0.056, -0.3], muzzle: 0.8, fov: 52 },
-  pistol: { hip: [0.18, -0.2, -0.34], ads: [0, -0.052, -0.28], muzzle: 0.22, fov: 62 },
-  shotgun: { hip: [0.2, -0.22, -0.36], ads: [0, -0.056, -0.3], muzzle: 0.86, fov: 60 },
+  rifle: { hip: [0.2, -0.22, -0.36], ads: [0, -0.064, -0.5], muzzle: 0.8, fov: 52 },
+  pistol: { hip: [0.18, -0.2, -0.34], ads: [0, -0.06, -0.42], muzzle: 0.22, fov: 62 },
+  shotgun: { hip: [0.2, -0.22, -0.36], ads: [0, -0.064, -0.5], muzzle: 0.86, fov: 60 },
 };
 export const HIP_FOV = 70;
 
@@ -96,7 +96,7 @@ function buildGun(id: WeaponId, mats: Mats): Group {
     bx('fabric', fore - 0.06, fore + 0.06, -0.055, 0.045, -0.04, 0.04); // left hand under the handguard
     b.fabric.cyl(
       [-0.02, -0.04, -fore + 0.05],
-      [-0.22, -0.3, -fore + 0.5],
+      [-0.12, -0.7, -fore + 0.12],
       0.04,
       0.06,
       12,
@@ -104,7 +104,7 @@ function buildGun(id: WeaponId, mats: Mats): Group {
     );
   }
   bx('fabric', -0.1, -0.03, -0.14, -0.05, -0.03, 0.03); // right hand on the grip
-  b.fabric.cyl([0.0, -0.1, 0.0], [0.12, -0.34, 0.5], 0.04, 0.06, 12, bt('fabric'));
+  b.fabric.cyl([0.0, -0.1, 0.0], [0.08, -0.7, 0.12], 0.04, 0.06, 12, bt('fabric'));
 
   const g = new Group();
   for (const k of ['metal', 'polymer', 'fabric'] as const) {

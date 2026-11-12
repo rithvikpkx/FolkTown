@@ -195,6 +195,14 @@ importers:
         specifier: 24.10.1
         version: 24.10.1
 
+  packages/shared: {}
+
+  packages/sim:
+    dependencies:
+      '@folktown/shared':
+        specifier: workspace:*
+        version: link:../shared
+
   tools: {}
 
 packages:

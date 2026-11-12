@@ -53,7 +53,7 @@ function farTexture() { // one bay x one storey of brick wall with a window, for
 }
 
 async function manifest() {
-  try { return (await (await fetch(BASE + 'walk/facades.json')).json()).walc || {}; } catch { return {}; }
+  try { return ((j) => (j.buildings || j).walc || {})(await (await fetch(BASE + 'walk/facades.json')).json()); } catch { return {}; }
 }
 
 function materials(m) {

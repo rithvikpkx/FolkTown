@@ -8,6 +8,9 @@ const poses = {
   'walc-to-tower': '35,1.7,-1,0,14,0',
   'along-path': '17,1.7,6,40,2,5',
   oblique: '22,1.7,36,70,9,-14',
+  'walc-nw': '18,1.7,-78,62,10,-44',
+  'walc-s': '40,1.7,58,75,10,26',
+  'walc-w': '20,1.7,-12,50,8,-6',
 };
 mkdirSync(new URL('shots/', import.meta.url), { recursive: true });
 for (const [name, cam] of Object.entries(poses)) {

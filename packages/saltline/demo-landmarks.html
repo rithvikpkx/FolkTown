@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Saltline landmarks demo</title>
+<style>html,body{margin:0;background:#222;overflow:hidden}#hud{position:fixed;left:8px;top:8px;color:#fff;font:12px monospace}</style></head>
+<body><div id="hud"></div>
+<script type="module">
+import * as THREE from 'three';
+import { lv } from './src/game/mats.js';
+import { Z0 } from './src/game/common.js';
+import { buildBellTower, buildFountain } from './src/campus/landmarks.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+// ?l=bell|fountain  ?v=0|1|2 (matched viewpoints)  ?orbit=1 slow orbit
+const q = new URLSearchParams(location.search), which = q.get('l') || 'bell', v = +(q.get('v') || 0);
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+r.setSize(innerWidth, innerHeight); r.setPixelRatio(1);
+r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = 0.6; r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(r.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x6f8db5); scene.fog = new THREE.Fog(0x9db3c8, 120, 500);
+// Game lighting: its golden low sun plus a sky hemisphere for fill
+const sun = new THREE.DirectionalLight(Z0.color, Z0.intensity);
+sun.position.copy(Z0.dir).multiplyScalar(120); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -40, right: 40, top: 60, bottom: -20, near: 1, far: 300 }); sun.shadow.bias = -1e-4; sun.shadow.normalBias = 0.05;
+scene.add(sun, new THREE.HemisphereLight(0x9db8e0, 0x4a4a3a, 2.2));
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.5;
+const mats = await lv({ renderer: r, params: { tex: 512 } });
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600).rotateX(-Math.PI / 2), mats.get('concrete_dirty', { triplanar: true, scale: 4, color: 0x7a9a5a }));
+ground.receiveShadow = true; ground.position.y = -0.05; scene.add(ground);
+const L = which === 'bell' ? buildBellTower([0, 0, 0], mats) : buildFountain([0, 0, 0], mats);
+scene.add(L.group);
+const views = which === 'bell'
+  ? [[[62, 52, 40], [0, 40, 0]], [[44, 2, 22], [0, 28, 0]], [[22, 30, 12], [0, 34, 0]]]
+  : [[[42, 2.5, 18], [0, 6, 0]], [[20, 2.5, 40], [0, 6, 0]], [[32, 24, 24], [0, 4, 0]]];
+const cam = new THREE.PerspectiveCamera(which === 'bell' ? 38 : 45, innerWidth / innerHeight, 0.1, 900);
+cam.position.set(...views[v][0]); cam.lookAt(...views[v][1]);
+document.getElementById('hud').textContent = `${which} v${v} tris=${L.tris} colliders=${L.colliders.length}`;
+window.__tris = L.tris;
+let t0 = performance.now(), n = 0;
+r.setAnimationLoop(() => { L.update((performance.now() - t0) / 1000); if (q.get('orbit')) { const a = (performance.now() - t0) / 4000; cam.position.set(Math.sin(a) * 50, 20, Math.cos(a) * 50); cam.lookAt(0, 20, 0); } r.render(scene, cam); if (++n === 5) window.__ready = true; });
+</script></body></html>

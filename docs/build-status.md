@@ -6,10 +6,11 @@ The handoff file. Update it at the end of every work package, so a session that 
 
 - Planning is finished. All decisions are in `docs/decisions.md`; the plan is `docs/implementation-plan.md`.
 - `main` holds the docs (fast-forwarded from `docs/design-import`).
-- **Done on `mvp`:** WP1 skeleton (also on `main`), WP5 harness, WP6 map fetch.
+- **Done on `mvp`:** WP1 skeleton (also on `main`), WP5 harness, WP6 map fetch, WP2 batching helper.
+  - WP2: `packages/client/src/batch.ts` (`Batch` with `rect`/`box`/`cyl`, world-scaled UVs, `shade(y)` grime hook, `mesh(material)`); tests in `batch.test.ts`.
   - WP5: `pnpm bench` (table, `--save` writes `tools/baseline.md`) and `pnpm shoot <name> [pose]`; poses in `tools/poses.json`; client takes `?cam=x,y,z,yaw,pitch` and exposes `window.__ft` frame times.
   - WP6: `packages/map-tools`; `pnpm map:fetch` (Overpass, cached in `data/raw/osm-campus.json`; public Overpass is flaky, curl the query if it times out), `pnpm map:project` writes `data/campus.json` (1376 buildings, 193 named, 102 with height/levels). Origin = Bell Tower centroid 40.42729, -86.91407; x east, z south; outer rings CCW, holes CW (see `types.ts`).
-- Agent cost so far: WP5 ~77k tokens, WP6 ~116k tokens (Sonnet). Owner's weekly usage was 54% before WP5/6 started.
+- Agent cost so far: WP5 ~77k tokens, WP6 ~116k tokens, WP2 ~60k tokens (Sonnet). Owner's weekly usage was 54% before WP5/6 started.
 - Pinned: pnpm 12.18.0, TypeScript 7.0.2, Vite 8.3.8, Vitest 5.1.0, Biome 2.6.7, Three.js 0.187.0.
 - Commands from the root: `pnpm dev`, `pnpm build`, `pnpm test`, `pnpm lint` (Biome plus `tsc` per package).
 - Tooling notes: the shell lazy-loads nvm, so in scripts call pnpm as `npx -y pnpm@12.18.0`. Biome skips `*.md` because it rewrites the doc tables. pnpm 12 refuses very new releases; it listed Biome in `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`.
@@ -38,7 +39,7 @@ The owner asked for the MVP (end of Stage 2) to be built without check-ins, as c
 
 ## Next
 
-1. **Next packages:** WP2 batching helper (track A) and WP7 LiDAR heights (track B), one Sonnet subagent each in a worktree off `mvp`.
+1. **Next packages:** WP4 effects chain (track A, running) and WP7 LiDAR heights (track B, running).
 2. **Persistence (owner travels, laptop goes offline):** move orchestration to a cloud session on `mvp`, and connect Vercel to the GitHub repo so pushes to `mvp` deploy previews. Benchmarks need this Mac's GPU; queue them for when it is online.
 3. Two tracks in parallel, one Sonnet subagent each, at most two running at once.
 

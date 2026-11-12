@@ -9,5 +9,6 @@
   "zMax": 50
  },
  "metresPerPixel": 0.0761904761904762,
+ "fit": {"note": "OSM/local point p samples the ortho at R(theta)(p-c)+c+d; fitted by maximising mean ortho edge gradient along 5 OSM building footprints (score 7.8 to 13.2), see docs/pilot-data.md", "dx": 1.9, "dz": -1.4, "theta": -0.011345, "cx": 70, "cz": -80},
  "source": "Indiana_2023_SPW_06in, IndianaMap/IGIO, CC0"
 }

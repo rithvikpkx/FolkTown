@@ -15,8 +15,8 @@ import {
   WebGLRenderTarget,
 } from 'three';
 import { COMMON, DETAIL, SURFACES } from './shaders';
-import { applyTextureSet, loadTextureSets } from './texture-sets';
 import { MATERIAL_NAMES, type MaterialName, TILING } from './table';
+import { applyTextureSet, loadTextureSets } from './texture-sets';
 
 export { MATERIAL_NAMES, type MaterialName, TILING } from './table';
 
@@ -56,9 +56,18 @@ function addDetail(m: MeshStandardMaterial, name: MaterialName) {
         '#include <common>',
         `#include <common>\nvarying vec3 vWp; varying vec3 vWn;\n#define MODE ${mode}\n#define CELL ${cell}\n#define DCOL ${col}\n#define DBUMP ${bump}\n#define DRV ${rv}\n${DETAIL}`,
       )
-      .replace('#include <map_fragment>', '#include <map_fragment>\n  float dRough; float dH = detail(diffuseColor.rgb, dRough);')
-      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n  roughnessFactor = clamp(roughnessFactor + dRough, 0.04, 1.0);')
-      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n  normal = bumpNormal(normal, dH, -vViewPosition, faceDirection);');
+      .replace(
+        '#include <map_fragment>',
+        '#include <map_fragment>\n  float dRough; float dH = detail(diffuseColor.rgb, dRough);',
+      )
+      .replace(
+        '#include <roughnessmap_fragment>',
+        '#include <roughnessmap_fragment>\n  roughnessFactor = clamp(roughnessFactor + dRough, 0.04, 1.0);',
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        '#include <normal_fragment_maps>\n  normal = bumpNormal(normal, dH, -vViewPosition, faceDirection);',
+      );
   };
 }
 

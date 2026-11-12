@@ -20,6 +20,12 @@ Models are chosen in `packages/client/public/models/weapons.json` (see `weapon-a
 | Pistol_1911_CC0.glb (9,533 tris, 1.1 MB, 1024 px PBR) | Pistol, default (`m1911`) | https://stein-indie.itch.io/classic-weapons-pack (Stein Games) | CC0 | No |
 | Shotgun_Pump_CC0.glb (1,740 tris, 350 KB, 1024 px PBR) | Shotgun, default (`pump`) | https://3dmodelscc0.itch.io/free-cc0-guns-explosives-pack (3dmodelscc0) | CC0 | No |
 
+| lab/pistol.glb + pistol_0..2.webp (service_pistol, 16,650 tris, 2K maps; Poly Haven author as listed on the asset page, https://polyhaven.com/a/service_pistol) | Pistol, default (, falls back to ); copied from reference/photoreal-lab/assets | https://polyhaven.com/a/service_pistol | CC0 | No |
+| lab/m4a1.glb + m4a1_0..2.webp (9,256 tris, 2K maps) | Rifle, default (, falls back to ) | https://3dmodelscc0.itch.io/free-cc0-guns-explosives-pack (3dmodelscc0) | CC0 | No |
+| lab/shotgun.glb + shotgun_0..2.webp (1,740 tris, 2K maps) | Shotgun, default (, falls back to ) | https://3dmodelscc0.itch.io/free-cc0-guns-explosives-pack (3dmodelscc0) | CC0 | No |
+
+The three `lab` models are the Photoreal Lab's quantised, texture-less GLBs; the webp maps are applied at load from the manifest `maps` field. Maps were prepared in the lab (2K, webp); their exact resize/pack steps are in reference/photoreal-lab/assets/manifest.json. The bolt rifle (Poly Haven bolt_action_rifle_7_62) is not copied: the game has no sniper weapon yet.
+
 The Flat Guns West models stay as the `flat` variant of each weapon. FBX files were converted with FBX2glTF; textures resized to 1024 px JPEG (base colour, normal, ORM packed from the roughness/metal maps).
 
 ## Material textures (local-materials)

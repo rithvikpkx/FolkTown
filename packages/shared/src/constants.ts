@@ -116,3 +116,6 @@ export const SPAWN_PROTECTION = 2;
 /** Headshot damage multiplier, and the height of the head zone below the top of the body (metres). */
 export const HEADSHOT_MULTIPLIER = 2;
 export const HEAD_ZONE = 0.25;
+
+/** Most bots in a single-player match: 31 bots plus the player is the 32-player Stage 2 target. Raise to 63 only after a Mac benchmark. */
+export const MAX_BOTS = 31;

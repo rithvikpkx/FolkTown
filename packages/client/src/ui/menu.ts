@@ -1,4 +1,4 @@
-import type { Difficulty, MatchMode, MatchState } from '@folktown/shared';
+import { type Difficulty, MAX_BOTS, type MatchMode, type MatchState } from '@folktown/shared';
 
 const PARAMS = ['mode', 'diff', 'bots'];
 
@@ -9,7 +9,7 @@ export const needsMenu = (search: string): boolean => {
 };
 
 export function menuQuery(mode: MatchMode, diff: Difficulty, bots: number): string {
-  const n = Math.min(31, Math.max(1, Math.round(bots) || 7));
+  const n = Math.min(MAX_BOTS, Math.max(1, Math.round(bots) || 7));
   return `?mode=${mode}&diff=${diff}&bots=${n}`;
 }
 
@@ -25,7 +25,7 @@ export function showMenu() {
   el.innerHTML = `<div style="font-size:38px">FolkTown</div>
     <label>Mode <select id="m"><option value="ffa">Free for all</option><option value="tdm">Team deathmatch</option></select></label>
     <label>Bot difficulty <select id="d"><option>easy</option><option selected value="normal">medium</option><option>hard</option></select></label>
-    <label>Bots <input id="b" type="number" min="1" max="31" value="7" style="width:60px"></label>
+    <label>Bots <input id="b" type="number" min="1" max="${MAX_BOTS}" value="7" style="width:60px"></label>
     <button id="go" style="${BTN}">Play</button>`;
   document.body.appendChild(el);
   const v = (id: string) => (el.querySelector(`#${id}`) as HTMLInputElement).value;

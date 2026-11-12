@@ -1,5 +1,6 @@
 import {
   type GameEvent,
+  MAX_BOTS,
   type MatchConfig,
   type MatchState,
   WALK_SPEED,
@@ -80,7 +81,7 @@ function startGame() {
   const config: MatchConfig = {
     mode: q.get('mode') === 'tdm' ? 'tdm' : 'ffa',
     difficulty: (['easy', 'normal', 'hard'] as const).find((d) => d === q.get('diff')) ?? 'normal',
-    botCount: Number(q.get('bots') ?? 7),
+    botCount: Math.min(MAX_BOTS, Math.max(1, Math.round(Number(q.get('bots') ?? 7)) || 7)),
     scoreLimit: 25,
     timeLimit: 600,
   };

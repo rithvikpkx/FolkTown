@@ -65,7 +65,10 @@ Cloud lock: 2026-11-12T11:41Z
 ### Local track status
 
 - **WP4 effects chain merged** (~130k tokens, Sonnet). `packages/client/src/render/`: `createRenderer(canvas, scene, camera, opts)` -> `{render(dt), setPreset, setEnabled, resize, invalidateShadow, state, webgl}`. Presets `?q=low|medium|high` (default medium, 1.2 MP), `?fx=0` or F toggles the chain, dynamic scale 0.6-1.0, start-up self test with fallbacks. Static shadow map once; `high` refreshes every second frame. `pnpm bench` on M1 (test boxes scene): median 263 fps, 1% low 185-192. Known gaps 6, 7.
-- WP8 facades running; WP3 GPU textures next, then WP10, WP11.
+- **WP8 footprint facades merged** (~106k tokens, Sonnet). `packages/client/src/facade/`: `new Batches()`, `buildFacade(B, {outer, holes?}, height, FacadeStyle)`, `buildLowDetail(B, fp, height, {wall})` (Tier 3); `glassMaterial()` fake-room shader. Test page `/facades.html` (`packages/client/vite.config.ts` has both inputs). Batch gained `tri()` and `triangleCount`. Real buildings cost 13k-21k triangles detailed vs 34-70 Tier 3: use Tier 3 beyond ~150 m. Known gap 8 (no entrances, gables only on rectangles).
+- **WP3 GPU textures: a fresh Sonnet subagent was started at 11:38 UTC on branch `wp3-textures`** (`packages/client/src/materials/`, `makeMaterials(renderer)`, plaza test scene in `scene.ts`). Next orchestrator: check `origin/wp3-textures` first; review and merge it if complete, otherwise finish it with a fresh subagent. Do not restart it from scratch.
+- **Next (local):** WP3 (above), WP10 Bell Tower, WP11 Engineering Fountain, render the cloud's baked zone when it lands, then the client side of Stage 2 against the `sim` contract.
+- Stage 0 note: the "prototype plaza" check is met by WP3's plaza test scene, not a full port of the prototype plaza (sensible default; the real Zone supersedes it).
 
 Work package numbers are from section 8 of the plan.
 

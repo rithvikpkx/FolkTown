@@ -4,8 +4,16 @@
 // Pilot data: ortho.jpg is blended into the ground beyond ~7 m (ground.js opts.ortho); LiDAR roof shapes/plant boxes of WALC from data/pilot/roofs.json.
 import { BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, SRGBColorSpace, TextureLoader, LinearMipmapLinearFilter, Vector3 } from 'three';
 import { fetchZone, buildCampus } from './index.js';
+import { getDecals } from './ground.js';
+import { buildFurniture, buildUnderstory } from './env/furniture.js';
+import { vegMode } from './vegetation.js';
 import STYLES from './building-styles.json';
 import roofs from '../../../../data/pilot/roofs.json';
+import { applyEarly, installSky } from './env/sky.js';
+import { S as SEASON } from './env/season.js';
+
+// sun/fog constants are cloned by render init, so they must change at import time, and only in walk mode
+if (typeof location !== 'undefined' && (import.meta.env.VITE_WALK ? !/[?&]walk=0/.test(location.search) : /[?&]walk=(?!0)/.test(location.search))) applyEarly();
 
 export const BOX = { minX: -50, maxX: 160, minZ: -70, maxZ: 50 }; // inside the ortho (x -50..190, z -200..50)
 const KEEP = ['way/301837711', 'way/508846031']; // Bell Tower, WALC: every other building is clipped
@@ -53,7 +61,7 @@ function loadOrtho() {
     const t = new TextureLoader().load(BASE + 'pilot/' + j.image);
     t.colorSpace = SRGBColorSpace; t.flipY = false; t.anisotropy = 8; t.minFilter = LinearMipmapLinearFilter;
     const b = j.bounds;
-    return { texture: t, xMin: b.xMin, zMin: b.zMin, w: b.xMax - b.xMin, h: b.zMax - b.zMin };
+    return { texture: t, xMin: b.xMin, zMin: b.zMin, w: b.xMax - b.xMin, h: b.zMax - b.zMin, fit: j.fit };
   }).catch(() => null); // pilot data absent: PBR ground only
 }
 
@@ -104,9 +112,11 @@ export async function buildWalk(G) {
     landmarks: { bellTower: zone.landmarks.bellTower }, // no fountain
     spawns: [{ x: 8, z: 0, yaw: -Math.PI / 2, team: 0 }],
   };
+  vegMode.walk = true;
   const ortho = await loadOrtho();
-  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho }, grass: { step: 0.17, far: 14 }, facades: { styles: walcStyles() } };
+  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: { styles: walcStyles() } };
   const level = await buildCampus(G, z);
+  try { await installSky(G); } catch (e) { console.error('[walk] sky failed', e); }
   // LiDAR plant boxes on the WALC roof
   const mech = G.mats.get('steel_dark', { triplanar: true, color: 0x9a9a98 });
   for (const b of walc.plantBoxes) {
@@ -115,7 +125,12 @@ export async function buildWalk(G) {
     m.castShadow = m.receiveShadow = true;
     level.root.add(m);
   }
-  level.root.add(furniture(G, paths));
+  G.walkCrossings = getDecals(z).crossings;
+  try {
+    const fur = buildFurniture(G, z, paths, z.props);
+    level.root.add(fur, buildUnderstory(G, z, fur.planters));
+    console.log('[walk] furniture', JSON.stringify(fur.counts));
+  } catch (e) { console.error('[walk] furniture failed', e); level.root.add(furniture(G, paths)); }
   // collision shapes: building polygons, tower plinth, tree trunks
   G.walkSolids = [
     ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),

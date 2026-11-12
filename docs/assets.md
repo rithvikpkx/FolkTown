@@ -107,3 +107,14 @@ Both are gitignored and not part of any shipped build until cleared.
 | pilot/ortho.jpg + ortho.json | 6-inch aerial ground/roof texture, 240 x 250 m, 3150 x 3281 px (7.6 cm/px), flown spring 2023 | Indiana Geographic Information Office orthoimagery, layer `Indiana_2023_SPW_06in`, ImageServer https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_Current_Imagery/ImageServer (IndianaMap / IGIO) | CC0 per the service's copyright text | No (credit IGIO as courtesy) |
 | data/pilot/roofs.json | Roof planes, 1 m height rasters, plant boxes for 12 buildings | Derived from USGS 3DEP IN_Statewide_Opt2_B2_2017 QL2 point cloud, https://usgs-lidar-public.s3.amazonaws.com/IN_Statewide_Opt2_B2_2017/ | Public domain (USGS) | No |
 | data/raw/purdue-historic-buildings.geojson | Names/years cross-check only (not shipped) | Purdue ArcGIS layer, via research folder | Unknown; Purdue says 3DEP viewer is unrestricted, this layer not stated | needs-clearance |
+
+## v2-environment (walk scene)
+
+| File | Use | Source | Licence | needs-clearance |
+|---|---|---|---|---|
+| public/campus/walk/concrete-{albedo,normal}.jpg (2K, concrete_pavement) | Plaza and walk paving, ground.js | https://polyhaven.com/a/concrete_pavement | CC0 | No |
+| public/campus/walk/dirt-albedo.jpg (2K, park_dirt) | Worn desire paths | https://polyhaven.com/a/park_dirt | CC0 | No |
+| public/campus/walk/leaves-albedo.jpg (2K, leafy_grass) | Fallen-leaf litter | https://polyhaven.com/a/leafy_grass | CC0 | No |
+| public/campus/env/sky/qwantani_{mid_morning,noon,late_afternoon,sunset}_puresky.jpg, kloofendal_overcast_puresky.jpg | Sky dome and image-based light (?tod=); 2K HDRI converted offline to tonemapped sRGB jpg | https://polyhaven.com/a/qwantani_mid_morning_puresky and siblings, https://polyhaven.com/a/kloofendal_overcast_puresky | CC0 | No |
+
+Ortho georeference fit lives in pilot/ortho.json (fit). Trees, shrubs, grasses, furniture, road paint, curbs are generated in code (src/campus/env/, ground.js decals).

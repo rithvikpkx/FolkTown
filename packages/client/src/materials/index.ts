@@ -15,6 +15,7 @@ import {
   WebGLRenderTarget,
 } from 'three';
 import { COMMON, DETAIL, SURFACES } from './shaders';
+import { applyTextureSet, loadTextureSets } from './texture-sets';
 import { MATERIAL_NAMES, type MaterialName, TILING } from './table';
 
 export { MATERIAL_NAMES, type MaterialName, TILING } from './table';
@@ -62,7 +63,7 @@ function addDetail(m: MeshStandardMaterial, name: MaterialName) {
 }
 
 type Set = Record<MaterialName, MeshStandardMaterial>;
-const cache = new WeakMap<WebGLRenderer, { mats: Set; targets: WebGLRenderTarget[] }>();
+const cache = new WeakMap<WebGLRenderer, { mats: Set; targets: { dispose(): void }[] }>();
 
 /**
  * Renders every material's colour (linear, half float), normal and roughness maps once on the
@@ -73,6 +74,7 @@ export async function makeMaterials(renderer: WebGLRenderer): Promise<Set> {
   const hit = cache.get(renderer);
   if (hit) return hit.mats;
   const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  const photo = loadTextureSets(renderer); // starts fetching while the procedural maps compile
   const quad = new Mesh(new PlaneGeometry(2, 2));
   quad.frustumCulled = false;
   const scene = new Scene().add(quad);
@@ -96,7 +98,8 @@ export async function makeMaterials(renderer: WebGLRenderer): Promise<Set> {
   );
   const prev = renderer.getRenderTarget();
   const mats = {} as Set;
-  const targets: WebGLRenderTarget[] = [];
+  const targets: { dispose(): void }[] = [];
+  const rts = {} as Record<MaterialName, WebGLRenderTarget>;
   MATERIAL_NAMES.forEach((name, i) => {
     const { size } = TILING[name];
     const rt = new WebGLRenderTarget(size, size, { count: 3, depthBuffer: false });
@@ -113,6 +116,7 @@ export async function makeMaterials(renderer: WebGLRenderer): Promise<Set> {
     renderer.setRenderTarget(rt);
     renderer.render(scene, cam);
     targets.push(rt);
+    rts[name] = rt;
     mats[name] = new MeshStandardMaterial({
       map: col,
       normalMap: nor,
@@ -122,6 +126,15 @@ export async function makeMaterials(renderer: WebGLRenderer): Promise<Set> {
     });
     addDetail(mats[name], name);
   });
+  // photo sets replace the procedural maps where they loaded; the world-space detail layer stays on top
+  const sets = await photo;
+  for (const name of MATERIAL_NAMES) {
+    const t = sets[name];
+    if (!t) continue;
+    applyTextureSet(mats[name], t);
+    rts[name].dispose(); // free the unused procedural maps
+    targets.push(t.map, t.normalMap, t.roughnessMap, ...(t.aoMap ? [t.aoMap] : []));
+  }
   renderer.setRenderTarget(prev);
   renderer.getContext().finish();
   for (const m of shaders) m.dispose();

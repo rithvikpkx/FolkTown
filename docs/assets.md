@@ -107,3 +107,13 @@ Both are gitignored and not part of any shipped build until cleared.
 | pilot/ortho.jpg + ortho.json | 6-inch aerial ground/roof texture, 240 x 250 m, 3150 x 3281 px (7.6 cm/px), flown spring 2023 | Indiana Geographic Information Office orthoimagery, layer `Indiana_2023_SPW_06in`, ImageServer https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_Current_Imagery/ImageServer (IndianaMap / IGIO) | CC0 per the service's copyright text | No (credit IGIO as courtesy) |
 | data/pilot/roofs.json | Roof planes, 1 m height rasters, plant boxes for 12 buildings | Derived from USGS 3DEP IN_Statewide_Opt2_B2_2017 QL2 point cloud, https://usgs-lidar-public.s3.amazonaws.com/IN_Statewide_Opt2_B2_2017/ | Public domain (USGS) | No |
 | data/raw/purdue-historic-buildings.geojson | Names/years cross-check only (not shipped) | Purdue ArcGIS layer, via research folder | Unknown; Purdue says 3DEP viewer is unrestricted, this layer not stated | needs-clearance |
+
+## Facade photo textures (v2-photo-textures)
+
+Rectified from real photographs by `tools/make-facade-textures.py` (quad corners picked by eye). Output in `packages/saltline/public/campus/walk/tex/`, described by `packages/saltline/public/campus/walk/facades.json`, proof sheet `docs/img/v2-textures.jpg`. Mapillary API search (about 48 images within the pilot area, all 2020-2021 plus a few 2024) found NO usable image of any WALC face and only distant, tree-occluded views of the Bell Tower.
+
+| Asset | Used for | Source URL | Licence | Credit needed |
+|---|---|---|---|---|
+| bell-shaft.jpg, bell-clock-stage.jpg, mat-brick-red.jpg, mat-limestone-cream.jpg | Bell Tower shaft and clock stage, red brick and cream stone patches | https://commons.wikimedia.org/wiki/File:Purdue_Bell_Tower_Purdue_University_2016_01.jpg (Julian Herzog) | CC BY 4.0 | Yes: "Julian Herzog, CC BY 4.0, via Wikimedia Commons" |
+| mat-brick-dark.jpg, mat-limestone-ashlar.jpg | Dark brick and ashlar limestone patches (from Elliott Hall of Music, not WALC or Bell Tower) | Mapillary image 750908235597635, 2020-10-31, user kennystier (Graph API, token not committed) | CC BY-SA 4.0 (Mapillary); `needs-clearance` for share-alike | Yes: "kennystier, CC BY-SA 4.0, via Mapillary" |
+| walc-wall-paired-windows.jpg, walc-wall-tall-slits.jpg, mat-glass-window.jpg | WALC brick wall looks (one corner, compass faces unknown, 800 px source so soft) | https://www.purdue.edu/uns/images/2018/plant-wilmeth-now2LO.jpg (Purdue Today, 2018); copy in reference/purdue-photos | `needs-clearance` (Purdue University photo, rights unknown) | Unknown |

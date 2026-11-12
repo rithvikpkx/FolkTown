@@ -1,0 +1,152 @@
+{
+ "buildings": {
+  "bell_tower": {
+   "faces": {
+    "N": [],
+    "E": [],
+    "S": [],
+    "W": []
+   },
+   "note": "Tower is a square shaft with identical faces (clocks on all four sides); compass of the photographed face is unknown (sun-lit left face, golden hour), so every face may use the same two tiles.",
+   "all_faces": [
+    {
+     "texture": "bell-shaft.jpg",
+     "part": "brick shaft bay between two limestone ledges (lower shaft; ledge spacing about 5.9 m)",
+     "size_m": [
+      5.18,
+      6.27
+     ],
+     "uvRepeat": null,
+     "source": "https://commons.wikimedia.org/wiki/File:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+     "sourceId": "commons:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+     "captured": "2016 (Commons; exact date in file page)",
+     "licence": "CC BY 4.0",
+     "attribution": "Julian Herzog, CC BY 4.0, via Wikimedia Commons",
+     "confidence": 0.7,
+     "notes": "Rectified by cropping the lit face (telephoto, vertical edges parallel) and stretching x by 1/cos33. Scale from brick course pitch (12px = 76 mm), +-15%. Vertical dark seam is a real expansion joint. Face is lit, opposite face in shadow."
+    },
+    {
+     "texture": "bell-clock-stage.jpg",
+     "part": "limestone clock stage incl. clock face, cornice, louvre hood",
+     "size_m": [
+      4.8,
+      5.0
+     ],
+     "uvRepeat": null,
+     "source": "https://commons.wikimedia.org/wiki/File:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+     "sourceId": "commons:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+     "captured": "2016 (Commons; exact date in file page)",
+     "licence": "CC BY 4.0",
+     "attribution": "Julian Herzog, CC BY 4.0, via Wikimedia Commons",
+     "confidence": 0.6,
+     "notes": "Same method. Baked sun shading and the 3D louvre hood at the bottom are projected flat; clock hands show ~8:15, baked in. Bell chamber arches above are not included."
+    }
+   ]
+  },
+  "walc": {
+   "faces": {
+    "N": [],
+    "E": [],
+    "S": [],
+    "W": []
+   },
+   "unassigned_to_compass": [
+    {
+     "texture": "walc-wall-paired-windows.jpg",
+     "part": "wall with paired double-hung windows, upper two storeys, between stringcourse and cornice",
+     "size_m": [
+      19.7,
+      10.2
+     ],
+     "uvRepeat": null,
+     "source": "https://www.purdue.edu/uns/images/2018/plant-wilmeth-now2LO.jpg",
+     "sourceId": "reference/purdue-photos/walc-news-plant-wilmeth-now2LO.jpg (page https://www.purdue.edu/newsroom/archive/purduetoday/releases/2018/Q4/then-and-now-wilmeth.html)",
+     "captured": "2018 (Purdue news, then-and-now)",
+     "licence": "needs-clearance (Purdue University photo, rights unknown)",
+     "attribution": "Purdue University / Purdue Today",
+     "confidence": 0.3,
+     "notes": "Source photo is only 800x887 (about 13 px/m at the near edge), so the tile is upsampled ~2.5x and soft. Metric aspect 1.93 from vanishing-point camera model (f=674px, corner bisected at 45 deg), absolute height ASSUMED 10.2 m. Compass face NOT known (photo is of one WALC corner; its two faces are these two). Use as generic WALC brick/window look, not as an exact face."
+    },
+    {
+     "texture": "walc-wall-tall-slits.jpg",
+     "part": "wall with tall slit window bays (3 bays recessed) and dark brick, upper two storeys",
+     "size_m": [
+      52.8,
+      10.2
+     ],
+     "uvRepeat": null,
+     "source": "https://www.purdue.edu/uns/images/2018/plant-wilmeth-now2LO.jpg",
+     "sourceId": "reference/purdue-photos/walc-news-plant-wilmeth-now2LO.jpg (page https://www.purdue.edu/newsroom/archive/purduetoday/releases/2018/Q4/then-and-now-wilmeth.html)",
+     "captured": "2018 (Purdue news, then-and-now)",
+     "licence": "needs-clearance (Purdue University photo, rights unknown)",
+     "attribution": "Purdue University / Purdue Today",
+     "confidence": 0.3,
+     "notes": "Source photo is only 800x887 (about 13 px/m at the near edge), so the tile is upsampled ~2.5x and soft. Metric aspect 5.18 from vanishing-point camera model (f=674px, corner bisected at 45 deg), absolute height ASSUMED 10.2 m. Compass face NOT known (photo is of one WALC corner; its two faces are these two). Use as generic WALC brick/window look, not as an exact face."
+    }
+   ],
+   "note": "No photo of WALC with a known compass face was found (Mapillary has none within 40 m, Commons has no WALC file). Faces N/E/S/W are empty; the two unassigned tiles are one corner of the real building, orientation unknown."
+  }
+ },
+ "materials": {
+  "brick_red": {
+   "texture": "mat-brick-red.jpg",
+   "size_px": 512,
+   "tile_m": 1.58,
+   "source": "https://commons.wikimedia.org/wiki/File:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+   "sourceId": "commons:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+   "captured": "2016 (Commons; exact date in file page)",
+   "licence": "CC BY 4.0",
+   "attribution": "Julian Herzog, CC BY 4.0, via Wikimedia Commons",
+   "confidence": 0.7,
+   "notes": "Real Purdue Bell Tower red-brown brick (rectified lit face, between the expansion joints), edge cross-faded with a half-shifted copy to tile (slight ghosting in the middle bands). Contains faint real vertical joint lines about every 0.6 m and a darker left edge, so it reads as striped when tiled."
+  },
+  "limestone_cream": {
+   "texture": "mat-limestone-cream.jpg",
+   "size_px": 128,
+   "tile_m": 0.89,
+   "source": "https://commons.wikimedia.org/wiki/File:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+   "sourceId": "commons:Purdue_Bell_Tower_Purdue_University_2016_01.jpg",
+   "captured": "2016 (Commons; exact date in file page)",
+   "licence": "CC BY 4.0",
+   "attribution": "Julian Herzog, CC BY 4.0, via Wikimedia Commons",
+   "confidence": 0.4,
+   "notes": "Plain cream limestone panel beside the clock; small and low-contrast, edge cross-faded."
+  },
+  "brick_dark": {
+   "texture": "mat-brick-dark.jpg",
+   "size_px": 512,
+   "tile_m": 0.99,
+   "source": "https://www.mapillary.com/app/?pKey=750908235597635",
+   "sourceId": "mapillary:750908235597635",
+   "captured": "2020-10-31",
+   "licence": "CC BY-SA 4.0 (Mapillary)",
+   "attribution": "Image by kennystier, CC BY-SA 4.0, via Mapillary. Share-alike: needs-clearance",
+   "confidence": 0.5,
+   "notes": "Dark purple-brown brick of Elliott Hall of Music (a different building; Purdue standard dark brick). tile_m set below from course pitch. Scale from ~23px per brick course (76 mm) read by eye; oblique view so +-30%."
+  },
+  "limestone_ashlar": {
+   "texture": "mat-limestone-ashlar.jpg",
+   "size_px": 256,
+   "tile_m": 1.7,
+   "source": "https://www.mapillary.com/app/?pKey=750908235597635",
+   "sourceId": "mapillary:750908235597635",
+   "captured": "2020-10-31",
+   "licence": "CC BY-SA 4.0 (Mapillary)",
+   "attribution": "Image by kennystier, CC BY-SA 4.0, via Mapillary. Share-alike: needs-clearance",
+   "confidence": 0.4,
+   "notes": "Grey-buff ashlar limestone base of Elliott Hall (different building; oblique view, sunlit part). tile_m is a guess (course height ~0.4 m)."
+  },
+  "glass_window": {
+   "texture": "mat-glass-window.jpg",
+   "size_px": 128,
+   "tile_m": 0.0,
+   "source": "https://www.purdue.edu/uns/images/2018/plant-wilmeth-now2LO.jpg",
+   "sourceId": "reference/purdue-photos/walc-news-plant-wilmeth-now2LO.jpg (page https://www.purdue.edu/newsroom/archive/purduetoday/releases/2018/Q4/then-and-now-wilmeth.html)",
+   "captured": "2018 (Purdue news, then-and-now)",
+   "licence": "needs-clearance (Purdue University photo, rights unknown)",
+   "attribution": "Purdue University / Purdue Today",
+   "confidence": 0.25,
+   "notes": "WALC cream-framed glazing, about 40x90 px in the source: upsampled and soft, reflections baked in. Prefer a procedural glass material; kept only as a colour reference."
+  }
+ }
+}

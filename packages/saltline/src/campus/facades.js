@@ -241,6 +241,6 @@ export function buildFacades(G, data, root, opts = {}) {
   const update = (p, far = FAR) => {
     for (const c of lod) { const nearIt = Math.hypot(p.x - c.cx, p.z - c.cz) - c.r < far; c.near.visible = nearIt; c.far.visible = !nearIt; }
   };
-  if (G.camera) (G.campusTick = G.campusTick || []).push(() => update(G.camera.position));
+  if (G.camera) (G.campusTick = G.campusTick || []).push(() => update(G.camera.position, opts.far));
   return { chunks: chunks.size, tris: Math.round(tris), trisFar: Math.round(trisFar), maxBuilding: Math.round(maxB), update };
 }

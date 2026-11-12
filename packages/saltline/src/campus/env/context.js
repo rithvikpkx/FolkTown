@@ -13,7 +13,7 @@ const RED = [0x8a3a30, 0xa8532f];
 const hash = (a, b) => { const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return s - Math.floor(s); };
 const inPoly = (x, z, p) => { let c = false; for (let i = 0, j = p.length - 2; i < p.length; j = i, i += 2) if ((p[i + 1] > z) !== (p[j + 1] > z) && x < ((p[j] - p[i]) * (z - p[i + 1])) / (p[j + 1] - p[i + 1]) + p[i]) c = !c; return c; };
 
-function hip(f, rise, color) { // eave overhang -> ridge ring, one bucket
+export function hip(f, rise, color) { // eave overhang -> ridge ring, one bucket
   const R = ring(f.poly), mat = new MeshStandardMaterial({ color, roughness: 0.85, side: DoubleSide }), B = new Bucket(mat, false);
   const w = Math.min(f.maxX - f.minX, f.maxZ - f.minZ), ins = Math.min(rise * 1.5, w * 0.35);
   const A = offset(R, 0.8), C = offset(R, -ins), e = f.top, r = f.top + rise;
@@ -22,24 +22,28 @@ function hip(f, rise, color) { // eave overhang -> ridge ring, one bucket
   return B;
 }
 
-export function buildContext(G, zone, root, { box, keep, ortho }) {
+export function buildContext(G, zone, root, opts) {
+  const { box, keep, ortho } = opts;
   const g = new Group(); g.name = 'walk_context';
   const near = loadCampus({ ...zone, colliders: zone.colliders.filter((c) => !keep.includes(c.id)), landmarks: {} }).footprints;
   const rf = Object.fromEntries(roofs.buildings.map((b) => [b.id, b]));
-  const halls = [];
-  for (const f of near) {
-    if (!HALLS.includes(f.id)) continue;
-    const r = rf[f.id], rise = r && r.ridgeH > r.eaveH ? r.ridgeH - r.eaveH : f.top * 0.18;
-    f.top = r ? r.eaveH : f.top - rise; // walls end at the eave, the hip carries the rest
-    halls.push([f, rise]);
-  }
-  const prevTicks = (G.campusTick || []).length;
-  const fac = buildFacades(G, { footprints: near }, g, {});
-  if (G.campusTick) G.campusTick.length = prevTicks; // replace the default 150 m LOD tick with a shorter one
-  if (G.camera) G.campusTick.push(() => fac.update(G.camera.position, 70));
-  let tris = fac.trisFar;
-  for (const [f, rise] of halls) {
-    const B = hip(f, rise, RED[Math.floor(hash(f.minX, f.minZ) * 2)]), m = B.mesh(); m.castShadow = true; g.add(m); tris += B.p.length / 9;
+  let tris = 0;
+  if (opts.facades !== false) { // region.js builds its own massing; the walk prototype box still uses this one
+    const halls = [];
+    for (const f of near) {
+      if (!HALLS.includes(f.id)) continue;
+      const r = rf[f.id], rise = r && r.ridgeH > r.eaveH ? r.ridgeH - r.eaveH : f.top * 0.18;
+      f.top = r ? r.eaveH : f.top - rise; // walls end at the eave, the hip carries the rest
+      halls.push([f, rise]);
+    }
+    const prevTicks = (G.campusTick || []).length;
+    const fac = buildFacades(G, { footprints: near }, g, {});
+    if (G.campusTick) G.campusTick.length = prevTicks; // replace the default 150 m LOD tick with a shorter one
+    if (G.camera) G.campusTick.push(() => fac.update(G.camera.position, 70));
+    tris = fac.trisFar;
+    for (const [f, rise] of halls) {
+      const B = hip(f, rise, RED[Math.floor(hash(f.minX, f.minZ) * 2)]), m = B.mesh(); m.castShadow = true; g.add(m); tris += B.p.length / 9;
+    }
   }
 
   // ground beyond the box: georeferenced ortho under everything, then a plain grass-brown plane to the horizon
@@ -61,7 +65,7 @@ export function buildContext(G, zone, root, { box, keep, ortho }) {
   const blocked = (x, z) => near.some((f) => x > f.minX - 4 && x < f.maxX + 4 && z > f.minZ - 4 && z < f.maxZ + 4 && (inPoly(x, z, f.poly) || [[4, 0], [-4, 0], [0, 4], [0, -4]].some(([a, b]) => inPoly(x + a, z + b, f.poly))));
   const out = (x, z) => x < box.minX || x > box.maxX || z < box.minZ || z > box.maxZ;
   const props = zone.props.filter((t) => out(t.x, t.z) && !blocked(t.x, t.z));
-  const cx = 40, cz = -80;
+  const [cx, cz] = opts.centre || [40, -80];
   for (let i = 0; i < 1500; i++) {
     const a = hash(i, 1) * 6.2832, rr = 40 + Math.pow(hash(i, 2), 0.7) * 420, x = cx + Math.cos(a) * rr * 1.5, z = cz + Math.sin(a) * rr;
     if (out(x, z) && !blocked(x, z) && hash(i, 3) < (Math.abs(x - 40) > 215 || z < box.minZ - 20 || z > box.maxZ + 20 ? 0.45 : 1)) props.push({ x, z });

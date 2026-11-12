@@ -1,4 +1,4 @@
-// ?walk=1 prototype: Bell Tower (origin) + WALC (~70,-2) + the land between, walk-only, to judge visual fidelity.
+// ?walk=1: the 'mall-union' campus region (Bell Tower origin; region.js massing + hotspot modules), walk-only, to judge visual fidelity.
 // Hooks: boot.js (quality/input/level/player/game swaps when params.walk) and campus/index.js (G.walk options).
 // Reuses buildCampus (ground, grass, trees, facades, Bell Tower, sun-follow); everything else (weapons, bots, HUD, menus) is stubbed in boot.
 // Pilot data: ortho.jpg is blended into the ground beyond ~7 m (ground.js opts.ortho); LiDAR roof shapes/plant boxes of WALC from data/pilot/roofs.json.
@@ -15,40 +15,24 @@ import { applyEarly, installSky } from './env/sky.js';
 import { S as SEASON } from './env/season.js';
 import { buildPlaza, inPlaza, plazaFloor, plazaTrees } from './env/plaza.js';
 import { loadBellTowerScan, SCAN_CREDIT } from './env/belltower-scan.js';
+import { fetchRegion, loadHotspots, massingOpts, addHips, regionSolids } from './region.js';
 
 const TOWER = (typeof location !== 'undefined' && /[?&]tower=(scan|code)/.exec(location.search)?.[1]) || 'code'; // ?tower=scan|code; code wins the comparison (docs/assets.md)
 
 // sun/fog constants are cloned by render init, so they must change at import time, and only in walk mode
 if (typeof location !== 'undefined' && (import.meta.env.VITE_WALK ? !/[?&]walk=0/.test(location.search) : /[?&]walk=(?!0)/.test(location.search))) applyEarly();
 
-export const BOX = { minX: -50, maxX: 160, minZ: -70, maxZ: 50 }; // inside the ortho (x -50..190, z -200..50)
+export const BOX = { minX: -50, maxX: 160, minZ: -70, maxZ: 50 }; // the detailed WALC/plaza box (furniture), inside the ortho (x -50..190, z -200..50)
+export const REGION = { minX: -200, maxX: 320, minZ: -350, maxZ: 365 }; // walkable 'mall-union' zone (ZONE_BBOX in map-tools)
+const EDGE = 14; // soft boundary: walking slows to a crawl over the last EDGE metres
 const KEEP = ['way/301837711', 'way/508846031']; // Bell Tower, WALC: every other building is clipped
 const BASE = import.meta.env.BASE_URL + 'campus/';
 const EYE = 1.7, R = 0.4;
 
 export const walkQuality = (q) => ({ ...q, shadow: 6144, tex: 2048, ao: true, bloom: true, msaa: 4, scale: 1 });
 
-// Liang-Barsky: clip a polyline to the box, returns sub-polylines
-function clipPath(pts) {
-  const out = []; let cur = [];
-  const { minX, maxX, minZ, maxZ } = BOX;
-  for (let i = 0; i + 1 < pts.length; i++) {
-    const [x0, z0] = pts[i], [x1, z1] = pts[i + 1], dx = x1 - x0, dz = z1 - z0;
-    let t0 = 0, t1 = 1, ok = true;
-    for (const [p, q] of [[-dx, x0 - minX], [dx, maxX - x0], [-dz, z0 - minZ], [dz, maxZ - z0]]) {
-      if (p === 0) { if (q < 0) ok = false; } else { const r = q / p; if (p < 0) t0 = Math.max(t0, r); else t1 = Math.min(t1, r); }
-    }
-    if (!ok || t0 > t1) { if (cur.length > 1) out.push(cur); cur = []; continue; }
-    const a = [x0 + t0 * dx, z0 + t0 * dz], b = [x0 + t1 * dx, z0 + t1 * dz];
-    if (!cur.length || t0 > 0) { if (cur.length > 1) out.push(cur); cur = [a]; }
-    cur.push(b);
-    if (t1 < 1) { out.push(cur); cur = []; }
-  }
-  if (cur.length > 1) out.push(cur);
-  return out;
-}
-
 const inBox = (x, z) => x > BOX.minX && x < BOX.maxX && z > BOX.minZ && z < BOX.maxZ;
+const inRegion = (x, z) => x > REGION.minX && x < REGION.maxX && z > REGION.minZ && z < REGION.maxZ;
 
 function loadOrtho() {
   return fetch(BASE + 'pilot/ortho.json').then((r) => r.json()).then((j) => {
@@ -60,7 +44,7 @@ function loadOrtho() {
 }
 
 // lamps and benches along the footways, a few metres off the path
-function furniture(G, paths) {
+function furniture(G, boxPaths) {
   const g = new Group(), dark = G.mats.get('steel_dark'), wood = G.mats.get('wood') || dark;
   const pole = new CylinderGeometry(0.06, 0.09, 4.2, 8).translate(0, 2.1, 0);
   const head = new BoxGeometry(0.36, 0.5, 0.36).translate(0, 4.3, 0);
@@ -95,23 +79,25 @@ function furniture(G, paths) {
 }
 
 export async function buildWalk(G) {
-  const zone = await fetchZone('purdue-mall');
-  const paths = (await (await fetch(BASE + 'mall-paths.json')).json()).paths
-    .flatMap((p) => clipPath(p.points).map((points) => ({ ...p, points })));
+  const zone = await fetchRegion();
+  const hot = await loadHotspots(G, zone, KEEP);
+  const paths = zone.paths, boxPaths = paths.filter((p) => p.points.some(([x, z]) => inBox(x, z)));
   const walc = roofs.buildings.find((b) => b.id === 'way/508846031');
-  const colliders = zone.colliders.filter((c) => KEEP.includes(c.id) && !(TOWER === 'scan' && c.id === KEEP[0])).map((c) => (c.id === KEEP[1] ? { ...c, topY: walc.eaveH } : c));
+  const skip = [KEEP[1], ...hot.replaced]; // massing skips WALC (walc.js) and every footprint a hotspot module replaced
+  const colliders = zone.colliders.filter((c) => !(TOWER === 'scan' && c.id === KEEP[0])).map((c) => (c.id === KEEP[1] ? { ...c, topY: walc.eaveH } : c));
   const z = {
-    ...zone, bounds: BOX, colliders, paths,
-    props: zone.props.filter((t) => inBox(t.x, t.z) && !inPlaza(t.x, t.z, 1)).concat(plazaTrees()),
-    landmarks: TOWER === 'code' ? { bellTower: zone.landmarks.bellTower } : {}, // no fountain; scan mode draws its own tower below
-    spawns: [{ x: 8, z: 0, yaw: -Math.PI / 2, team: 0 }],
+    ...zone, bounds: REGION, colliders, paths,
+    props: zone.props.filter((t) => !inPlaza(t.x, t.z, 1)).concat(plazaTrees()),
+    landmarks: TOWER === 'code' ? { bellTower: zone.landmarks.bellTower, fountain: zone.landmarks.fountain } : {}, // scan mode draws its own tower below
   };
   vegMode.walk = true;
   const ortho = await loadOrtho();
   G.bellShaftTexture = await new Promise((r) => new TextureLoader().load(BASE + 'walk/tex/bell-shaft.jpg', (t) => { t.colorSpace = SRGBColorSpace; t.anisotropy = 8; r(t); }, undefined, () => r(null)));
-  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: { skip: [KEEP[1]] } };
+  G.walk = { ground: { dir: 'walk/', aniso: 16, ortho, paveName: 'concrete', paveTile: 2.4, decals: true, leaf: SEASON.leaf, dry: Math.min(1, SEASON.dry * 1.4) }, grass: { step: 0.17, far: 14, dry: SEASON.dry }, facades: massingOpts(zone, skip) };
   const level = await buildCampus(G, z);
   level.root.add(await buildWalc(G, colliders.find((c) => c.id === KEEP[1]).poly)); // code-generated WALC (walc.js); facades.js skips it
+  hot.groups.forEach((g) => level.root.add(g));
+  const hipTris = addHips(zone, level.root, skip);
   let scanHalf = BELLTOWER_HALF;
   if (TOWER === 'scan') {
     const bt = zone.landmarks.bellTower, t = await loadBellTowerScan(G, [bt.x, 0, bt.z], { rotY: Number(/[?&]trot=(-?[\d.]+)/.exec(location.search)?.[1] || 0), model: /[?&]tex=model/.test(location.search) });
@@ -122,16 +108,16 @@ export async function buildWalk(G) {
   G.walkCrossings = getDecals(z).crossings;
   G.plazaExclude = (x, z) => inPlaza(x, z, 1.5); G.walkFloor = plazaFloor;
   try {
-    const fur = buildFurniture(G, z, paths, z.props);
+    const fur = buildFurniture(G, z, boxPaths, z.props);
     level.root.add(fur, buildUnderstory(G, z, fur.planters));
     console.log('[walk] furniture', JSON.stringify(fur.counts));
-  } catch (e) { console.error('[walk] furniture failed', e); level.root.add(furniture(G, paths)); }
+  } catch (e) { console.error('[walk] furniture failed', e); level.root.add(furniture(G, boxPaths)); }
   const plaza = buildPlaza(G, z); level.root.add(plaza);
   // collision shapes: building polygons, tower plinth, tree trunks
   let ctx = { solids: [] };
-  if (!/[?&]ctx=0/.test(location.search)) try { ctx = buildContext(G, zone, level.root, { box: BOX, keep: KEEP, ortho }); console.log('[walk] context', JSON.stringify({ ...ctx, solids: ctx.solids.length })); } catch (e) { console.error('[walk] context failed', e); }
+  if (!/[?&]ctx=0/.test(location.search)) try { ctx = buildContext(G, zone, level.root, { box: REGION, keep: KEEP, ortho, facades: false, centre: [60, 7] }); console.log('[walk] context', JSON.stringify({ ...ctx, solids: ctx.solids.length }), 'massing', JSON.stringify({ ...level.stats, update: undefined, hipTris, hotspots: hot.names, failed: hot.failed })); } catch (e) { console.error('[walk] context failed', e); }
   G.walkSolids = [
-    ...ctx.solids,
+    ...regionSolids(zone, [...skip, KEEP[0]], hot),
     ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),
     [[-scanHalf, -scanHalf], [scanHalf, -scanHalf], [scanHalf, scanHalf], [-scanHalf, scanHalf]],
     ...plaza.solids,
@@ -190,7 +176,9 @@ export function walkPlayer(G) {
       p.sprinting = keys.has('ShiftLeft') || keys.has('ShiftRight');
       const sp = (p.sprinting ? 7.2 : 3.9) / Math.hypot(f || 0, r || 0, 1e-9) * (f || r ? 1 : 0);
       const s = Math.sin(p.yaw), c = Math.cos(p.yaw);
-      p.pos.x += (-s * f + c * r) * sp * dt; p.pos.z += (-c * f - s * r) * sp * dt;
+      // soft edge: the last EDGE metres slow walking to 15% so the world end is felt, not hit
+      const e = Math.min(p.pos.x - REGION.minX, REGION.maxX - p.pos.x, p.pos.z - REGION.minZ, REGION.maxZ - p.pos.z), soft = e >= EDGE ? 1 : 0.15 + 0.85 * Math.max(0, e) / EDGE;
+      p.pos.x += (-s * f + c * r) * sp * soft * dt; p.pos.z += (-c * f - s * r) * sp * soft * dt;
       p.speed = f || r ? sp / 1 : 0;
       if (p.onGround && keys.has('Space')) { p.vel.y = 5; p.onGround = false; }
       p.vel.y -= 14 * dt; p.pos.y += p.vel.y * dt;
@@ -203,8 +191,8 @@ export function walkPlayer(G) {
           if (d < m) { p.pos.x = t.x + (dx / (d || 1)) * m; p.pos.z = t.z + (dz / (d || 1)) * m; }
         }
       }
-      p.pos.x = Math.max(BOX.minX + 0.5, Math.min(BOX.maxX - 0.5, p.pos.x));
-      p.pos.z = Math.max(BOX.minZ + 0.5, Math.min(BOX.maxZ - 0.5, p.pos.z));
+      p.pos.x = Math.max(REGION.minX + 0.5, Math.min(REGION.maxX - 0.5, p.pos.x));
+      p.pos.z = Math.max(REGION.minZ + 0.5, Math.min(REGION.maxZ - 0.5, p.pos.z));
       p.eye.set(p.pos.x, p.pos.y + EYE, p.pos.z);
       cam.position.copy(p.eye); cam.rotation.set(p.pitch, p.yaw, 0);
       p.forward.set(-s, 0, -c);

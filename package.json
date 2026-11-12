@@ -18,6 +18,7 @@
     "map:heights": "pnpm --filter @folktown/map-tools run heights",
     "map:pilot-ortho": "uv run --with pillow --with pyproj python packages/map-tools/src/pilot-ortho.py",
     "map:pilot-roofs": "uv run --with rasterio --with numpy --with 'laspy[lazrs]' --with pyproj --with scipy --with shapely python packages/map-tools/src/pilot-roofs.py",
+    "map:bake-region": "uv run --with pillow python packages/map-tools/src/bake-region.py",
     "map:tiles": "pnpm --filter @folktown/map-tools run tiles",
     "map:tiles:convert": "pnpm --filter @folktown/map-tools run tiles-convert",
     "map:streetview": "pnpm --filter @folktown/map-tools run streetview"

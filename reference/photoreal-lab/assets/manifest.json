@@ -1,0 +1,66 @@
+{
+ "m4a1": {
+  "glb": "m4a1.glb",
+  "tris": 9256,
+  "texSize": 2048,
+  "mats": {
+   "DefaultMaterial": {
+    "map": "m4a1_0.webp",
+    "normal": "m4a1_1.webp",
+    "orm": "m4a1_2.webp",
+    "ao": false
+   }
+  }
+ },
+ "shotgun": {
+  "glb": "shotgun.glb",
+  "tris": 1740,
+  "texSize": 2048,
+  "mats": {
+   "Mat": {
+    "map": "shotgun_0.webp",
+    "normal": "shotgun_1.webp",
+    "orm": "shotgun_2.webp",
+    "ao": false
+   }
+  }
+ },
+ "pistol": {
+  "glb": "pistol.glb",
+  "tris": 16650,
+  "texSize": 2048,
+  "mats": {
+   "service_pistol": {
+    "map": "pistol_1.webp",
+    "normal": "pistol_0.webp",
+    "orm": "pistol_2.webp",
+    "ao": false
+   }
+  }
+ },
+ "boltrifle": {
+  "glb": "boltrifle.glb",
+  "tris": 19985,
+  "texSize": 2048,
+  "mats": {
+   "bolt_action_rifle_7_62_accesories": {
+    "map": "boltrifle_1.webp",
+    "normal": "boltrifle_0.webp",
+    "orm": "boltrifle_2.webp",
+    "ao": false
+   },
+   "bolt_action_rifle_7_62_accesories_glass": {
+    "map": "boltrifle_1.webp",
+    "normal": "boltrifle_0.webp",
+    "orm": "boltrifle_2.webp",
+    "ao": false
+   },
+   "bolt_action_rifle_7_62": {
+    "map": "boltrifle_4.webp",
+    "normal": "boltrifle_3.webp",
+    "orm": "boltrifle_5.webp",
+    "ao": false
+   }
+  }
+ }
+}

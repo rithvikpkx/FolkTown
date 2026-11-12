@@ -30,6 +30,25 @@ export interface BotParams {
   recoilControl: number;
   /** Aims down sights beyond this distance (Infinity = never). */
   adsRange: number;
+  /** Metres at which a shot from an unseen enemy is heard and investigated. */
+  hear: number;
+  /** Most bots that may fire at the same target at once (Saltline's attack tokens). */
+  maxShooters: number;
+  /** Per second, how fast aim settles while a target stays in view (0..1 exposure). */
+  exposureUp: number;
+}
+
+/** Aim error is this much larger at first sight, settling to 1x as exposure reaches 1. */
+const FRESH_AIM_PENALTY = 1.5;
+/** Exposure falls this fast per second once the target is lost. */
+const EXPOSURE_DOWN = 0.45;
+/** Extra aim error per m/s of target speed (strafing is rewarded). */
+const TARGET_SPEED_PENALTY = 0.08;
+
+/** Multiplier on a bot's aim error from how long it has watched the target and how fast the target moves. */
+export function aimErrorScale(exposure: number, targetSpeed: number): number {
+  const e = clamp(exposure, 0, 1);
+  return (1 + FRESH_AIM_PENALTY * (1 - e)) * (1 + TARGET_SPEED_PENALTY * Math.max(0, targetSpeed));
 }
 
 export const BOT_PARAMS: Record<Difficulty, BotParams> = {
@@ -42,6 +61,9 @@ export const BOT_PARAMS: Record<Difficulty, BotParams> = {
     sight: 35,
     recoilControl: 0.2,
     adsRange: Number.POSITIVE_INFINITY,
+    hear: 30,
+    maxShooters: 1,
+    exposureUp: 0.25,
   },
   normal: {
     reaction: 0.35,
@@ -52,6 +74,9 @@ export const BOT_PARAMS: Record<Difficulty, BotParams> = {
     sight: 55,
     recoilControl: 0.6,
     adsRange: 18,
+    hear: 50,
+    maxShooters: 2,
+    exposureUp: 0.35,
   },
   hard: {
     reaction: 0.15,
@@ -62,6 +87,9 @@ export const BOT_PARAMS: Record<Difficulty, BotParams> = {
     sight: 80,
     recoilControl: 0.95,
     adsRange: 10,
+    hear: 70,
+    maxShooters: 3,
+    exposureUp: 0.5,
   },
 };
 
@@ -113,6 +141,11 @@ export class BotBrain {
   private visible = false;
   private reactionLeft = 0;
   private noSightTime = 99;
+  /** 0..1, how long the current target has been in view; scales aim error. */
+  private exposure = 0;
+  private lastHeard = -99;
+  /** Set by the controller: every brain in the match, to count bots already firing at a target. */
+  peers: ReadonlyMap<number, BotBrain> | null = null;
 
   private aimOffYaw = 0;
   private aimOffPitch = 0;
@@ -189,6 +222,9 @@ export class BotBrain {
       } else this.visible = false;
     }
     const target = this.visible ? this.target(players) : undefined;
+    this.exposure = target
+      ? Math.min(1, this.exposure + p.exposureUp * dt)
+      : Math.max(0, this.exposure - EXPOSURE_DOWN * dt);
 
     // ---- state transitions ----
     const threatened = time - this.lastSeenTime < 3;
@@ -290,8 +326,12 @@ export class BotBrain {
       if (time >= this.aimOffUntil) {
         this.aimOffUntil = time + 0.25;
         const g = () => this.rng.next() + this.rng.next() + this.rng.next() - 1.5;
-        this.aimOffYaw = g() * p.aimError * 2;
-        this.aimOffPitch = g() * p.aimError * 2;
+        const scale = aimErrorScale(
+          this.exposure,
+          Math.hypot(aimTarget.vel.x, aimTarget.vel.z),
+        );
+        this.aimOffYaw = g() * p.aimError * 2 * scale;
+        this.aimOffPitch = g() * p.aimError * 2 * scale;
       }
       const eyeY = self.pos.y + (self.crouching ? EYE_HEIGHT_CROUCH : EYE_HEIGHT);
       const ty = aimTarget.pos.y + (aimTarget.crouching ? 0.75 : 1.25);
@@ -334,8 +374,11 @@ export class BotBrain {
             this.pauseLeft = p.pause[0] + this.rng.next() * (p.pause[1] - p.pause[0]);
         } else {
           this.pauseLeft -= dt;
-          if (this.pauseLeft <= 0)
-            this.burstLeft = p.burst[0] + this.rng.next() * (p.burst[1] - p.burst[0]);
+          if (this.pauseLeft <= 0) {
+            // Too many bots already shooting at this target: wait a moment, then ask again.
+            if (this.shootersOn(aimTarget.id) >= p.maxShooters) this.pauseLeft = 0.3;
+            else this.burstLeft = p.burst[0] + this.rng.next() * (p.burst[1] - p.burst[0]);
+          }
         }
       }
       if (self.ammo[w] <= 0 && self.reloadLeft <= 0) {
@@ -407,6 +450,30 @@ export class BotBrain {
     this.stuckPos = { x: self.pos.x, z: self.pos.z };
     this.stuckCount = 0;
     this.unstickUntil = 0;
+  }
+
+  /** Other bots currently in a burst at `targetId`. */
+  private shootersOn(targetId: number): number {
+    let n = 0;
+    if (this.peers)
+      for (const b of this.peers.values())
+        if (b !== this && b.wasAlive && b.burstLeft > 0 && b.visible && b.targetId === targetId)
+          n++;
+    return n;
+  }
+
+  /**
+   * A shot was fired by `shooter`. If it is an enemy within hearing range that this bot cannot see,
+   * remember where it came from, so the bot goes to look (Saltline: gunfire alerts everyone in 45 m).
+   */
+  hear(self: PlayerState, shooter: PlayerState, time: number): void {
+    if (!self.alive || this.visible || !this.isEnemy(self, shooter)) return;
+    if (time - this.lastHeard < 0.3) return;
+    if (Math.hypot(shooter.pos.x - self.pos.x, shooter.pos.z - self.pos.z) > this.params.hear)
+      return;
+    this.lastHeard = time;
+    this.lastSeen = { x: shooter.pos.x, z: shooter.pos.z };
+    this.lastSeenTime = time;
   }
 
   private target(players: readonly PlayerState[]): PlayerState | undefined {
@@ -650,6 +717,7 @@ export class BotBrain {
 export class BotController {
   private readonly brains = new Map<number, BotBrain>();
   private tick = 0;
+  private readonly lastAmmo = new Map<number, { weapon: WeaponId; n: number }>();
 
   constructor(
     private readonly match: Match,
@@ -665,6 +733,7 @@ export class BotController {
       this.match.config.mode,
       this.seed,
     );
+    b.peers = this.brains;
     this.brains.set(id, b);
     return b;
   }
@@ -675,6 +744,17 @@ export class BotController {
     const out = new Map<number, PlayerInput>();
     const players = this.match.playerList;
     const time = this.tick * TICK_DT;
+    // A drop in the current weapon's ammo is a shot; every bot in earshot hears it.
+    for (const q of players) {
+      const prev = this.lastAmmo.get(q.id);
+      const n = q.ammo[q.weapon];
+      this.lastAmmo.set(q.id, { weapon: q.weapon, n });
+      if (!q.alive || !prev || prev.weapon !== q.weapon || n >= prev.n) continue;
+      for (const b of this.brains.values()) {
+        const self = players.find((x) => x.id === b.id);
+        if (self && self !== q) b.hear(self, q, time);
+      }
+    }
     for (const p of players) {
       const brain = this.brains.get(p.id);
       if (brain) out.set(p.id, brain.think(p, players, this.tick, time));

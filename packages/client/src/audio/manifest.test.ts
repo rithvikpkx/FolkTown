@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pitchRate, VoiceLimiter, validateManifest } from './manifest';
+import { pickSource, pitchRate, VoiceLimiter, validateManifest } from './manifest';
 
 describe('validateManifest', () => {
   it('applies defaults and clamps', () => {
@@ -16,6 +16,29 @@ describe('validateManifest', () => {
     expect(Object.keys(manifest.sounds)).toEqual([]);
     expect(errors).toHaveLength(2);
     expect(validateManifest(null).manifest.sounds).toEqual({});
+  });
+});
+
+describe('synth backend', () => {
+  it('accepts synth-only sounds and reads the backend switch', () => {
+    const { manifest, errors } = validateManifest({
+      backend: 'synth',
+      sounds: { a: { synth: 'rifle-shot' }, b: { files: ['b.ogg'], synth: 'step' } },
+    });
+    expect(errors).toEqual([]);
+    expect(manifest.backend).toBe('synth');
+    expect(manifest.sounds.a).toMatchObject({ files: [], synth: 'rifle-shot' });
+    expect(validateManifest({ backend: 'nonsense' }).manifest.backend).toBe('files');
+    expect(validateManifest({}).manifest.backend).toBe('files');
+  });
+  it('picks the source: files by default, synth when asked or when the file is missing', () => {
+    const both = { files: ['a.ogg'], synth: 'x' };
+    expect(pickSource('files', both, true, true)).toBe('file');
+    expect(pickSource('synth', both, true, true)).toBe('synth');
+    expect(pickSource('files', both, true, false)).toBe('synth'); // fallback
+    expect(pickSource('synth', both, false, true)).toBe('file'); // unknown recipe
+    expect(pickSource('files', { files: ['a.ogg'] }, true, false)).toBe('none');
+    expect(pickSource('synth', { files: ['a.ogg'] }, true, true)).toBe('file');
   });
 });
 

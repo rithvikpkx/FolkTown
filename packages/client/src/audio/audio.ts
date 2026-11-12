@@ -1,5 +1,12 @@
 import type { GameEvent, PlayerState, Vec3, WeaponId } from '@folktown/shared';
-import { type AudioManifest, pitchRate, VoiceLimiter, validateManifest } from './manifest';
+import {
+  type AudioManifest,
+  pickSource,
+  pitchRate,
+  VoiceLimiter,
+  validateManifest,
+} from './manifest';
+import { RECIPES, renderSynth } from './synth';
 
 const KEY = 'folktown.audio';
 const STEP_STRIDE = 2.1; // metres of walking per footstep
@@ -12,6 +19,8 @@ interface Counters {
   plays: Record<string, number>;
   muted: boolean;
   volume: number;
+  /** Synthesised buffers rendered so far. */
+  synth?: number;
 }
 
 /**
@@ -31,8 +40,10 @@ export class AudioSystem {
   };
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
-  private manifest: AudioManifest = { master: 0.8, cullDistance: 80, sounds: {} };
+  private manifest: AudioManifest = { backend: 'files', master: 0.8, cullDistance: 80, sounds: {} };
   private readonly buffers = new Map<string, AudioBuffer>();
+  /** Rendered recipe variants by sound id. */
+  private readonly synthBufs = new Map<string, AudioBuffer[]>();
   private readonly limiter = new VoiceLimiter();
   private readonly stride = new Map<number, number>();
   private prev = { weapon: '' as string, reloading: false, dry: 0 };
@@ -132,7 +143,35 @@ export class AudioSystem {
         }
       }),
     );
+    // ?audio=synth|files overrides the manifest, for A/B listening
+    const forced = new URLSearchParams(globalThis.location?.search).get('audio');
+    if (forced === 'synth' || forced === 'files') this.manifest.backend = forced;
+    this.renderSynth(ctx);
     if (ctx.state === 'running') this.startLoops();
+  }
+
+  /** Render the recipe variants a sound needs, one per timeout so start-up never stalls a frame. */
+  private renderSynth(ctx: AudioContext) {
+    const jobs: { id: string; recipe: string; v: number }[] = [];
+    for (const [id, d] of Object.entries(this.manifest.sounds)) {
+      const rec = d.synth ? RECIPES[d.synth] : undefined;
+      const fileLoaded = d.files.some((f) => this.buffers.has(f));
+      if (!rec || pickSource(this.manifest.backend, d, true, fileLoaded) !== 'synth') continue;
+      for (let v = 0; v < rec.variants; v++) jobs.push({ id, recipe: d.synth as string, v });
+    }
+    const next = () => {
+      const j = jobs.shift();
+      if (!j) return;
+      const data = renderSynth(j.recipe, j.v, ctx.sampleRate);
+      if (data) {
+        const b = ctx.createBuffer(1, data.length, ctx.sampleRate);
+        b.getChannelData(0).set(data);
+        this.synthBufs.set(j.id, [...(this.synthBufs.get(j.id) ?? []), b]);
+        this.stats.synth = (this.stats.synth ?? 0) + 1;
+      }
+      setTimeout(next, 0);
+    };
+    setTimeout(next, 0);
   }
 
   private startLoops() {
@@ -147,7 +186,10 @@ export class AudioSystem {
     const def = this.manifest.sounds[id];
     // suspended = no gesture yet; queued sounds would all burst out on resume
     if (!ctx || !this.master || !def || ctx.state !== 'running') return;
-    const buf = this.buffers.get(def.files[Math.floor(Math.random() * def.files.length)] as string);
+    const rendered = this.synthBufs.get(id);
+    const buf = rendered?.length
+      ? rendered[Math.floor(Math.random() * rendered.length)]
+      : this.buffers.get(def.files[Math.floor(Math.random() * def.files.length)] as string);
     if (!buf) return;
     let dist = 0;
     if (at) {

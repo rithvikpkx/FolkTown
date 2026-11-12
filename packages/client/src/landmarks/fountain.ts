@@ -1,85 +1,119 @@
-import { DoubleSide, Group, MeshStandardMaterial } from 'three';
-import { Batch } from '../batch';
+import { Group, type Mesh, type ShaderMaterial } from 'three';
+import { Batch, type Vec3 } from '../batch';
 import { type MaterialName, TILING } from '../materials';
+import { makeConcrete, makeMirrorSteel, makeWaterMaterial, tickWater } from './fountainMaterials';
 
 type Mats = Record<MaterialName, import('three').Material>;
 
+const HEIGHT = 11.6; // 38 ft
+const SLABS = 4;
+
 /**
- * Engineering Fountain (Tier 1): round stone basin, static glossy water, and a cluster of
- * angular concrete columns with frozen jets. Centred on (cx, cz), ground at y = 0.
+ * Engineering Fountain (Robert Youngman, 1989): no pool and no fence. Four tall concrete
+ * parabolic slabs lean in around a central jet inside a mirror-steel cylinder, water runs down
+ * them onto a paved, gently dished apron and drains through a metal grate ring.
+ * Sources: Purdue Alumnus / Purdue UVAC campus art pages (see docs/known-gaps.md 40).
+ * Centred on (cx, cz), ground at y = 0.
  */
 export function buildFountain(mats: Mats, cx = 0, cz = 0) {
-  const stone = new Batch();
-  const metal = new Batch();
-  const water = new Batch();
-  const jets = new Batch();
-  const ts = TILING.limestone.tile;
-  const R = 9; // basin outer radius
-  const seg = 48;
-  const P = (x: number, y: number, z: number) => [cx + x, y, cz + z] as const;
+  const pave = new Batch();
+  const grate = new Batch();
+  const conc = new Batch();
+  const sheet = new Batch();
+  const pool = new Batch();
+  const jet = new Batch();
+  const P = (x: number, y: number, z: number): Vec3 => [cx + x, y, cz + z];
 
-  // basin: wall (outer + inner face), coping ring, floor
-  stone.cyl(P(0, 0, 0), P(0, 0.9, 0), R, R, seg, ts, false);
-  stone.cyl(P(0, 0.9, 0), P(0, 0, 0), R - 0.7, R - 0.7, seg, ts, false);
-  stone.cyl(P(0, 0.9, 0), P(0, 1.0, 0), R + 0.25, R + 0.25, seg, ts);
-  stone.cyl(P(0, 0.05, 0), P(0, 0.1, 0), R - 0.7, R - 0.7, seg, ts);
-  // static water: a thin disc just under the coping
-  water.cyl(P(0, 0.6, 0), P(0, 0.62, 0), R - 0.7, R - 0.7, seg, 4);
+  // paved apron (slightly dished toward the drain) and the grate ring
+  const apron = 9.5;
+  pave.cyl(P(0, 0, 0), P(0, 0.06, 0), apron, apron, 40, TILING.pavers.tile);
+  grate.cyl(P(0, 0.061, 0), P(0, 0.07, 0), 6.0, 6.0, 40, 1, true);
+  pave.cyl(P(0, 0.07, 0), P(0, 0.075, 0), 5.6, 5.6, 40, TILING.pavers.tile);
+  // thin film of water over the wetted area inside the grate
+  pool.cyl(P(0, 0.08, 0), P(0, 0.085, 0), 5.4, 5.4, 40, 4);
 
-  // central sculpture: plinth plus ragged ring of square columns of varied height
-  stone.cyl(P(0, 0.1, 0), P(0, 0.9, 0), 2.6, 2.4, 12, ts);
-  const cols = 9;
-  for (let i = 0; i < cols; i++) {
-    const a = (i / cols) * Math.PI * 2;
-    const r = i % 2 ? 1.5 : 0.7;
-    const h = 3 + ((i * 7) % 5) * 1.1;
-    const x = Math.cos(a) * r;
-    const z = Math.sin(a) * r;
-    const w = 0.35 + (i % 3) * 0.1;
-    stone.box(cx + x - w, 0.9, cz + z - w, cx + x + w, 0.9 + h, cz + z + w, ts);
-    metal.box(
-      cx + x - w - 0.04,
-      0.9 + h,
-      cz + z - w - 0.04,
-      cx + x + w + 0.04,
-      1.0 + h,
-      cz + z + w + 0.04,
-      TILING.metal.tile,
-    );
-    // frozen jet arcing outward from the column top
-    jets.cyl(P(x, 1.0 + h, z), P(x * 2.6, 1.0 + h * 0.6, z * 2.6), 0.05, 0.03, 6, 1, false);
-    jets.cyl(
-      P(x * 2.6, 1.0 + h * 0.6, z * 2.6),
-      P(x * 4.2, 0.65, z * 4.2),
-      0.03,
-      0.06,
-      6,
-      1,
-      false,
-    );
+  // four leaning parabolic slabs: radius shrinks with the square of the remaining height
+  const steps = 14;
+  for (let k = 0; k < SLABS; k++) {
+    const th = (k / SLABS) * Math.PI * 2 + 0.4;
+    const er: Vec3 = [Math.cos(th), 0, Math.sin(th)];
+    const et: Vec3 = [-Math.sin(th), 0, Math.cos(th)];
+    // ring i: centre, half width, half thickness, normal in the r-y plane
+    const ring = (i: number, off: number, thick: number) => {
+      const t = i / steps;
+      const r = 0.9 + 4.6 * (1 - t) * (1 - t);
+      const dr = (-9.2 * (1 - t)) / HEIGHT; // dr/dy
+      const nl = Math.hypot(1, dr);
+      const nr = 1 / nl;
+      const ny = -dr / nl;
+      const hw = 1.9 - 0.9 * t;
+      const ht = thick * (1 - 0.35 * t) + off;
+      const y = t * HEIGHT;
+      const c = (sw: number, sn: number): Vec3 =>
+        P(
+          (r + sn * ht * nr) * er[0] + sw * hw * et[0],
+          y + sn * ht * ny,
+          (r + sn * ht * nr) * er[2] + sw * hw * et[2],
+        );
+      return c;
+    };
+    for (let i = 0; i < steps; i++) {
+      const a = ring(i, 0, 0.45);
+      const b = ring(i + 1, 0, 0.45);
+      // outer (+1), inner (-1) faces and two sides
+      for (const [s0, n0, s1, n1] of [
+        [-1, 1, 1, 1],
+        [1, -1, -1, -1],
+        [1, 1, 1, -1],
+        [-1, -1, -1, 1],
+      ] as const) {
+        const q0 = a(s0, n0);
+        const q1 = a(s1, n1);
+        const q2 = b(s1, n1);
+        const q3 = b(s0, n0);
+        conc.tri(q0, q1, q2, 2);
+        conc.tri(q0, q2, q3, 2);
+      }
+      // water sheet sliding down the inner face, a hair off the concrete
+      const wa = ring(i, 0.05, 0.45);
+      const wb = ring(i + 1, 0.05, 0.45);
+      const l0 = wa(-0.8, -1);
+      const l1 = wa(0.8, -1);
+      const l2 = wb(0.8, -1);
+      const l3 = wb(-0.8, -1);
+      sheet.tri(l0, l1, l2, 2);
+      sheet.tri(l0, l2, l3, 2);
+    }
+    // top cap
+    const ta = ring(steps, 0, 0.45);
+    conc.tri(ta(-1, 1), ta(1, 1), ta(1, -1), 2);
+    conc.tri(ta(-1, 1), ta(1, -1), ta(-1, -1), 2);
   }
-  // ring of low ground jets
-  for (let i = 0; i < 16; i++) {
-    const a = (i / 16) * Math.PI * 2;
-    const x = Math.cos(a) * 6;
-    const z = Math.sin(a) * 6;
-    jets.cyl(P(x, 0.6, z), P(x * 0.9, 2.2, z * 0.9), 0.05, 0.02, 6, 1, false);
-  }
 
-  const waterMat = new MeshStandardMaterial({ color: 0x3f6f78, roughness: 0.05, metalness: 0.1 });
-  const jetMat = new MeshStandardMaterial({
-    color: 0xe8f4f6,
-    roughness: 0.1,
-    transparent: true,
-    opacity: 0.7,
-    side: DoubleSide,
-  });
+  // central jet inside the mirrored cylinder, plus a falling plume
+  jet.cyl(P(0, 2.2, 0), P(0, 8.5, 0), 0.22, 0.1, 10, 1, false);
+  jet.cyl(P(0, 8.5, 0), P(0, 2.4, 0), 0.1, 0.9, 16, 1, false);
+  const steel = new Batch();
+  steel.cyl(P(0, 0.08, 0), P(0, 2.2, 0), 0.8, 0.8, 24, 1, true);
+
   const g = new Group();
+  const concMat = makeConcrete();
+  const steelMat = makeMirrorSteel();
+  const flatWater = makeWaterMaterial(0);
+  const sheetWater = makeWaterMaterial(1);
+  const jetWater = makeWaterMaterial(1);
+  const animate = (m: ShaderMaterial) => (mesh: Mesh) => {
+    mesh.onBeforeRender = () => tickWater(m);
+    return mesh;
+  };
   g.add(
-    stone.mesh(mats.limestone),
-    metal.mesh(mats.metal),
-    water.mesh(waterMat, false),
-    jets.mesh(jetMat, false),
+    pave.mesh(mats.pavers),
+    grate.mesh(mats.metal),
+    conc.mesh(concMat),
+    steel.mesh(steelMat),
+    animate(flatWater)(pool.mesh(flatWater, false)),
+    animate(sheetWater)(sheet.mesh(sheetWater, false)),
+    animate(jetWater)(jet.mesh(jetWater, false)),
   );
   return g;
 }

@@ -17,7 +17,22 @@ The handoff file. Update it at the end of every work package, so a session that 
 ## Branches and deploys
 
 - `mvp` is the dev branch. Each work package is a branch off `mvp`, merged back by the main session. **Nothing merges into `main`** until the owner has played and approved the MVP.
-- Deploy: `npx -y vercel@latest` (logged in) from the built client. `folktown.rithvik.si` needs a CNAME at the domain's DNS host (Hostinger), which only the owner can add; until then use the `*.vercel.app` link.
+- **Deploy is automatic:** Vercel project `folktown` is connected to the GitHub repo; every push to `mvp` deploys to **https://folktown.vercel.app** (config in `vercel.json`; `ENABLE_EXPERIMENTAL_COREPACK=1` is set so Vercel uses pnpm 12). `folktown.rithvik.si` needs a CNAME at Hostinger, which only the owner can add.
+
+## Rules for the autonomous run to the MVP
+
+The owner asked for the MVP (end of Stage 2) to be built without check-ins, as cheaply as possible.
+- Never merge into `main`, never push `main`. The finished MVP lives on `mvp`; the owner merges after playing it.
+- Orchestrator stays lean: one Sonnet subagent per work package with a short brief that points at files; the orchestrator reviews the diff stat and test output, merges, updates this file, pushes. At most two subagents at once.
+- Do not ask the owner questions; pick the sensible default and note it here. Minor issues go in `docs/known-gaps.md`.
+- Update this file and push after every merged package, so any session can resume from it.
+- Cloud sessions have no Mac GPU: `pnpm bench` numbers from the cloud do not count. Keep a "Benchmarks pending on the Mac" list below; the owner's Mac runs them. Screenshots in the cloud may use software rendering (set the Chrome path via env; `tools/chrome.mjs` defaults to the macOS path).
+- Landmark and facade references: public photos (Wikimedia Commons), since nobody can take photos.
+- When the Stage 2 done-when criteria are met (apart from the Mac benchmark), stop and report the link.
+
+## Benchmarks pending on the Mac
+
+- (none yet)
 - This machine is the baseline (MacBook Air M1, 16 GB), so benchmarks run here.
 - LiDAR step: Python through `uv run --with rasterio` (no system GDAL needed).
 

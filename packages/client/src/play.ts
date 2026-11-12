@@ -27,6 +27,10 @@ const fx = createRenderer(canvas, scene, camera, {
   shadow: { center: new Vector3(cx, 0, cz), size: 340 },
 });
 addEventListener('resize', () => fx.resize());
+// frame-time ring buffer (ms) for tools/bench.mjs and shoot.mjs
+const ft = { times: new Float32Array(600), n: 0, renderer: '', texMs: 0 };
+(window as unknown as { __ft: typeof ft }).__ft = ft;
+ft.renderer = String(fx.webgl.getContext().getParameter(0x1f01));
 const mats = await makeMaterials(fx.webgl);
 const view = buildZone(scene, mats, zone);
 fx.invalidateShadow();
@@ -38,7 +42,12 @@ if (cam?.length === 5 && cam.every(Number.isFinite)) {
   camera.position.set(x, y, z);
   camera.rotation.set((pitch * Math.PI) / 180, (yaw * Math.PI) / 180, 0, 'YXZ');
   view.updateLod(x, z);
-  fx.webgl.setAnimationLoop((now: number) => fx.render(Math.min(now / 1000, 0.1)));
+  let prev = performance.now();
+  fx.webgl.setAnimationLoop((now: number) => {
+    ft.times[ft.n++ % 600] = now - prev;
+    fx.render(Math.min((now - prev) / 1000, 0.1));
+    prev = now;
+  });
 } else {
   startGame();
 }
@@ -78,6 +87,7 @@ function startGame() {
   let hudT = 0;
   let matchState: MatchState | null = null;
   fx.webgl.setAnimationLoop((now: number) => {
+    ft.times[ft.n++ % 600] = now - last;
     const dt = Math.min((now - last) / 1000, 0.1);
     last = now;
     const locked = document.pointerLockElement === canvas;

@@ -16,6 +16,7 @@ export function requireDist() {
   if (!existsSync(join(dist, 'index.html'))) throw new Error('client build missing');
 }
 
+// PAGE=play.html?bots=7 opens that page as-is (no ?cam=) instead of index.html with the pose.
 export async function withPage(pose, { uncapped }, fn) {
   const server = createServer((req, res) => {
     const raw = normalize(new URL(req.url, 'http://x').pathname).replace(/^(\.\.[/\\])+/, '');
@@ -29,7 +30,8 @@ export async function withPage(pose, { uncapped }, fn) {
     }
   }).listen(0, '127.0.0.1');
   await new Promise((r) => server.once('listening', r));
-  const url = `http://127.0.0.1:${server.address().port}/?cam=${pose.join(',')}`;
+  const base = `http://127.0.0.1:${server.address().port}/`;
+  const url = process.env.PAGE ? base + process.env.PAGE : `${base}?cam=${pose.join(',')}`;
   const prof = mkdtempSync(join(tmpdir(), 'ft-'));
   const port = 9300 + Math.floor(Math.random() * 600);
   const chrome = spawn(
@@ -66,9 +68,14 @@ export async function withPage(pose, { uncapped }, fn) {
     });
     let id = 0;
     const pend = {};
+    const logs = [];
     ws.onmessage = (m) => {
       const d = JSON.parse(m.data);
       pend[d.id]?.(d.result);
+      if (d.method === 'Runtime.exceptionThrown')
+        logs.push(d.params.exceptionDetails.exception?.description);
+      if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error')
+        logs.push(d.params.args.map((a) => a.value ?? a.description).join(' '));
     };
     const send = (method, params) =>
       new Promise((r) => {
@@ -80,8 +87,9 @@ export async function withPage(pose, { uncapped }, fn) {
       if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description);
       return r.result.value;
     };
+    await send('Runtime.enable');
     await sleep(500);
-    return await fn({ send, ev });
+    return await fn({ send, ev, logs });
   } finally {
     chrome.kill();
     server.close();

@@ -14,7 +14,7 @@ export interface Area {
   tags: Record<string, string>;
 }
 
-export type Building = Area;
+export type Building = Area & { heightLidar?: number };
 
 export interface Path {
   id: string;

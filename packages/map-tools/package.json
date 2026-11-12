@@ -5,6 +5,7 @@
   "scripts": {
     "fetch-osm": "node src/fetch.ts",
     "project": "node src/run-project.ts",
+    "heights": "uv run --with rasterio --with numpy --with 'laspy[lazrs]' --with pyproj python src/heights.py && node src/merge-heights.ts",
     "typecheck": "tsc -p ."
   },
   "devDependencies": {

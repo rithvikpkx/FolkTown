@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { makeProjector, signedArea, wind } from './geo.ts';
+import { mergeHeights } from './merge-heights.ts';
 import { assemble, type El } from './osm.ts';
-import type { Pt } from './types.ts';
+import type { Campus, Pt } from './types.ts';
+
+describe('mergeHeights', () => {
+  it('sets heightLidar only where a positive sample exists', () => {
+    const b = (id: string) => ({ id, outer: [], holes: [], tags: {} });
+    const campus = { buildings: [b('a'), b('b'), b('c')] } as unknown as Campus;
+    const n = mergeHeights(campus, { a: { h: 12.3, n: 40 }, b: { h: -1, n: 3 } });
+    expect(n).toBe(1);
+    expect(campus.buildings.map((x) => x.heightLidar)).toEqual([12.3, undefined, undefined]);
+  });
+});
 
 describe('projection', () => {
   it('matches known distances within 0.5%', () => {

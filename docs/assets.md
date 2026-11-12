@@ -161,3 +161,17 @@ Google Street View Static API frames bought/downloaded by the owner with their o
 - reference/purdue-photos/memorial-union-3d-model-screenshot.png (SketchUp 3D Warehouse, see above): plan, roof forms, entrance, courtyard; reference only, no geometry or texture taken.
 - data/google/mall-area.glb (Google Photorealistic 3D Tiles, local, gitignored): heights only (eave ~9 m, slate plateau ~13 m, tower 19-20 m, west pavilion 17 m, front pavilion 3-7 m); no texture or geometry used.
 - Face coverage (tools/saltline-union-shots.mjs, docs/img/v5-union-vs-ref.jpg): **measured** = north wing north face (2009 frame: 3-light windows 3.4 x 4.8 m at 5.2 m pitch, dormers every ~13 m, eave) and the SE-wing east gable north 13 m (arched triple 4.0 m wide, window pairs, eave 8-9 m); **copied** = rest of the east gable face (punched rhythm), all other main-wall faces (generic 3.6 m punched/arcade rhythm); **guessed from SketchUp + mesh** = south front, front limestone pavilions, tower with stone window, portal and steps, west pavilion and canopy, east bays, dormers on all other wings, roof plateau clutter, chimneys, skylight. West face, south face, tower and portal have NO exterior photo. Interior of the building is not modelled.
+## v5 hotspots (v5-elliott-mall): Elliott Hall of Music, Memorial Mall
+
+Code-generated scenes `packages/saltline/src/campus/hotspots/{elliott,memorial-mall}.js` (no model files). Subsets of OSM data in `hotspots/data/*.json` via `tools/hotspot-data.py`.
+
+| File / data | Use | Source | Licence | Needs clearance |
+|---|---|---|---|---|
+| data/raw/streetview/elliott-hall-of-music: HwF9pEOA_GGsn7OmyaXn2A (2007-09), XvCOiCOdmYC3iN9U64hBJg (2019-08), gd8RfryM02nVN5eF4Kj7Sg (2019-08), all 4 headings | measurements only (plan, portico, belts, windows); side-by-side docs/img/v5-elliott-vs-ref.jpg | Google Street View Static API (owner key) | (c) 2026 Google | Yes |
+| data/raw/streetview/memorial-mall: edsyJrqna9EH1j_glWMayw (2019-08), eey-GRoIHUgaa9f9gm4QQw (2026-03), G1TnVsgNtp47PJz65TM4_g (2019-08), 4ZJB4xBsLSZSpd_pZk8Zzw (2019-08) | lamps, chain posts, hedge, walk/paver treatment; docs/img/v5-mall-vs-ref.jpg | Google Street View Static API (owner key) | (c) 2026 Google | Yes |
+| docs/img/google/elliott-*.jpg, mall-*.jpg, mall-area-topdown.png | massing, roof, tower/drum layout, path and canopy layout | Google Photorealistic 3D Tiles renders | (c) Google | Yes |
+| data/pilot/roofs.json (way/74151922), data/heights.json | roof planes (flat ~22.8 m, hip 33.7 deg), heights | USGS 3DEP lidar (see rows above) | public domain | No |
+| data/campus.json (Elliott footprint, Memorial Mall park/lawns/gardens/paths/trees) | footprints, paths, trees | OpenStreetMap contributors | ODbL | Attribution |
+| Not found | monuments on Memorial Mall: none in OSM or in the 5 frames, none drawn | | | |
+
+Note: the brief called Elliott circular/domed; the data show a rectangular hipped-roof hall with a half-round rotunda. Raw frames for memorial-mall were read from a sibling worktree (gitignored, not committed).

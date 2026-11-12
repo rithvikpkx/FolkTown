@@ -14,6 +14,7 @@ import {
   SRGBColorSpace,
   TextureLoader,
   Vector2,
+  Vector4,
 } from 'three';
 
 const BASE = (import.meta.env?.BASE_URL ?? '/') + 'campus/';
@@ -71,11 +72,11 @@ export function getMask(zone) {
   return m;
 }
 
-function loadSet(name, aniso, tiles) {
+function loadSet(name, aniso, tiles, dir = '') {
   const L = new TextureLoader();
   const out = {};
   for (const [k, cs] of [['albedo', SRGBColorSpace], ['normal', NoColorSpace], ['roughness', NoColorSpace]]) {
-    const t = L.load(`${BASE}${name}-${k}.jpg`);
+    const t = L.load(`${BASE}${dir}${name}-${k}.jpg`);
     t.wrapS = t.wrapT = RepeatWrapping;
     t.colorSpace = cs;
     t.anisotropy = aniso;
@@ -100,13 +101,16 @@ export function buildGround(zone, mats, opts = {}) {
   const mask = getMask(zone);
   const aniso = Math.min(8, opts.aniso ?? 8);
   const tiles = [];
-  const grass = loadSet('grass', aniso, tiles), pave = loadSet('pavers', aniso, tiles), asph = loadSet('asphalt', aniso, tiles);
+  const grass = loadSet('grass', aniso, tiles, opts.dir), pave = loadSet('pavers', aniso, tiles, opts.dir), asph = loadSet('asphalt', aniso, tiles, opts.dir);
   const u = {
     uMask: { value: mask.texture }, uOrg: { value: mask.origin }, uSize: { value: mask.size },
     gA: { value: grass.albedo }, gN: { value: grass.normal }, gR: { value: grass.roughness },
     pA: { value: pave.albedo }, pN: { value: pave.normal }, pR: { value: pave.roughness },
     aA: { value: asph.albedo }, aN: { value: asph.normal }, aR: { value: asph.roughness },
   };
+  // optional aerial orthophoto (walk mode): {texture, xMin, zMin, w, h}; blended in beyond `near` metres from the camera so PBR detail stays close
+  const o = opts.ortho;
+  if (o) { u.uOrtho = { value: o.texture }; u.uOB = { value: new Vector4(o.xMin, o.zMin, o.w, o.h) }; u.uONear = { value: o.near ?? 7 }; }
   const mat = new MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0 });
   mat.name = 'campus_ground';
   mat.onBeforeCompile = (s) => {
@@ -115,7 +119,7 @@ export function buildGround(zone, mats, opts = {}) {
       .replace('#include <common>', '#include <common>\nvarying vec3 vWP;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     s.fragmentShader = s.fragmentShader
-      .replace('#include <common>', `#include <common>\nvarying vec3 vWP;\nuniform sampler2D uMask,gA,gN,gR,pA,pN,pR,aA,aN,aR; uniform vec2 uOrg,uSize;\n${GLSL_NOISE}`)
+      .replace('#include <common>', `#include <common>\nvarying vec3 vWP;\nuniform sampler2D uMask,gA,gN,gR,pA,pN,pR,aA,aN,aR; uniform vec2 uOrg,uSize;\n${o ? 'uniform sampler2D uOrtho; uniform vec4 uOB; uniform float uONear;' : ''}\n${GLSL_NOISE}`)
       .replace('#include <map_fragment>', /* glsl */ `
         vec2 wp = vWP.xz;
         vec4 mk = texture2D(uMask, (wp - uOrg) / uSize);
@@ -141,6 +145,11 @@ export function buildGround(zone, mats, opts = {}) {
         vec3 alb = mix(mix(ga, pa, path), aa, road);
         vec3 nn = mix(mix(gnn, pnn, path), ann, road);
         float rgh = mix(mix(gr, pr, path), ar_, road);
+        ${o ? `{ vec2 ou = (wp - uOB.xy) / uOB.zw;
+          float inb = step(0.0, ou.x) * step(ou.x, 1.0) * step(0.0, ou.y) * step(ou.y, 1.0);
+          vec3 oc = texture2D(uOrtho, clamp(ou, 0.0, 1.0)).rgb;
+          float ow = inb * smoothstep(uONear, uONear * 4.0, length(vWP - cameraPosition)) * 0.85;
+          alb = mix(alb, oc * 0.95, ow); }` : ''}
         gRough = clamp(rgh, 0.35, 1.0);
         gWN = normalize(vec3(nn.x * 0.9, 1.0, -nn.y * 0.9));
         diffuseColor.rgb *= alb;
@@ -149,7 +158,7 @@ export function buildGround(zone, mats, opts = {}) {
       .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = gRough;')
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n  normal = normalize((viewMatrix * vec4(gWN, 0.0)).xyz);');
   };
-  mat.customProgramCacheKey = () => 'campus_ground_v1';
+  mat.customProgramCacheKey = () => 'campus_ground_v1' + (o ? 'o' : '');
 
   const w = b.maxX - b.minX + 2 * FAR, h = b.maxZ - b.minZ + 2 * FAR;
   const geo = new PlaneGeometry(w, h, 1, 1).rotateX(-Math.PI / 2);

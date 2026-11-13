@@ -5,7 +5,7 @@
 import { BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, SRGBColorSpace, TextureLoader, LinearMipmapLinearFilter, Vector3 } from 'three';
 import { BELLTOWER_HALF } from './belltower.js';
 import { fetchZone, buildCampus } from './index.js';
-import { buildWalc } from './walc.js';
+import { buildWalc, WALC_SOLIDS, walcFloor } from './walc.js';
 import { buildContext } from './env/context.js';
 import { getDecals } from './ground.js';
 import { buildFurniture, buildUnderstory } from './env/furniture.js';
@@ -118,7 +118,7 @@ export async function buildWalk(G) {
   }
   try { await installSky(G); } catch (e) { console.error('[walk] sky failed', e); }
   G.walkCrossings = getDecals(z).crossings;
-  G.plazaExclude = (x, z) => inPlaza(x, z, 1.5); G.walkFloor = plazaFloor;
+  G.plazaExclude = (x, z) => inPlaza(x, z, 1.5); G.walkFloor = (x, z) => walcFloor(x, z) ?? plazaFloor(x, z); // the colonnade walkway is on the deck
   try {
     const fur = buildFurniture(G, z, boxPaths, z.props);
     level.root.add(fur, buildUnderstory(G, z, fur.planters));
@@ -130,7 +130,7 @@ export async function buildWalk(G) {
   if (!/[?&]ctx=0/.test(location.search)) try { ctx = buildContext(G, zone, level.root, { box: REGION, keep: KEEP, ortho, facades: false, centre: [60, 7] }); console.log('[walk] context', JSON.stringify({ ...ctx, solids: ctx.solids.length }), 'massing', JSON.stringify({ ...level.stats, update: undefined, hipTris, hotspots: hot.names, failed: hot.failed })); } catch (e) { console.error('[walk] context failed', e); }
   G.walkSolids = [
     ...regionSolids(zone, [...skip, KEEP[0]], hot),
-    ...colliders.filter((c) => c.id === KEEP[1]).map((c) => c.poly),
+    ...WALC_SOLIDS, // measured wall footprint (the OSM polygon is the roof edge), colonnade open
     [[-scanHalf, -scanHalf], [scanHalf, -scanHalf], [scanHalf, scanHalf], [-scanHalf, scanHalf]],
     ...plaza.solids,
   ];

@@ -25,13 +25,16 @@ const page = () => {
     }
   });
   const stamp = new Int32Array(tri.length); let sid = 0;
-  // nearest hit along o + t d for t in (1e-3, tmax), Moller-Trumbore, both sides; Infinity if none. Voxels are sampled every 1 m (voxel 4 m).
+  // nearest hit along o + t d for t in (1e-3, tmax), Moller-Trumbore, both sides; Infinity if none.
   const hit = (o, d, tmax) => {
     sid++; let best = Infinity;
-    for (let t = 0; t < Math.min(tmax, best) + 1; t += 1) {
-      const a = grid.get(Math.floor((o[0] + d[0] * t) / CS) + ',' + Math.floor((o[1] + d[1] * t) / CS) + ',' + Math.floor((o[2] + d[2] * t) / CS));
-      if (!a) continue;
-      for (const k of a) {
+    // exact voxel walk (Amanatides-Woo): every 4 m voxel the ray passes through is tested. The old 1 m point sampling skipped voxels the ray only clipped, and missed thin faces near voxel corners.
+    const c = [0, 1, 2].map((i) => Math.floor(o[i] / CS)), st = d.map((v) => (v > 0 ? 1 : -1)), dt = d.map((v) => (v ? CS / Math.abs(v) : Infinity));
+    const tn = [0, 1, 2].map((i) => (d[i] ? ((c[i] + (d[i] > 0 ? 1 : 0)) * CS - o[i]) / d[i] : Infinity));
+    for (let t = 0; t <= Math.min(tmax, best); ) {
+      const a = grid.get(c[0] + ',' + c[1] + ',' + c[2]), m = tn[0] < tn[1] ? (tn[0] < tn[2] ? 0 : 2) : tn[1] < tn[2] ? 1 : 2;
+      t = tn[m]; tn[m] += dt[m]; c[m] += st[m];
+      for (const k of a || []) {
         if (stamp[k] === sid) continue; stamp[k] = sid;
         const [p0, p1, p2] = tri[k], e1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]], e2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]];
         const h = [d[1] * e2[2] - d[2] * e2[1], d[2] * e2[0] - d[0] * e2[2], d[0] * e2[1] - d[1] * e2[0]], a0 = e1[0] * h[0] + e1[1] * h[1] + e1[2] * h[2];

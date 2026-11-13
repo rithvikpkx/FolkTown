@@ -1,5 +1,5 @@
 // Screenshots of the ?walk=1 prototype at 1.7 m eye height into tools/shots/walk-*.png (serves packages/saltline/dist-walk).
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 process.env.DIST = 'packages/saltline/dist-walk';
 const { sleep, withPage } = await import('./chrome.mjs');
@@ -26,12 +26,25 @@ Object.assign(poses, {
   'sv-west': sv(25.1, 1.7, 5.5, 90), // pano CAoSF0NJ...TbWdF 2021-09, east: colonnade + south pavilion west face
   'sv-south': sv(66, 2.4, 53, 0), // pano _2SMIz...jQiA 2017-09, north: south bulge + long south wall
 });
+// Apple Maps frames (data/raw/apple-maps-walc): camera poses fitted to the roof (tools/walc-apple.py -> tools/walc-apple.json). Rendered at the Maps window size
+// (1600 x 949 pt @2x); crop x 0, y 104, 3056 x 1794 to match the frame.
+const apple = JSON.parse(readFileSync(new URL('walc-apple.json', import.meta.url), 'utf8'));
+for (const [n, p] of Object.entries(apple)) poses['apple-' + n] = `${p.cam.join(',')}&fov=${p.fov}`;
+Object.assign(poses, {
+  'hifi-front': '27,1.94,-10,48,8,-10', // plaza, facing the seven glazed bays and the lettering
+  'hifi-oblique': '24,1.94,-40,50,9,-8',
+  'hifi-colonnade': '40.5,1.94,3,48.4,5.5,-9', // close, under the canopies
+  'hifi-nw': '30,1.7,-68,62,9,-48', // the 2018 photo's corner (north face + west face)
+  'hifi-east': '120,1.7,-12,96,8,-12',
+  'hifi-south': '60,1.7,62,62,9,30',
+});
 mkdirSync(new URL('shots/', import.meta.url), { recursive: true });
 const only = process.argv.slice(2); // optional pose names
 for (const [name, cam] of Object.entries(poses)) {
   if (only.length && !only.includes(name)) continue;
   process.env.PAGE = `index.html?walk=1&cam=${cam}`;
   await withPage([], { uncapped: false }, async ({ send, ev, logs }) => {
+    if (name.startsWith('apple-')) await send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 949, deviceScaleFactor: 2, mobile: false });
     for (let i = 0; i < 120 && !(await ev('window.__ready === true')); i++) await sleep(250);
     await sleep(6000);
     const png = await send('Page.captureScreenshot', { format: 'png' });

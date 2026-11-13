@@ -12,6 +12,9 @@ const poses = {
   'walc-s': '40,1.7,58,75,10,26',
   'walc-w': '20,1.7,-12,50,8,-6',
   'walc-aerial': '-4,48,44,66,6,-14', // high oblique from the south-west above the plaza, like the design render
+  'am-top': '70,190,-13,70,0,-14&fov=32', // same views as the Apple Maps reference frames (data/raw/apple-maps-walc): top-down,
+  'am-west': '-95,115,-14,62,8,-14&fov=30', // west face at the steeper tilt (west-mid.png),
+  'am-sw': '-45,95,125,70,6,-14&fov=32', // and from the south-west at about 45 degrees
   'walc-bay': '27,1.7,-10,45,9,-10',
   'v5-bay': '28,1.7,-10,45,8,-10', // owner shot 18: plaza facing the west glazed bay (no back wall behind the curtain wall)
   'v5-sw-up': '108,1.7,2,96,11,-8', // owner shot 19 area: the pavilions and the low wing between them, seen from the south-east, looking up at the eaves

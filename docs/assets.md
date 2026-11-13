@@ -78,6 +78,7 @@ Used only in the prototype page (`docs/graphics-research.md`); the files are in 
 |---|---|---|---|
 | Photorealistic 3D Tiles around the Mall (`data/google/`, raw in `data/raw/tiles/`) | Google Map Tiles API, official, owner's key (`pnpm map:tiles`, `docs/google-export.md`) | needs-clearance | Attribution strings are recorded in `data/raw/tiles/manifest.json` |
 | Street View Static images (`data/raw/streetview/`) | Google Street View Static API, official, owner's key (`pnpm map:streetview`) | needs-clearance | Copyright text per image in its manifest |
+| Apple Maps screenshots of WALC (`data/raw/apple-maps-walc/`, reference only, not shipped) | Screenshots of the macOS Apple Maps app window, satellite 3D view, author Apple and its imagery providers (`tools/apple-maps-capture.sh`, `docs/apple-maps-capture.md`) | needs-clearance | Gitignored; per-image camera data in `manifest.json` |
 
 Both are gitignored and not part of any shipped build until cleared.
 

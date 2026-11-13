@@ -1,0 +1,64 @@
+# Frame list for tools/apple-maps-capture.sh. Tab separated, no empty fields.
+# north/east: target in metres from the WALC footprint centre (40.427416, -86.913225); the target is the screen centre.
+# heading: degrees, 0 = north up (camera looks toward that bearing). tilt: View Angle slider 0..1 (0 = 2D top-down, 1 = lowest camera, about 70 deg).
+# spn: maps:// span in degrees (0.0007 is the closest Maps goes; smaller values and Zoom In are clamped).
+# name	group	north	east	heading	tilt	spn	note
+west-1	a-face	-44	-36	90	1	0.0007	west glazed face, south end
+west-2	a-face	-22	-36	90	1	0.0007	west glazed face
+west-3	a-face	0	-36	90	1	0.0007	west glazed face, centre and colonnade
+west-4	a-face	22	-36	90	1	0.0007	west glazed face
+west-5	a-face	44	-36	90	1	0.0007	west glazed face, north end
+west-mid	a-face	0	-30	90	0.75	0.0007	west face, steeper view over the plaza trees
+east-1	a-face	44	36	270	1	0.0007	east face, north end
+east-2	a-face	22	36	270	1	0.0007	east face
+east-3	a-face	0	36	270	1	0.0007	east face, centre and east lobe
+east-4	a-face	-22	36	270	1	0.0007	east face
+east-5	a-face	-44	36	270	1	0.0007	east face, south end
+east-mid	a-face	0	30	270	0.75	0.0007	east face, steeper view
+south-1	a-face	-56	-25	0	1	0.0007	south face, west end
+south-2	a-face	-56	0	0	1	0.0007	south face, centre and south bulge
+south-3	a-face	-56	25	0	1	0.0007	south face, east end
+south-mid	a-face	-50	0	0	0.75	0.0007	south face, steeper view
+north-1	a-face	53	25	180	1	0.0007	north face, east end
+north-2	a-face	53	0	180	1	0.0007	north face, centre
+north-3	a-face	53	-25	180	1	0.0007	north face, west end
+north-mid	a-face	47	0	180	0.75	0.0007	north face, steeper view
+orbit-000	b-orbit	0	0	0	0.64	0.0009	whole building, about 45 deg
+orbit-045	b-orbit	0	0	45	0.64	0.0009	whole building, about 45 deg
+orbit-090	b-orbit	0	0	90	0.64	0.0009	whole building, about 45 deg
+orbit-135	b-orbit	0	0	135	0.64	0.0009	whole building, about 45 deg
+orbit-180	b-orbit	0	0	180	0.64	0.0009	whole building, about 45 deg
+orbit-225	b-orbit	0	0	225	0.64	0.0009	whole building, about 45 deg
+orbit-270	b-orbit	0	0	270	0.64	0.0009	whole building, about 45 deg
+orbit-315	b-orbit	0	0	315	0.64	0.0009	whole building, about 45 deg
+top-whole	c-roof	0	0	0	0	0.0012	top-down, whole building and surroundings
+top-north	c-roof	32	0	0	0	0.0007	top-down, north wing roof
+top-centre	c-roof	0	0	0	0	0.0007	top-down, flat roof and roof monitor
+top-south	c-roof	-32	0	0	0	0.0007	top-down, south wing roof and south bulge
+roof-000	c-roof	0	0	0	0.4	0.0008	high oblique roof view
+roof-090	c-roof	0	0	90	0.4	0.0008	high oblique roof view
+roof-180	c-roof	0	0	180	0.4	0.0008	high oblique roof view
+roof-270	c-roof	0	0	270	0.4	0.0008	high oblique roof view
+corner-sw	d-detail	-55	-38	45	1	0.0007	south-west corner
+corner-nw	d-detail	55	-38	135	1	0.0007	north-west corner
+corner-ne	d-detail	55	38	225	1	0.0007	north-east corner
+corner-se	d-detail	-55	38	315	1	0.0007	south-east corner
+colonnade-060	d-detail	0	-38	60	1	0.0007	west colonnade and entrance from the south-west
+colonnade-120	d-detail	0	-38	120	1	0.0007	west colonnade and entrance from the north-west
+eastlobe-240	d-detail	0	40	240	1	0.0007	east lobe from the north-east
+eastlobe-300	d-detail	0	40	300	1	0.0007	east lobe from the south-east
+eastlobe-high	d-detail	0	40	270	0.4	0.0007	east lobe and green roof from above
+southbulge-330	d-detail	-62	0	330	1	0.0007	south bulge from the south-east
+southbulge-030	d-detail	-62	0	30	1	0.0007	south bulge from the south-west
+southbulge-high	d-detail	-62	0	0	0.4	0.0007	south bulge from above
+north-150	d-detail	55	0	150	1	0.0007	north face from the north-west
+north-210	d-detail	55	0	210	1	0.0007	north face from the north-east
+plaza-top-s	e-plaza	-45	-62	0	0	0.0007	plaza paving top-down, south part
+plaza-top-c	e-plaza	0	-62	0	0	0.0007	plaza paving top-down, centre
+plaza-top-n	e-plaza	45	-62	0	0	0.0007	plaza paving top-down, north part
+plaza-090	e-plaza	0	-58	90	0.64	0.0007	plaza and planters looking east at the building
+plaza-000	e-plaza	0	-58	0	0.64	0.0007	plaza and planters looking north along the face
+plaza-180	e-plaza	0	-58	180	0.64	0.0007	plaza and planters looking south along the face
+plaza-270	e-plaza	0	-58	270	0.4	0.0007	plaza and planters looking west from over the roof
+plaza-low-000	e-plaza	-20	-58	0	1	0.0007	plaza at the lowest camera looking north
+plaza-low-180	e-plaza	20	-58	180	1	0.0007	plaza at the lowest camera looking south

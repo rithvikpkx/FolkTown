@@ -114,7 +114,7 @@ function materials(m) {
   return {
     brick, stone, far, photos,
     roof: std({ map: tileTexture(), roughness: 0.75, name: 'tile' }),
-    flat: std({ color: 0xc8c5bc, roughness: 0.9 }),
+    flat: std({ color: 0x5c5f62, roughness: 0.9 }), // dark grey membrane (Apple Maps top-down)
     steel: std({ color: 0x8d9094, roughness: 0.4, metalness: 0.7 }),
     dark: std({ color: 0x1b1a1a, roughness: 0.7 }),
     frame: std({ color: 0xcfc9b8, roughness: 0.5, metalness: 0.2 }), dframe: std({ color: 0x353b38, roughness: 0.5, metalness: 0.3 }),
@@ -329,7 +329,7 @@ export async function buildWalc(G, poly, opts = {}) {
     for (let k = 0; k <= nb; k += k === 0 || k === nb ? 1 : 4) pipeAt(k === 0 ? 0.35 : k === nb ? L - 0.35 : m0 + k * pitch);
     if (colon) { // deep tiled overhang over the bay, on the piers: eave 16.1 m, rises to meet the flat roof
       const ye = 16.1, oe = 2.8;
-      rfq(P(0, ye, oe), P(L, ye, oe), P(L, 16.95, -0.3), P(0, 16.95, -0.3));
+      if (e.nx > -0.9) rfq(P(0, ye, oe), P(L, ye, oe), P(L, 16.95, -0.3), P(0, 16.95, -0.3)); // the west bay gets the full gable below instead
       face(DK, 0, ye - 0.35, L, ye + 0.04, oe); DK.q(P(0, ye - 0.35, oe), P(L, ye - 0.35, oe), P(L, ye - 0.35, 0), P(0, ye - 0.35, 0));
       for (const u of [0, L]) DK.q(P(u, ye - 0.35, 0), P(u, ye - 0.35, oe), P(u, ye + 0.04, oe), P(u, 16.95, -0.3));
       face(DK, 0, 16.2, L, 16.95, -0.3); // close the back of the overhang against the flat roof
@@ -363,6 +363,17 @@ export async function buildWalc(G, poly, opts = {}) {
     }
     box(DK, h.x0 + hd, ry, zc - 0.12, h.x1 - hd, ry + 0.22, zc + 0.12); // ridge cap
   }
+  // West bar: a clay-tile gable joins the two hips into one C-shaped roof (Apple Maps top-down, docs/apple-maps-capture.md: west eave over the
+  // colonnade, ridge 9.3 m in, east edge at x 58.8 above the flat roof). The slopes run from hip ridge to hip ridge and pass under the hip tiles,
+  // so the valleys come out of the intersection. The LiDAR bump here was a plant box before; it is this roof.
+  const ce = edgeInfo.find((e) => e.kind === 'colonnade' && e.nx < -0.9);
+  if (ce) {
+    const xw = ce.mx - 2.8, yw = 16.14, xr = xw + 9.3, yr = yw + SLOPE * 9.3, xe = 58.8, ye = yr - SLOPE * (xe - xr), zn = (HIPS[0].z0 + HIPS[0].z1) / 2, zs = (HIPS[1].z0 + HIPS[1].z1) / 2;
+    rfq([xw, yw, zs], [xw, yw, zn], [xr, yr, zn], [xr, yr, zs]); // west slope
+    rfq([xe, ye, zn], [xe, ye, zs], [xr, yr, zs], [xr, yr, zn]); // east slope
+    DK.q([xe, 16.2, zn], [xe, ye, zn], [xe, ye, zs], [xe, 16.2, zs]); // inner fascia down to the flat roof
+    box(DK, xr - 0.12, yr, zn, xr + 0.12, yr + 0.22, zs); // ridge cap
+  }
   // walls that slant away from the LiDAR hip outline end below the tile plane (up to 0.5 m on the south pavilion's west face): raise brick up to the tile
   const tileY = (x, z) => { let y = 0; for (const h of HIPS) { const d = Math.min(x - h.x0, h.x1 - x, z - h.z0, h.z1 - z); if (d > -1.5) y = Math.max(y, yt + SLOPE * d); } return y; };
   for (const e of edgeInfo) {
@@ -393,9 +404,6 @@ export async function buildWalc(G, poly, opts = {}) {
     const m = b.mesh();
     if (k === 'far') { far.add(m); trisFar += b.p.length / 9; } else { (ROOT.has(k) ? root : near).add(m); tris += b.p.length / 9; }
   }
-  // rooftop plant (LiDAR: ~3 m above the flat roof)
-  const mech = (x0, x1, z0, z1, y0, y1) => { const m = new Mesh(new BoxGeometry(x1 - x0, y1 - y0, z1 - z0), M.mech); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; root.add(m); tris += 12; };
-  mech(52, 58, -30, 5, 16.2, 19.4);
 
   // ---------- site details: entrance canopy, lamp posts, limestone seat walls ----------
   const props = new Group(), lampMat = new MeshStandardMaterial({ color: 0xfff1d0, emissive: 0xffe2a8, emissiveIntensity: 0.6 });

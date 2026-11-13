@@ -2,6 +2,22 @@
 
 The handoff file. Update it at the end of every work package, so a session that hits a usage limit or loses its transcript loses nothing.
 
+## TAKING OVER MAP DEVELOPMENT? START HERE
+
+**Repo and branches:** https://github.com/rithvikpkx/FolkTown. Work on branch **`v2-walk`** (map/fidelity track, everything from this track is merged into it). `mvp` holds the Saltline game base only (what Vercel deploys); do not push or merge to `main`. When the walk scene is accepted, merge `v2-walk` into `mvp`.
+
+**Setup:** Node 24, then from the repo root `npx -y pnpm@12.18.0 install`. Run the game: `npx -y pnpm@12.18.0 saltline` and open `/?walk=1` (the campus walk scene) or `/` (the shooter). Checks: `node tools/saltline-check.mjs` and `PAGE='index.html?walk=1' node tools/saltline-check.mjs` (headless Chrome, both must report no errors); hole checks `node tools/walc-holes.mjs` and `node tools/hotspot-holes.mjs` (must stay 0 escapes); screenshots `node tools/saltline-walk-shots.mjs` and `node tools/saltline-campus-shots.mjs`. `pnpm lint` fails on some pre-existing files.
+
+**Where the map code is** (`packages/saltline/src/campus/`): `walk.js` (walk mode entry), `region.js` (campus region loader, massing, hotspot registry), `facades.js` + `building-styles.json` (facades, photo facade tiles), `walc.js`, `belltower.js`, `hotspots/{union,elliott,memorial-mall}.js` (each exports `build(G, zone)`), `env/` (sky, trees, furniture, plaza, roofs, context), `ground.js`, `vegetation.js`. Data bake: `packages/map-tools` (`pnpm map:bake-region`, footprint fixes in `packages/map-tools/data/footprint-fixes.json`). Per-feature reports: `docs/walc-hifi.md`, `docs/layout-report.md`, `docs/walc-holes.md`, `docs/hotspot-holes.md`, `docs/apple-maps-capture.md`, `docs/pilot-data.md`; every external source and licence status (all needs-clearance) is in `docs/assets.md`.
+
+**Secrets and big data are NOT in git.** Create `.env.local` in the repo root with your own `GOOGLE_MAPS_API_KEY` (Map Tiles API + Street View Static API enabled; set a low daily quota; the previous owner used a free-trial credit) and `MAPILLARY_TOKEN` (free, mapillary.com/developer). Gitignored data you must regenerate or get from the previous owner's machine: `data/google/` (3D tiles mesh: `pnpm map:tiles --zone mall-union` then `pnpm map:tiles:convert --zone mall-union`), `data/raw/streetview/` (`pnpm map:streetview`), `data/raw/streetview-tiles/` (Street View Tiles panoramas, see `tools/facade-extract.py`), `data/raw/apple-maps-walc/` (Apple Maps frames, see below), `data/raw/campusmapper/`. The shipped textures and tiles built from them are committed under `packages/saltline/public/campus/`.
+
+**Publishing the walk artifact** (https://claude.ai/artifact/Q2H24oddSYNjYo2kpPPfma, private to the previous owner; your friend would publish their own): `npx -y pnpm@12.18.0 saltline:walk-build` (output `packages/saltline/dist-walk`; the script's own 40 MB budget check fails at 40.9 MB but the bundle is valid), delete `models/`, strip the html/head/body wrappers from `index.html`, publish with an explicit `files` list (served types only, no `.glb`). Always pass the existing artifact `url` when republishing.
+
+**Apple Maps capture** needs macOS Accessibility and Screen Recording for the terminal (relaunch it after granting): `tools/apple-maps-capture.sh`, `tools/apple-maps-cam.swift`. The owner is in West Lafayette, Indiana; the capture drives real mouse events, so do not use the machine while it runs.
+
+**What to do next** (ranked): the open items in the HANDOFF list below (fallback facades on 31 buildings, plaza paving colour, low-poly trees, Union/Elliott guessed faces, courtyard holes not rendered, then merge into `mvp`). All data is needs-clearance: the owner handles licences.
+
 ## HANDOFF, end of session 12 November 2026 (read this first)
 
 **Pivot done.** The game base is now **Saltline** (`packages/saltline`, owner-approved; the old `packages/client` stays untouched). On `mvp`: Saltline base, Mall level, landmarks, ground/veg, lab weapons (M4A1, pistol), FFA/TDM modes with bots, FolkTown UI wipe, Vercel serves Saltline (https://folktown.vercel.app, default build `pnpm --filter @folktown/saltline build`). Enterable buildings, vehicles, multiplayer, shotgun and the bolt rifle are cut or pushed later; Google 3D tiles export is no longer tabled (see below).

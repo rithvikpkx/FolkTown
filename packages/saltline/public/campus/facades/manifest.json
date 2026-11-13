@@ -1,0 +1,867 @@
+{
+ "way/74340895": {
+  "name": "Physics Building (PHYS)",
+  "tex": "photo/way-74340895.webp",
+  "w": 10.65,
+  "h": 17.45,
+  "y0": 0.3,
+  "bay": 3.55,
+  "gain": 2.36,
+  "confidence": 0.998,
+  "fitConf": 1.0,
+  "pano": "R5n3-Wan-fR-gmoilcN_9Q",
+  "date": "2025-08",
+  "color": "#ab8d7a",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/75498146": {
+  "name": "Hovde Hall of Administration (HOVD)",
+  "tex": "photo/way-75498146.webp",
+  "w": 10.5,
+  "h": 14.65,
+  "y0": 0.3,
+  "bay": 2.62,
+  "gain": 1.09,
+  "confidence": 0.978,
+  "fitConf": 1.0,
+  "pano": "AlEKOl5L6ZaLeS_RFWTraw",
+  "date": "2019-08",
+  "color": "#8b7d78",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117146482": {
+  "name": "Heine Pharmacy (RHPH)",
+  "tex": "photo/way-117146482.webp",
+  "w": 11.0,
+  "h": 20.65,
+  "y0": 0.3,
+  "bay": 2.2,
+  "gain": 1.58,
+  "confidence": 0.961,
+  "fitConf": 1.0,
+  "pano": "4Di-384KjxdTvozJdh_icw",
+  "date": "2026-04",
+  "color": "#958275",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117146483": {
+  "name": "Union Club Hotel",
+  "tex": "photo/way-117146483.webp",
+  "w": 9.1,
+  "h": 18.25,
+  "y0": 0.3,
+  "bay": 2.27,
+  "gain": 0.89,
+  "confidence": 0.775,
+  "fitConf": 1.0,
+  "pano": "kHR6H6noizuVfkj29PCfOQ",
+  "date": "2026-03",
+  "color": "#8d7974",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117146484": {
+  "name": "Stewart Center (STEW)",
+  "tex": "photo/way-117146484.webp",
+  "w": 8.9,
+  "h": 15.95,
+  "y0": 0.3,
+  "bay": 2.23,
+  "gain": 2.6,
+  "confidence": 0.788,
+  "fitConf": 0.98,
+  "pano": "wAIHN7NdJxoKqHXyH8FSMw",
+  "date": "2019-08",
+  "color": "#ac947a",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117146486": {
+  "name": "Student Health Center (PUSH)",
+  "tex": "photo/way-117146486.webp",
+  "w": 9.9,
+  "h": 15.45,
+  "y0": 0.3,
+  "bay": 3.3,
+  "gain": 1.6,
+  "confidence": 0.995,
+  "fitConf": 1.0,
+  "pano": "3-WO0G8nTRrBDVY2aPQUng",
+  "date": "2026-04",
+  "color": "#99847c",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117146489": {
+  "name": "R. B. Wetherill Laboratory of Chemistry (WTHR)",
+  "tex": "photo/way-117146489.webp",
+  "w": 10.0,
+  "h": 19.05,
+  "y0": 0.3,
+  "bay": 4.55,
+  "gain": 2.12,
+  "confidence": 0.836,
+  "fitConf": 1.0,
+  "pano": "wJ-Wrf7vCg8ot3AKt_XBIQ",
+  "date": "2017-09",
+  "color": "#9e7c6a",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117147168": {
+  "name": "Haas (Felix) Hall (HAAS)",
+  "tex": "photo/way-117147168.webp",
+  "w": 11.0,
+  "h": 12.65,
+  "y0": 0.3,
+  "bay": 2.2,
+  "gain": 1.69,
+  "confidence": 0.832,
+  "fitConf": 1.0,
+  "pano": "MtZMclI1aQlsgUm1U4Zsiw",
+  "date": "2026-04",
+  "color": "#927f81",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117147171": {
+  "name": "Armory (AR)",
+  "tex": "photo/way-117147171.webp",
+  "w": 10.05,
+  "h": 14.35,
+  "y0": 0.3,
+  "bay": 3.35,
+  "gain": 2.5,
+  "confidence": 0.926,
+  "fitConf": 1.0,
+  "pano": "CAoSFkNJSE0wb2dLRUlDQWdJRHEzY25MZVE.",
+  "date": "2021-04",
+  "color": "#a1756c",
+  "credit": "Google Street View, (c) Dana Moseson-Tarrh",
+  "fallback": false
+ },
+ "way/117147172": {
+  "name": "Matthews Hall (MTHW)",
+  "tex": "photo/way-117147172.webp",
+  "w": 11.4,
+  "h": 17.65,
+  "y0": 0.3,
+  "bay": 3.8,
+  "gain": 1.81,
+  "confidence": 0.891,
+  "fitConf": 1.0,
+  "pano": "s1iu6s9n1GN-FE89VbiSFw",
+  "date": "2023-07",
+  "color": "#89747f",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117147178": {
+  "name": "Stone Hall (STON)",
+  "tex": "photo/way-117147178.webp",
+  "w": 10.2,
+  "h": 13.95,
+  "y0": 0.3,
+  "bay": 3.4,
+  "gain": 1.07,
+  "confidence": 0.871,
+  "fitConf": 1.0,
+  "pano": "K9XU9ibaM4m26MfSH41vog",
+  "date": "2019-08",
+  "color": "#987665",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/158307858": {
+  "name": "Materials Science and Electrical Engineering (MSEE)",
+  "tex": "photo/way-158307858.webp",
+  "w": 10.0,
+  "h": 18.95,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 2.12,
+  "confidence": 0.998,
+  "fitConf": 1.0,
+  "pano": "u149QOTu5LDQAa6qdW4bkw",
+  "date": "2025-08",
+  "color": "#a18877",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/158307860": {
+  "name": "Max W & Maileen Brown Family Hall of Electrical Engineering (BHEE)",
+  "tex": "photo/way-158307860.webp",
+  "w": 11.3,
+  "h": 14.85,
+  "y0": 0.3,
+  "bay": 2.83,
+  "gain": 1.79,
+  "confidence": 0.978,
+  "fitConf": 1.0,
+  "pano": "yxb2_jy7IK62GQGlRuZMug",
+  "date": "2025-08",
+  "color": "#938176",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/158307901": {
+  "name": "University Hall (UNIV)",
+  "tex": "photo/way-158307901.webp",
+  "w": 9.8,
+  "h": 21.75,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 0.88,
+  "confidence": 0.981,
+  "fitConf": 1.0,
+  "pano": "se50M2E4MsI4SDY51--kTg",
+  "date": "2019-08",
+  "color": "#8c7363",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/301932783": {
+  "name": null,
+  "tex": "photo/way-301932783.webp",
+  "w": 10.0,
+  "h": 7.15,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 1.71,
+  "confidence": 0.999,
+  "fitConf": 1.0,
+  "pano": "exlBMg_pdUN9R3Cfm1-9jQ",
+  "date": "2025-08",
+  "color": "#8b7a69",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/301932784": {
+  "name": "University Lutheran Church",
+  "tex": "photo/way-301932784.webp",
+  "w": 8.24,
+  "h": 15.45,
+  "y0": 0.3,
+  "bay": 2.25,
+  "gain": 2.19,
+  "confidence": 0.998,
+  "fitConf": 1.0,
+  "pano": "yxb2_jy7IK62GQGlRuZMug",
+  "date": "2025-08",
+  "color": "#8a766c",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/301932787": {
+  "name": "Wang Hall (WANG)",
+  "tex": "photo/way-301932787.webp",
+  "w": 10.0,
+  "h": 23.45,
+  "y0": 0.3,
+  "bay": 7.72,
+  "gain": 1.74,
+  "confidence": 0.915,
+  "fitConf": 1.0,
+  "pano": "GDRDAdWQDlUVZI2qsD9uTg",
+  "date": "2025-08",
+  "color": "#998776",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/301932790": {
+  "name": null,
+  "tex": "photo/way-301932790.webp",
+  "w": 10.0,
+  "h": 9.55,
+  "y0": 0.3,
+  "bay": 4.1,
+  "gain": 0.8,
+  "confidence": 0.99,
+  "fitConf": 1.0,
+  "pano": "1CPNSiyIlJzORCXct7K_SA",
+  "date": "2026-03",
+  "color": "#907d6d",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/860822250": {
+  "name": null,
+  "tex": "photo/way-860822250.webp",
+  "w": 10.0,
+  "h": 10.05,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 1.69,
+  "confidence": 0.765,
+  "fitConf": 1.0,
+  "pano": "MOM0ExItgzNnpRGYGXtlOA",
+  "date": "2017-08",
+  "color": "#9e7263",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/932253994": {
+  "name": "American Railway Building (RAIL)",
+  "tex": "photo/way-932253994.webp",
+  "w": 10.0,
+  "h": 9.25,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 1.95,
+  "confidence": 0.916,
+  "fitConf": 1.0,
+  "pano": "6u2Sw1tE8AOViveStsyV9A",
+  "date": "2017-08",
+  "color": "#937e78",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/1103303762": {
+  "name": "Purdue Graduate Student Center",
+  "tex": "photo/way-1103303762.webp",
+  "w": 10.0,
+  "h": 15.05,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 1.47,
+  "confidence": 0.933,
+  "fitConf": 1.0,
+  "pano": "rb-46OKsv-rCfnUUIYr4vA",
+  "date": "2025-08",
+  "color": "#92806f",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/1149668161": {
+  "name": null,
+  "tex": "photo/way-1149668161.webp",
+  "w": 7.4,
+  "h": 3.35,
+  "y0": 0.3,
+  "bay": 3.38,
+  "gain": 1.02,
+  "confidence": 0.87,
+  "fitConf": 0.9,
+  "pano": "SFkpFTnBSvlf7blM-jBa8g",
+  "date": "2026-03",
+  "color": "#8a7159",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/1383852532": {
+  "name": "Lambertus Hall (LMBS)",
+  "tex": "photo/way-1383852532.webp",
+  "w": 10.0,
+  "h": 9.15,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 1.76,
+  "confidence": 0.785,
+  "fitConf": 1.0,
+  "pano": "MOM0ExItgzNnpRGYGXtlOA",
+  "date": "2017-08",
+  "color": "#a07163",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/1418955365": {
+  "name": null,
+  "tex": "photo/way-1418955365.webp",
+  "w": 10.0,
+  "h": 13.45,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 0.95,
+  "confidence": 0.998,
+  "fitConf": 1.0,
+  "pano": "fQPNgpqxXOkFgFCUmL8hgw",
+  "date": "2026-03",
+  "color": "#85786e",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/1418958953": {
+  "name": null,
+  "tex": "photo/way-1418958953.webp",
+  "w": 10.0,
+  "h": 15.05,
+  "y0": 0.3,
+  "bay": null,
+  "gain": 1.24,
+  "confidence": 1.0,
+  "fitConf": 1.0,
+  "pano": "ycaxPb0AeM9b8EX15LDDOA",
+  "date": "2025-08",
+  "color": "#776759",
+  "credit": "Google Street View, (c) 2026 Google",
+  "fallback": false
+ },
+ "way/117146480": {
+  "name": "Brown Laboratory of Chemistry (BRWN)",
+  "tex": null,
+  "color": "#9e7263",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/860822250",
+   "way/117146489",
+   "way/1383852532"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117146487": {
+  "name": "Knoy Hall (KNOY)",
+  "tex": null,
+  "color": "#9e7263",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/1383852532",
+   "way/301932783",
+   "way/860822250"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117146488": {
+  "name": "Johnson Hall of Nursing (JNSN)",
+  "tex": null,
+  "color": "#958278",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117146482",
+   "way/117146486",
+   "way/75498146"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117146492": {
+  "name": "Hall of Data Science and AI (DSAI)",
+  "tex": null,
+  "color": "#958278",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/75498146",
+   "way/117146488",
+   "way/117146482"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117146493": {
+  "name": "Grissom Hall",
+  "tex": null,
+  "color": "#9e7263",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117146480",
+   "way/860822250",
+   "way/117146483"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117146495": {
+  "name": "Hampton Hall of Civil Engineering (HAMP)",
+  "tex": null,
+  "color": "#99847a",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/74340895",
+   "way/117146486",
+   "way/117146488"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117146497": {
+  "name": "Forney Hall of Chemical Engineering (FRNY)",
+  "tex": null,
+  "color": "#99847a",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/74340895",
+   "way/117146495",
+   "way/117146492"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117147167": {
+  "name": "Schleman Hall (SCHM)",
+  "tex": null,
+  "color": "#8c7363",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/158307901",
+   "way/117147178",
+   "way/1149668161"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117147170": {
+  "name": "Potter Engineering Center (POTR)",
+  "tex": null,
+  "color": "#9e7263",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/932253994",
+   "way/1383852532",
+   "way/860822250"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117147173": {
+  "name": "Psychological Sciences Building (PSYC)",
+  "tex": null,
+  "color": "#8c7d78",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117147168",
+   "way/117147167",
+   "way/75498146"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117147176": {
+  "name": "Beering Hall (BRNG)",
+  "tex": null,
+  "color": "#8c7363",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117147167",
+   "way/158307901",
+   "way/117147172"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/117147177": {
+  "name": "Mathematical Sciences Building (MATH)",
+  "tex": null,
+  "color": "#8c7363",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117147167",
+   "way/117147176",
+   "way/117147168"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/158307862": {
+  "name": "Mechanical Engineering (ME)",
+  "tex": null,
+  "color": "#937e76",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/932253994",
+   "way/117147170",
+   "way/158307860"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/158307900": {
+  "name": "Hicks Undergraduate Library (HIKS)",
+  "tex": null,
+  "color": "#9e7c74",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117146484",
+   "way/117146483",
+   "way/117146489"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/283275025": {
+  "name": "Northwestern Parking Garage",
+  "tex": null,
+  "color": "#85786e",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/1418955365",
+   "way/1418958953",
+   "way/1103303762"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/301932785": {
+  "name": null,
+  "tex": null,
+  "color": "#8a786c",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/301932783",
+   "way/301932784",
+   "way/1418955365"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/301932786": {
+  "name": null,
+  "tex": null,
+  "color": "#8a786c",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/301932785",
+   "way/301932784",
+   "way/1418955365"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/309492283": {
+  "name": "Class of 1950 Lecture Hall (CL50)",
+  "tex": null,
+  "color": "#8c7363",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117147177",
+   "way/117147167",
+   "way/117147173"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/309492284": {
+  "name": "Pierce Hall (PRCE)",
+  "tex": null,
+  "color": "#8c7363",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/309492283",
+   "way/117147173",
+   "way/117147177"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/607137011": {
+  "name": null,
+  "tex": null,
+  "color": "#85786d",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/301932790",
+   "way/283275025",
+   "way/1418958953"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/607137013": {
+  "name": null,
+  "tex": null,
+  "color": "#85786d",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/607137011",
+   "way/301932790",
+   "way/283275025"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/607137015": {
+  "name": null,
+  "tex": null,
+  "color": "#85786d",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/607137013",
+   "way/607137011",
+   "way/301932790"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/866802210": {
+  "name": "Chaney-Hale Hall of Science (CHAS)",
+  "tex": null,
+  "color": "#957d78",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/117147171",
+   "way/117146492",
+   "way/75498146"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/1033674918": {
+  "name": null,
+  "tex": null,
+  "color": "#a1887a",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/158307858",
+   "way/74340895",
+   "way/117146497"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/1033674919": {
+  "name": null,
+  "tex": null,
+  "color": "#938176",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/158307858",
+   "way/158307860",
+   "way/1418958953"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/1033674920": {
+  "name": null,
+  "tex": null,
+  "color": "#957d78",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/75498146",
+   "way/117146492",
+   "way/866802210"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "no usable Street View facade"
+ },
+ "way/1383852533": {
+  "name": "Dudley Hall (DUDL)",
+  "tex": null,
+  "color": "#9e7263",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/860822250",
+   "way/1383852532",
+   "way/117146493"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/1418750210": {
+  "name": null,
+  "tex": null,
+  "color": "#85786e",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/1418958953",
+   "way/283275025",
+   "way/1103303762"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "no usable Street View facade"
+ },
+ "way/1418954764": {
+  "name": null,
+  "tex": null,
+  "color": "#85786e",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/283275025",
+   "way/607137011",
+   "way/1418750210"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "best facade below quality threshold"
+ },
+ "way/1419291577": {
+  "name": null,
+  "tex": null,
+  "color": "#85786e",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/1418750210",
+   "way/283275025",
+   "way/1418958953"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "no usable Street View facade"
+ },
+ "way/1419291578": {
+  "name": null,
+  "tex": null,
+  "color": "#8a786c",
+  "mat": "brick",
+  "confidence": 0,
+  "fallback": true,
+  "basedOn": [
+   "way/301932786",
+   "way/301932785",
+   "way/1418955365"
+  ],
+  "credit": "style from nearest photographed buildings",
+  "note": "no usable Street View facade"
+ }
+}

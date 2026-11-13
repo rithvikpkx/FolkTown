@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Saltline Memorial Union demo</title>
+<style>html,body{margin:0;background:#222;overflow:hidden;height:100%}#hud{position:fixed;left:8px;top:8px;color:#fff;font:12px monospace;text-shadow:0 0 3px #000}</style></head>
+<body><div id="hud"></div>
+<script type="module">
+// Renders the code-generated Memorial Union hotspot (src/campus/hotspots/union.js) in Saltline's three.js setup.
+// ?cam=x,y,z,tx,ty,tz (local metres, Bell Tower = origin)  &fov=50  &far=1 forces the far LOD  &ground=0 hides the ground disc
+import * as THREE from 'three';
+import { Z0 } from './src/game/common.js';
+import { build } from './src/campus/hotspots/union.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+const q = new URLSearchParams(location.search), cam3 = (q.get('cam') || '248,40,350,248,8,260').split(',').map(Number);
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+r.setSize(innerWidth, innerHeight); r.setPixelRatio(1); r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = 0.6; r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(r.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x8fb0d8); scene.fog = new THREE.Fog(0xaec3d6, 260, 900);
+const camera = new THREE.PerspectiveCamera(+(q.get('fov') || 50), innerWidth / innerHeight, 0.1, 1500);
+camera.position.set(cam3[0], cam3[1], cam3[2]); camera.lookAt(cam3[3], cam3[4], cam3[5]);
+const cx = 248, cz = 250, sun = new THREE.DirectionalLight(Z0.color, Z0.intensity);
+sun.position.set(cx, 0, cz).addScaledVector(Z0.dir, 160); sun.target.position.set(cx, 0, cz); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 1, far: 420 }); sun.shadow.bias = -1e-4; sun.shadow.normalBias = 0.05;
+scene.add(sun, sun.target, new THREE.HemisphereLight(0x9db8e0, 0x4a4a3a, 2.2));
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.5;
+if (q.get('ground') !== '0') { const g = new THREE.Mesh(new THREE.CircleGeometry(600, 48).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x8a8678, roughness: 1 })); g.position.set(cx, -0.03, cz); g.receiveShadow = true; scene.add(g); }
+const G = { camera, scene, renderer: r };
+const u = await build(G, null);
+scene.add(u.group);
+if (q.get('far')) { camera.position.x += 0; u.update(); G.camera = { position: new THREE.Vector3(1e4, 0, 1e4) }; u.update(); G.camera = camera; }
+let n = 0;
+r.setAnimationLoop(() => { if (!q.get('far')) u.update(0); r.render(scene, camera); if (++n === 8) window.__ready = true; });
+document.getElementById('hud').textContent = `union tris=${u.group.userData.stats.tris} far=${u.group.userData.stats.trisFar} solids=${u.solids.length}`;
+window.__union = u;
+</script></body></html>

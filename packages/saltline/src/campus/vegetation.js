@@ -25,6 +25,10 @@ import {
 } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { getMask } from './ground.js';
+import { buildWalkTrees } from './env/trees.js';
+
+/** walk.js sets walk=true before buildCampus so buildTrees returns the species-based walk trees */
+export const vegMode = { walk: false };
 
 // small deterministic RNG so every client sees the same trees
 const rng = (seed) => () => ((seed = (Math.imul(seed ^ (seed >>> 15), 1 | seed) + 0x6d2b79f5) | 0), ((seed ^ (seed >>> 14)) >>> 0) / 4294967296);
@@ -73,7 +77,7 @@ export function buildGrass(zone, opts = {}) {
         float vnz(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
           return mix(mix(h3(i).x, h3(i+vec2(1,0)).x, f.x), mix(h3(i+vec2(0,1)).x, h3(i+vec2(1,1)).x, f.x), f.y); }`)
       .replace('#include <beginnormal_vertex>', `
-        float GN = ${GRASS_N}.0, GS = ${GRASS_S.toFixed(3)};
+        float GN = ${GRASS_N}.0, GS = ${(opts.step ?? GRASS_S).toFixed(3)};
         vec2 base = floor(uCam.xz / GS) - GN * 0.5;
         vec2 cell = base + mod(aCell - base, GN);
         vec3 r = h3(cell), r2 = h3(cell + 91.7);
@@ -102,10 +106,10 @@ export function buildGrass(zone, opts = {}) {
       .replace('#include <common>', '#include <common>\nvarying float vT; varying vec3 vTint;')
       .replace('#include <normal_fragment_begin>', ShaderChunk.normal_fragment_begin.replace('gl_FrontFacing ? 1.0 : - 1.0', '1.0'))
       .replace('#include <map_fragment>', `
-        vec3 gBase = vec3(0.030, 0.095, 0.014), gTip = vec3(0.19, 0.40, 0.075);
+        vec3 gBase = mix(vec3(0.030, 0.095, 0.014), vec3(0.09, 0.07, 0.02), ${(opts.dry ?? 0).toFixed(2)}), gTip = mix(vec3(0.19, 0.40, 0.075), vec3(0.42, 0.34, 0.14), ${(opts.dry ?? 0).toFixed(2)});
         diffuseColor.rgb = mix(gBase, gTip, vT) * vTint * (0.65 + 0.35 * vT);`);
   };
-  mat.customProgramCacheKey = () => 'campus_grass_v1';
+  mat.customProgramCacheKey = () => 'campus_grass_v1' + (opts.dry ?? 0);
   const mesh = new Mesh(tuftGeometry(), mat);
   mesh.name = 'campus_grass';
   mesh.frustumCulled = false;
@@ -212,6 +216,7 @@ const LOD_NEAR = 55, LOD_MID = 140, LOD_FAR = 650;
 
 /** Returns a Group with update(camera). Trees come from zone.trees, else zone.props (trunk cylinders in purdue-mall.json). */
 export function buildTrees(zone) {
+  if (vegMode.walk) return buildWalkTrees(zone);
   const src = zone.trees?.length ? zone.trees : zone.props ?? [];
   const trees = src.map((t) => {
     const h = hash2(t.x, t.z);

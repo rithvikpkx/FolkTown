@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Saltline hotspot demo</title>
+<style>html,body{margin:0;background:#222;overflow:hidden;height:100%}#hud{position:fixed;left:8px;top:8px;color:#fff;font:12px monospace;text-shadow:0 0 3px #000}</style></head>
+<body><div id="c"></div><div id="hud"></div>
+<script type="module">
+import * as THREE from 'three';
+import { Z0 } from './src/game/common.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+// ?h=elliott|memorial-mall  &cam=x,y,z,tx,ty,tz (local metres)  &fov=60  &w=640&hh=640 (viewport)  &far=1 (force the far LOD)
+const q = new URLSearchParams(location.search), which = q.get('h') || 'elliott';
+const mods = { elliott: () => import('./src/campus/hotspots/elliott.js'), 'memorial-mall': () => import('./src/campus/hotspots/memorial-mall.js'), union: () => import('./src/campus/hotspots/union.js') };
+const cam6 = (q.get('cam') || '-40,40,-20,-80,10,-70').split(',').map(Number), VW = +(q.get('w') || innerWidth), VH = +(q.get('hh') || innerHeight);
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+r.setSize(VW, VH); r.setPixelRatio(1); r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = 0.75; r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+document.getElementById('c').appendChild(r.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x86a9d6); scene.fog = new THREE.Fog(0xb4c6d8, 220, 900);
+const [cx, , cz, tx, ty, tz] = cam6;
+const sun = new THREE.DirectionalLight(0xfff6e8, Z0.intensity);
+const sd = q.get('sun') ? new THREE.Vector3(...q.get('sun').split(',').map(Number)).normalize() : Z0.dir; sun.position.set(tx, 0, tz).addScaledVector(sd, 160); sun.target.position.set(tx, 0, tz); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, { left: -110, right: 110, top: 110, bottom: -110, near: 1, far: 500 }); sun.shadow.bias = -1e-4; sun.shadow.normalBias = 0.05;
+scene.add(sun, sun.target, new THREE.HemisphereLight(0x9db8e0, 0x4a4a3a, 1.6));
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.5;
+// stand-in terrain: dormant-lawn green plane at y 0 (the walk scene supplies the real ground)
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x6d7f3f, roughness: 1 }));
+ground.receiveShadow = true; ground.position.set(tx, -0.02, tz); scene.add(ground);
+const mod = await mods[which]();
+const hs = await mod.build({}, {});
+scene.add(hs.group); window.__hs = hs; window.__hsRoot = hs.group; // for tools/hotspot-holes.mjs
+const cam = new THREE.PerspectiveCamera(+(q.get('fov') || 60), VW / VH, 0.1, 1500);
+cam.position.set(cx, cam6[1], cz); cam.lookAt(tx, ty, tz);
+let n = 0;
+r.setAnimationLoop((t) => { hs.update?.(t / 1000); r.render(scene, cam); if (++n === 6) window.__ready = true; });
+window.__stats = { ...hs.stats, solids: hs.solids.length };
+document.getElementById('hud').textContent = `${which} ${JSON.stringify(hs.stats)} solids=${hs.solids.length}`;
+</script></body></html>

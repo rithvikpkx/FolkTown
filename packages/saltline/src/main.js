@@ -14,3 +14,4 @@ import './game/enemies.js';
 import './game/hud.js';
 import './game/loop.js';
 import './game/boot.js';
+import './ui/idcard.js';

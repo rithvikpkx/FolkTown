@@ -9,6 +9,12 @@
     "x": 0,
     "rotationY": 0,
     "magazine": "Magazine",
+    "sights": {
+      "eyeY": 0.0785,
+      "hide": ["Sight_2"],
+      "front": { "z": -0.3715, "base": 0.064, "width": 0.0021, "depth": 0.003, "dot": 0.0027, "color": "gold", "glow": 1.4 },
+      "rear": { "z": -0.034, "inner": 0.0047, "outer": 0.0063, "edge": 0.0004, "stem": 0.0605, "stemWidth": 0.0035 }
+    },
     "maps": {
       "DefaultMaterial": { "map": "models/lab/m4a1_0.webp", "normal": "models/lab/m4a1_1.webp", "orm": "models/lab/m4a1_2.webp" }
     }
@@ -24,5 +30,5 @@
       "service_pistol": { "map": "models/lab/pistol_1.webp", "normal": "models/lab/pistol_0.webp", "orm": "models/lab/pistol_2.webp" }
     }
   },
-  "_notes": "Models swap by editing this file. length/frontZ/topY fit the glb into the rig's gun space (metres, -z forward, y up). Shotgun (client package lab/shotgun.glb) has no slot: Saltline is a two-weapon rig. Sources and licences: docs/assets.md."
+  "_notes": "Models swap by editing this file. length/frontZ/topY fit the glb into the rig's gun space (metres, -z forward, y up). Shotgun (client package lab/shotgun.glb) has no slot: Saltline is a two-weapon rig. Sources and licences: docs/assets.md. rifle.sights adds the ADS overlay (src/weapons/sights.js): eyeY is the eye line the ADS pose aims down, front/rear place the post+dot and the aperture ring, hide drops GLB parts that would block the ring. The hammer is procedural (src/weapons/hammer.js)."
 }

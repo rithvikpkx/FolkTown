@@ -150,7 +150,7 @@ __late_weapon.rb(rb);
           he && he.killed && he.weak && P && D === n.time.frame && !P.weak && ((P.weak = !0), (P.el.innerHTML += "<em>Weak point</em>")));
       }),
       n.events.on("enemy:killed", (he) => {
-        let V = String((he && (he.type || (he.enemy && he.enemy.type))) || "machine").toUpperCase();
+        let V = String((he && ((he.enemy && he.enemy.label) || he.type || (he.enemy && he.enemy.type))) || "machine").replace(/^hound$/, "Moonship").toUpperCase();
         ((P = X.feed(`<b>${V}</b> destroyed`)), (D = n.time.frame));
       }),
       n.events.on("player:hit", (he) => {
@@ -364,7 +364,7 @@ __late_weapon.rb(rb);
           `<b>${$e.name || ""}</b> ${String(Math.max(0, $e.ammo | 0)).padStart(2, "0")} / ${$e.reserve === 1 / 0 ? "\u221E" : Math.max(0, $e.reserve | 0)}`;
       }
       je !== oe.alt && ((oe.alt = je), (H.innerHTML = je));
-      let Ze = Ne <= Math.ceil(_e * 0.27),
+      let Ze = !ne.melee && Ne <= Math.ceil(_e * 0.27),
         qe =
           ne.state === "reloading"
             ? "Reloading"
@@ -531,11 +531,13 @@ __late_weapon.ab(ab);
     <div><dt>Fire</dt><dd>Left button</dd></div>
     <div><dt>Aim</dt><dd>Right button</dd></div>
     <div><dt>Reload</dt><dd><kbd>R</kbd></dd></div>
-    <div><dt>Swap weapon</dt><dd><kbd>Q</kbd>, wheel, or <kbd>1</kbd> <kbd>2</kbd></dd></div>
+    <div><dt>Swap weapon</dt><dd><kbd>Q</kbd>, wheel, or <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></dd></div>
+    <div><dt>Rivet hammer</dt><dd><kbd>3</kbd></dd></div>
     <div><dt>Jump</dt><dd><kbd>Space</kbd></dd></div>
     <div><dt>Sprint</dt><dd><kbd>Shift</kbd></dd></div>
     <div><dt>Crouch</dt><dd><kbd>C</kbd> or <kbd>Ctrl</kbd></dd></div>
-    <div><dt>Melee</dt><dd><kbd>F</kbd></dd></div>
+    <div><dt>Melee</dt><dd><kbd>F</kbd>, <kbd>V</kbd> or middle button</dd></div>
+    <div><dt>Weapon skin</dt><dd><kbd>B</kbd></dd></div>
     <div><dt>Pause</dt><dd><kbd>Esc</kbd> or <kbd>P</kbd></dd></div>
   </dl>`,
     oL = `
@@ -591,7 +593,7 @@ __late_enemies.sL(sL);
       </div>
       <aside class="m-legend" aria-label="Controls at a glance">
         <div><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span><span><kbd>Mouse</kbd> Look</span><span><kbd>LMB</kbd> Fire</span><span><kbd>RMB</kbd> Aim</span><span><kbd>R</kbd> Reload</span></div>
-        <div><span><kbd>Q</kbd> Sidearm</span><span><kbd>Tab</kbd> Scores</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>C</kbd> Crouch</span><span><kbd>Esc</kbd> Pause</span></div>
+        <div><span><kbd>Q</kbd> Sidearm</span><span><kbd>3</kbd> Hammer</span><span><kbd>F</kbd> Melee</span><span><kbd>B</kbd> Skin</span><span><kbd>Tab</kbd> Scores</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span><kbd>C</kbd> Crouch</span><span><kbd>Esc</kbd> Pause</span></div>
         <div class="lg-pad"><em>Controller</em><span>Sticks move and look</span><span><kbd>RT</kbd> Fire</span><span><kbd>LT</kbd> Aim</span><span><kbd>X</kbd> Reload / use</span><span><kbd>Y</kbd> Sidearm</span><span><kbd>A</kbd> Play</span></div>
         <div class="lg-touch"><em>Touch</em><span>Left thumb moves</span><span>Right thumb looks</span><span>Fire \xB7 Aim \xB7 Reload \xB7 Jump on screen</span></div>
       </aside>

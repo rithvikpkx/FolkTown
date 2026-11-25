@@ -1,0 +1,2937 @@
+{
+  "meta": {
+    "university": "Folk University",
+    "town": "Folktown",
+    "colours": "black and old gold",
+    "note": "Stand-in names for every real place and name on the modelled campus. The game never uses official Purdue names. This file is the source of truth; nothing in the game reads it yet. Codes are callout codes derived from the folk name and never equal the real official code. Streets and natural geography keep their real names until the owner decides. \"osm\" is the OpenStreetMap id carried over from data/campus.json (or data/raw/osm-campus.json); null where the place has no OSM building.",
+    "kinds": [
+      "building",
+      "dorm",
+      "dining",
+      "landmark",
+      "venue",
+      "street",
+      "other"
+    ]
+  },
+  "entries": [
+    {
+      "real": "Cary Quadrangle Northeast (CQNE)",
+      "folk": "Carry Quad Northeast",
+      "code": "CRNE",
+      "kind": "dorm",
+      "osm": "way/75498142"
+    },
+    {
+      "real": "Cary Quadrangle South (CQS)",
+      "folk": "Carry Quad South",
+      "code": "CRS",
+      "kind": "dorm",
+      "osm": "way/75498144"
+    },
+    {
+      "real": "Cary Quadrangle East (CQE)",
+      "folk": "Carry Quad East",
+      "code": "CRE",
+      "kind": "dorm",
+      "osm": "way/75498145"
+    },
+    {
+      "real": "Cary Quadrangle West (CQW)",
+      "folk": "Carry Quad West",
+      "code": "CRW",
+      "kind": "dorm",
+      "osm": "way/75498147"
+    },
+    {
+      "real": "Cary Quadrangle Northwest (CQNW)",
+      "folk": "Carry Quad Northwest",
+      "code": "CRNW",
+      "kind": "dorm",
+      "osm": "way/75498148"
+    },
+    {
+      "real": "Earhart Hall",
+      "folk": "Airhart Hall",
+      "code": "AIR",
+      "kind": "dorm",
+      "osm": "way/128488694"
+    },
+    {
+      "real": "Harrison Hall",
+      "folk": "Harris Hall",
+      "code": "HRS",
+      "kind": "dorm",
+      "osm": "relation/12652929",
+      "note": "Not in campus.json (outside the baked area); id from data/raw/osm-campus.json"
+    },
+    {
+      "real": "Hawkins Hall",
+      "folk": "Hawk Hall",
+      "code": "HWK",
+      "kind": "dorm",
+      "osm": "way/117396585"
+    },
+    {
+      "real": "Hillenbrand Hall",
+      "folk": "Hill Hall",
+      "code": "HLL",
+      "kind": "dorm",
+      "osm": "way/128487952"
+    },
+    {
+      "real": "Honors College and Residences North",
+      "folk": "Laurel Hall North",
+      "code": "LHN",
+      "kind": "dorm",
+      "osm": "way/470285119"
+    },
+    {
+      "real": "Honors College And Residences South",
+      "folk": "Laurel Hall South",
+      "code": "LHS",
+      "kind": "dorm",
+      "osm": "way/518434567"
+    },
+    {
+      "real": "McCutcheon Hall",
+      "folk": "McCutch Hall",
+      "code": "MCH",
+      "kind": "dorm",
+      "osm": "relation/12652930",
+      "note": "Not in campus.json; id from data/raw/osm-campus.json"
+    },
+    {
+      "real": "Meredith Hall",
+      "folk": "Merriweather Hall",
+      "code": "MWH",
+      "kind": "dorm",
+      "osm": "way/128488696"
+    },
+    {
+      "real": "Meredith Hall South",
+      "folk": "Merriweather South",
+      "code": "MWS",
+      "kind": "dorm",
+      "osm": "way/859157050"
+    },
+    {
+      "real": "Owen (Richard) Residence Hall (OWEN)",
+      "folk": "Owens Hall",
+      "code": "OWS",
+      "kind": "dorm",
+      "osm": "relation/12647862",
+      "note": "Not in campus.json; id from data/raw/osm-campus.json"
+    },
+    {
+      "real": "Shreve Hall",
+      "folk": "Shrieve Hall",
+      "code": "SHV",
+      "kind": "dorm",
+      "osm": "way/128488704"
+    },
+    {
+      "real": "Tarkington (Newton Booth) Residence Hall (TARK)",
+      "folk": "Tarkton Hall",
+      "code": "TKT",
+      "kind": "dorm",
+      "osm": "relation/12647702",
+      "note": "Not in campus.json; id from data/raw/osm-campus.json"
+    },
+    {
+      "real": "Wiley (Harvey W.) Residence Hall (WILY)",
+      "folk": "Wily Hall",
+      "code": "WLY",
+      "kind": "dorm",
+      "osm": "relation/12647701",
+      "note": "Not in campus.json; id from data/raw/osm-campus.json"
+    },
+    {
+      "real": "Windsor Halls",
+      "folk": "Windham Halls",
+      "code": "WDH",
+      "kind": "dorm",
+      "osm": "way/128488698"
+    },
+    {
+      "real": "Frieda Parker Hall",
+      "folk": "Frida Porter Hall",
+      "code": "FRP",
+      "kind": "dorm",
+      "osm": "way/886353320"
+    },
+    {
+      "real": "Winifred Parker Hall",
+      "folk": "Winnie Porter Hall",
+      "code": "WNP",
+      "kind": "dorm",
+      "osm": "way/327303065"
+    },
+    {
+      "real": "First Street Towers, West (FSTW)",
+      "folk": "First Avenue Towers West",
+      "code": "FATW",
+      "kind": "dorm",
+      "osm": "way/283274997"
+    },
+    {
+      "real": "First Street Towers, Central (FSTC)",
+      "folk": "First Avenue Towers Central",
+      "code": "FATC",
+      "kind": "dorm",
+      "osm": "way/283274998"
+    },
+    {
+      "real": "First Street Towers, East (FSTE)",
+      "folk": "First Avenue Towers East",
+      "code": "FATE",
+      "kind": "dorm",
+      "osm": "way/283274999"
+    },
+    {
+      "real": "Third Street Suites",
+      "folk": "Third Avenue Suites",
+      "code": "TAS",
+      "kind": "dorm",
+      "osm": null,
+      "note": "Owner-fixed stand-in; not in campus.json or the building list"
+    },
+    {
+      "real": "Griffin Residence Hall North",
+      "folk": "Gryphon Hall North",
+      "code": "GYN",
+      "kind": "dorm",
+      "osm": null,
+      "note": "Owner-fixed stand-in; not in campus.json or the building list"
+    },
+    {
+      "real": "Griffin Residence Hall South",
+      "folk": "Gryphon Hall South",
+      "code": "GYS",
+      "kind": "dorm",
+      "osm": null,
+      "note": "Owner-fixed stand-in; not in campus.json or the building list"
+    },
+    {
+      "real": "Fowler Memorial House",
+      "folk": "Fuller House",
+      "code": "FUL",
+      "kind": "dorm",
+      "osm": "way/283275001",
+      "note": "Tagged university in OSM; on the dorm list because the ID card uses it"
+    },
+    {
+      "real": "Shealy (Frances M.) Residence Hall",
+      "folk": "Shelley Hall",
+      "code": "SHL",
+      "kind": "dorm",
+      "osm": "way/128488695"
+    },
+    {
+      "real": "Duhme (Ophelia) Residence Hall",
+      "folk": "Dewey Hall",
+      "code": "DWY",
+      "kind": "dorm",
+      "osm": "way/936763597"
+    },
+    {
+      "real": "3rd and West",
+      "folk": "Third and Western Hall",
+      "code": "TWH",
+      "kind": "dorm",
+      "osm": "way/1324500897"
+    },
+    {
+      "real": "Wiley Dining Court (WDCT)",
+      "folk": "Wily Dining",
+      "code": "WLD",
+      "kind": "dining",
+      "osm": "way/184280688"
+    },
+    {
+      "real": "Earhart Dining Court",
+      "folk": "Airhart Dining",
+      "code": "AHD",
+      "kind": "dining",
+      "osm": null,
+      "note": "Inside Earhart Hall; no separate OSM building"
+    },
+    {
+      "real": "Ford Dining Court",
+      "folk": "Forde Dining",
+      "code": "FDD",
+      "kind": "dining",
+      "osm": "way/283275005"
+    },
+    {
+      "real": "Windsor Dining Court",
+      "folk": "Windham Dining",
+      "code": "WHD",
+      "kind": "dining",
+      "osm": null,
+      "note": "Inside Windsor Halls; no separate OSM building"
+    },
+    {
+      "real": "Rolling Bowl",
+      "folk": "Rolling Wok",
+      "code": "RWK",
+      "kind": "dining",
+      "osm": "way/71497486",
+      "note": "Off-campus restaurant"
+    },
+    {
+      "real": "Panda Express",
+      "folk": "Bamboo Express",
+      "code": "BMX",
+      "kind": "dining",
+      "osm": "way/71497488",
+      "note": "Chain restaurant"
+    },
+    {
+      "real": "Chipotle",
+      "folk": "Chili Pepper Grill",
+      "code": "CPG",
+      "kind": "dining",
+      "osm": "way/71497490",
+      "note": "Chain restaurant"
+    },
+    {
+      "real": "Jimmy John's",
+      "folk": "Johnny Jim's",
+      "code": "JJS",
+      "kind": "dining",
+      "osm": "way/116427223",
+      "note": "Chain restaurant"
+    },
+    {
+      "real": "McDonald's",
+      "folk": "MacDougal's",
+      "code": "MCD",
+      "kind": "dining",
+      "osm": "way/116427228",
+      "note": "Chain restaurant; one of two in campus.json"
+    },
+    {
+      "real": "McDonald's",
+      "folk": "MacDougal's Express",
+      "code": "MDX",
+      "kind": "dining",
+      "osm": "way/256640455",
+      "note": "Chain restaurant; second one in campus.json"
+    },
+    {
+      "real": "O'Bryan's Nine Irish Brothers",
+      "folk": "O'Malley's Nine Irish Cousins",
+      "code": "OMC",
+      "kind": "dining",
+      "osm": "way/116427243",
+      "note": "Off-campus pub"
+    },
+    {
+      "real": "Triple XXX Family Restaurant",
+      "folk": "Triple Z Family Diner",
+      "code": "TZD",
+      "kind": "dining",
+      "osm": "way/116427250",
+      "note": "Local diner"
+    },
+    {
+      "real": "Ross-Ade Stadium",
+      "folk": "Rosswood Stadium",
+      "code": "RWS",
+      "kind": "venue",
+      "osm": null,
+      "note": "Not a named building in campus.json"
+    },
+    {
+      "real": "Mackey Arena",
+      "folk": "Mackie Arena",
+      "code": "MKA",
+      "kind": "venue",
+      "osm": "way/74144839"
+    },
+    {
+      "real": "Elliott Hall of Music (ELLT)",
+      "folk": "Ellison Hall of Music",
+      "code": "ELH",
+      "kind": "venue",
+      "osm": "way/74151922"
+    },
+    {
+      "real": "Slayter Center for Performing Arts",
+      "folk": "Slater Center for Performing Arts",
+      "code": "SLC",
+      "kind": "venue",
+      "osm": "way/283275010"
+    },
+    {
+      "real": "Lambert (Ward L.) Fieldhouse and Gymnasium",
+      "folk": "Lambeth Fieldhouse",
+      "code": "LFH",
+      "kind": "venue",
+      "osm": "way/128488701"
+    },
+    {
+      "real": "Morgan J. Burke Boilermaker Aquatic Center",
+      "folk": "Folk Aquatic Center",
+      "code": "AQC",
+      "kind": "venue",
+      "osm": "way/128488697"
+    },
+    {
+      "real": "France A. Córdova Recreational Sports Center",
+      "folk": "Cordell Rec Center",
+      "code": "CRC",
+      "kind": "venue",
+      "osm": "way/128488703"
+    },
+    {
+      "real": "Turf Recreation Exercise Center",
+      "folk": "Turf Training Center",
+      "code": "TTC",
+      "kind": "venue",
+      "osm": "way/283275002"
+    },
+    {
+      "real": "Purdue Football Performance Complex",
+      "folk": "Riveters Football Complex",
+      "code": "RFC",
+      "kind": "venue",
+      "osm": null,
+      "note": "From the building list only; not in campus.json"
+    },
+    {
+      "real": "Schwartz Tennis Center",
+      "folk": "Schultz Tennis Center",
+      "code": "STN",
+      "kind": "venue",
+      "osm": null,
+      "note": "From the building list only; not in campus.json"
+    },
+    {
+      "real": "Hull \"All-American\" Marching Band Complex",
+      "folk": "Hulme Marching Band Complex",
+      "code": "MBC",
+      "kind": "venue",
+      "osm": "way/1167600633"
+    },
+    {
+      "real": "Rohrman Field",
+      "folk": "Rohrbach Field",
+      "code": "RBH",
+      "kind": "venue",
+      "osm": "way/74144840",
+      "note": "Sports pitch (grass layer)"
+    },
+    {
+      "real": "Hull Field",
+      "folk": "Hulme Field",
+      "code": "HMF",
+      "kind": "venue",
+      "osm": "way/301911804",
+      "note": "Sports pitch (grass layer)"
+    },
+    {
+      "real": "Purdue Gold Intramural Fields",
+      "folk": "Old Gold Intramural Fields",
+      "code": "OGF",
+      "kind": "venue",
+      "osm": "way/249303043",
+      "note": "Grass layer"
+    },
+    {
+      "real": "The Pete Dye Clubhouse",
+      "folk": "Birdie Clubhouse",
+      "code": "BCH",
+      "kind": "venue",
+      "osm": null,
+      "note": "Golf clubhouse; from the building list only"
+    },
+    {
+      "real": "Purdue Bell Tower",
+      "folk": "Bell Tower",
+      "code": "BEL",
+      "kind": "landmark",
+      "osm": "way/301837711"
+    },
+    {
+      "real": "Engineering Fountain",
+      "folk": "Engineering Fountain",
+      "code": "EFT",
+      "kind": "landmark",
+      "osm": "way/283274213"
+    },
+    {
+      "real": "Loeb Fountain",
+      "folk": "Lobe Fountain",
+      "code": "LBF",
+      "kind": "landmark",
+      "osm": null,
+      "note": "Not named in campus.json"
+    },
+    {
+      "real": "John Purdue's grave",
+      "folk": "Founder's Grave (John Folk)",
+      "code": "FGV",
+      "kind": "landmark",
+      "osm": null,
+      "note": "On Memorial Mall; not in campus.json"
+    },
+    {
+      "real": "Unfinished Block P",
+      "folk": "Unfinished Block F",
+      "code": "UBF",
+      "kind": "landmark",
+      "osm": null,
+      "note": "Sculpture; not in campus.json"
+    },
+    {
+      "real": "Hello Walk",
+      "folk": "Hello Walk",
+      "code": "HLW",
+      "kind": "landmark",
+      "osm": "way/283274236",
+      "note": "Footpath in campus.json paths"
+    },
+    {
+      "real": "Purdue Mall",
+      "folk": "Folk Mall",
+      "code": "FML",
+      "kind": "landmark",
+      "osm": "way/158307947",
+      "note": "Also the name of zone data/zones/purdue-mall.json"
+    },
+    {
+      "real": "Engineering Mall",
+      "folk": "Engineering Mall",
+      "code": "EML",
+      "kind": "landmark",
+      "osm": null,
+      "note": "Zone name in data/zones/engineering-mall.json"
+    },
+    {
+      "real": "Memorial Mall",
+      "folk": "Memorial Mall",
+      "code": "MML",
+      "kind": "landmark",
+      "osm": "way/74154179"
+    },
+    {
+      "real": "Stadium Mall",
+      "folk": "Stadium Mall",
+      "code": "SML",
+      "kind": "landmark",
+      "osm": "way/301604963"
+    },
+    {
+      "real": "Centennial Mall",
+      "folk": "Centennial Mall",
+      "code": "CML",
+      "kind": "landmark",
+      "osm": "way/1098706602"
+    },
+    {
+      "real": "Centennial Mall South",
+      "folk": "Centennial Mall South",
+      "code": "CTS",
+      "kind": "landmark",
+      "osm": "way/630081195"
+    },
+    {
+      "real": "Agricultural Mall",
+      "folk": "Agricultural Mall",
+      "code": "AGM",
+      "kind": "landmark",
+      "osm": "way/5327012",
+      "note": "Named path in campus.json"
+    },
+    {
+      "real": "3rd Street Mall",
+      "folk": "3rd Street Mall",
+      "code": "TSM",
+      "kind": "landmark",
+      "osm": "way/888273588",
+      "note": "Pedestrian path; street name kept (geography, owner decides)"
+    },
+    {
+      "real": "Freedom Square",
+      "folk": "Freedom Square",
+      "code": "FSQ",
+      "kind": "landmark",
+      "osm": "way/361973955"
+    },
+    {
+      "real": "MSEE tunnel",
+      "folk": "Engineering Tunnel",
+      "code": "ETN",
+      "kind": "landmark",
+      "osm": "way/301738145"
+    },
+    {
+      "real": "Bell Tower Area",
+      "folk": "Bell Tower Lawn",
+      "code": "BTL",
+      "kind": "landmark",
+      "osm": "way/547113855"
+    },
+    {
+      "real": "Slayter Hill",
+      "folk": "Slater Hill",
+      "code": "SLH",
+      "kind": "landmark",
+      "osm": "way/283275009"
+    },
+    {
+      "real": "Krach Lawn",
+      "folk": "Craig Lawn",
+      "code": "CGL",
+      "kind": "landmark",
+      "osm": "way/327304066"
+    },
+    {
+      "real": "Spitzer Court",
+      "folk": "Spitz Court",
+      "code": "SPZ",
+      "kind": "landmark",
+      "osm": "way/301840188"
+    },
+    {
+      "real": "De Bedout Plaza",
+      "folk": "Bedford Plaza",
+      "code": "BFP",
+      "kind": "landmark",
+      "osm": "way/663313311"
+    },
+    {
+      "real": "Purdue Jules Janick Horticulture Garden",
+      "folk": "Folk Horticulture Garden",
+      "code": "FHG",
+      "kind": "landmark",
+      "osm": "way/547145358"
+    },
+    {
+      "real": "Founders Park",
+      "folk": "Founders Park",
+      "code": "FDP",
+      "kind": "landmark",
+      "osm": "way/635838192"
+    },
+    {
+      "real": "Sinninger Pond",
+      "folk": "Singer Pond",
+      "code": "SGP",
+      "kind": "landmark",
+      "osm": "way/547113856"
+    },
+    {
+      "real": "Academy Park",
+      "folk": "Academy Park",
+      "code": "ACP",
+      "kind": "landmark",
+      "osm": "way/74154178",
+      "note": "City park"
+    },
+    {
+      "real": "Pickett Park",
+      "folk": "Picket Park",
+      "code": "PKP",
+      "kind": "landmark",
+      "osm": "way/283275007",
+      "note": "City park"
+    },
+    {
+      "real": "Lincoln Park",
+      "folk": "Lincoln Park",
+      "code": "LNP",
+      "kind": "landmark",
+      "osm": "way/469941409",
+      "note": "City park"
+    },
+    {
+      "real": "Paula R. Woods Park",
+      "folk": "Riverwoods Park",
+      "code": "RWP",
+      "kind": "landmark",
+      "osm": "way/469941411",
+      "note": "City park"
+    },
+    {
+      "real": "Squirrel Park",
+      "folk": "Squirrel Park",
+      "code": "SQP",
+      "kind": "landmark",
+      "osm": "way/553890826",
+      "note": "City park"
+    },
+    {
+      "real": "Tommy Johnston Park",
+      "folk": "Johnstone Park",
+      "code": "JNP",
+      "kind": "landmark",
+      "osm": "way/860808218",
+      "note": "City park"
+    },
+    {
+      "real": "R. B. Wetherill Laboratory of Chemistry (WTHR)",
+      "folk": "Weather Hall",
+      "code": "WTH",
+      "kind": "building",
+      "osm": "way/117146489"
+    },
+    {
+      "real": "Wilmeth Active Learning Center (WALC)",
+      "folk": "Wilmore Learning Center",
+      "code": "WLC",
+      "kind": "building",
+      "osm": "way/508846031"
+    },
+    {
+      "real": "Purdue Student Union",
+      "folk": "Folk Memorial Union",
+      "code": "FMU",
+      "kind": "building",
+      "osm": "way/117146490",
+      "note": "OSM name for the Purdue Memorial Union (PMU)"
+    },
+    {
+      "real": "Union Club Hotel",
+      "folk": "Union Club Inn",
+      "code": "UCI",
+      "kind": "building",
+      "osm": "way/117146483",
+      "note": "Hotel inside the Memorial Union complex"
+    },
+    {
+      "real": "Hovde Hall of Administration (HOVD)",
+      "folk": "Hove Hall",
+      "code": "HOVE",
+      "kind": "building",
+      "osm": "way/75498146"
+    },
+    {
+      "real": "Hicks Undergraduate Library (HIKS)",
+      "folk": "Hix Library",
+      "code": "HIX",
+      "kind": "building",
+      "osm": "way/158307900"
+    },
+    {
+      "real": "Stewart Center (STEW)",
+      "folk": "Stuart Center",
+      "code": "STC",
+      "kind": "building",
+      "osm": "way/117146484"
+    },
+    {
+      "real": "Neil Armstrong Hall of Engineering (ARMS)",
+      "folk": "Strongarm Hall",
+      "code": "SAH",
+      "kind": "building",
+      "osm": "way/117146481"
+    },
+    {
+      "real": "Lawson Hall (LWSN)",
+      "folk": "Lawton Hall",
+      "code": "LWT",
+      "kind": "building",
+      "osm": "way/159752222"
+    },
+    {
+      "real": "Krannert School of Management",
+      "folk": "Crane Hall",
+      "code": "CRH",
+      "kind": "building",
+      "osm": "way/117396623",
+      "note": "The Krannert Building (KRAN)"
+    },
+    {
+      "real": "Physics Building (PHYS)",
+      "folk": "Physics Building",
+      "code": "PHB",
+      "kind": "building",
+      "osm": "way/74340895"
+    },
+    {
+      "real": "Brown Laboratory of Chemistry (BRWN)",
+      "folk": "Braun Laboratory of Chemistry",
+      "code": "BRC",
+      "kind": "building",
+      "osm": "way/117146480"
+    },
+    {
+      "real": "Heine Pharmacy (RHPH)",
+      "folk": "Hyne Pharmacy Building",
+      "code": "HPB",
+      "kind": "building",
+      "osm": "way/117146482"
+    },
+    {
+      "real": "Student Health Center (PUSH)",
+      "folk": "Student Health Center",
+      "code": "HLT",
+      "kind": "building",
+      "osm": "way/117146486"
+    },
+    {
+      "real": "Knoy Hall (KNOY)",
+      "folk": "Noy Hall",
+      "code": "NOY",
+      "kind": "building",
+      "osm": "way/117146487"
+    },
+    {
+      "real": "Johnson Hall of Nursing (JNSN)",
+      "folk": "Jonson Hall of Nursing",
+      "code": "JON",
+      "kind": "building",
+      "osm": "way/117146488"
+    },
+    {
+      "real": "Hall of Data Science and AI (DSAI)",
+      "folk": "Hall of Data Science and AI",
+      "code": "HDS",
+      "kind": "building",
+      "osm": "way/117146492"
+    },
+    {
+      "real": "Grissom Hall",
+      "folk": "Grisham Hall",
+      "code": "GRH",
+      "kind": "building",
+      "osm": "way/117146493"
+    },
+    {
+      "real": "Hampton Hall of Civil Engineering (HAMP)",
+      "folk": "Hamlin Hall of Civil Engineering",
+      "code": "HML",
+      "kind": "building",
+      "osm": "way/117146495"
+    },
+    {
+      "real": "Forney Hall of Chemical Engineering (FRNY)",
+      "folk": "Forley Hall of Chemical Engineering",
+      "code": "FCE",
+      "kind": "building",
+      "osm": "way/117146497"
+    },
+    {
+      "real": "Schleman Hall (SCHM)",
+      "folk": "Shelman Hall",
+      "code": "SHM",
+      "kind": "building",
+      "osm": "way/117147167"
+    },
+    {
+      "real": "Haas (Felix) Hall (HAAS)",
+      "folk": "Haze Hall",
+      "code": "HZH",
+      "kind": "building",
+      "osm": "way/117147168"
+    },
+    {
+      "real": "Potter Engineering Center (POTR)",
+      "folk": "Plotter Engineering Center",
+      "code": "PLT",
+      "kind": "building",
+      "osm": "way/117147170"
+    },
+    {
+      "real": "Armory (AR)",
+      "folk": "The Armory",
+      "code": "ARM",
+      "kind": "building",
+      "osm": "way/117147171"
+    },
+    {
+      "real": "Matthews Hall (MTHW)",
+      "folk": "Mathis Hall",
+      "code": "MAH",
+      "kind": "building",
+      "osm": "way/117147172"
+    },
+    {
+      "real": "Psychological Sciences Building (PSYC)",
+      "folk": "Psychological Sciences Building",
+      "code": "PSY",
+      "kind": "building",
+      "osm": "way/117147173"
+    },
+    {
+      "real": "Beering Hall (BRNG)",
+      "folk": "Bearing Hall",
+      "code": "BRH",
+      "kind": "building",
+      "osm": "way/117147176"
+    },
+    {
+      "real": "Mathematical Sciences Building (MATH)",
+      "folk": "Mathematical Sciences Building",
+      "code": "MTS",
+      "kind": "building",
+      "osm": "way/117147177"
+    },
+    {
+      "real": "Stone Hall (STON)",
+      "folk": "Flint Hall",
+      "code": "FLH",
+      "kind": "building",
+      "osm": "way/117147178"
+    },
+    {
+      "real": "Young Hall (YONG)",
+      "folk": "Younger Hall",
+      "code": "YGH",
+      "kind": "building",
+      "osm": "way/117396581"
+    },
+    {
+      "real": "Stanley Coulter Hall (SC)",
+      "folk": "Coulson Hall",
+      "code": "CLS",
+      "kind": "building",
+      "osm": "relation/3759822",
+      "note": "Baked into the purdue-mall zone as an extra building (zones.config.json)"
+    },
+    {
+      "real": "Yue-Kong Pao Hall",
+      "folk": "Pow Hall",
+      "code": "PWH",
+      "kind": "building",
+      "osm": "way/117396586"
+    },
+    {
+      "real": "Philip E. Nelson Hall of Food Science (NLSN)",
+      "folk": "Nielsen Hall of Food Science",
+      "code": "NFS",
+      "kind": "building",
+      "osm": "way/117396587"
+    },
+    {
+      "real": "Rawls Hall",
+      "folk": "Rolls Hall",
+      "code": "RLH",
+      "kind": "building",
+      "osm": "way/117396593"
+    },
+    {
+      "real": "National Soil Erosion Laboratory (SOIL)",
+      "folk": "Soil Erosion Laboratory",
+      "code": "SEL",
+      "kind": "building",
+      "osm": "way/117396594"
+    },
+    {
+      "real": "Life Science Plant and Soils Laboratory",
+      "folk": "Life Science Plant and Soils Laboratory",
+      "code": "LPS",
+      "kind": "building",
+      "osm": "way/117396596"
+    },
+    {
+      "real": "Smith Hall",
+      "folk": "Smyth Hall",
+      "code": "SMY",
+      "kind": "building",
+      "osm": "way/117396598"
+    },
+    {
+      "real": "Herrick Laboratories",
+      "folk": "Old Herrin Laboratories",
+      "code": "HLO",
+      "kind": "building",
+      "osm": "way/117396601",
+      "note": "Assumed to be the older Herrick building, since campus.json also has Ray W. Herrick Laboratories",
+      "confidence": "low"
+    },
+    {
+      "real": "Ray W. Herrick Laboratories",
+      "folk": "Herrin Laboratories",
+      "code": "HRL",
+      "kind": "building",
+      "osm": "way/550881239",
+      "note": "Assumed to be the newer (2017) Herrick building",
+      "confidence": "low"
+    },
+    {
+      "real": "Biochemistry Building",
+      "folk": "Biochemistry Building",
+      "code": "BCB",
+      "kind": "building",
+      "osm": "way/117396603"
+    },
+    {
+      "real": "Agricultural Administration Building",
+      "folk": "Agriculture Administration Building",
+      "code": "AGA",
+      "kind": "building",
+      "osm": "way/117396610"
+    },
+    {
+      "real": "Lilly Hall",
+      "folk": "Lilac Hall",
+      "code": "LLH",
+      "kind": "building",
+      "osm": "way/117396614"
+    },
+    {
+      "real": "Life Science Ranges (Greenhouse and Service Building)",
+      "folk": "Life Science Greenhouses",
+      "code": "LSG",
+      "kind": "building",
+      "osm": "way/117396615"
+    },
+    {
+      "real": "Whistler Hall",
+      "folk": "Whittler Hall",
+      "code": "WHT",
+      "kind": "building",
+      "osm": "way/117396619"
+    },
+    {
+      "real": "Horticulture",
+      "folk": "Horticulture Building",
+      "code": "HRT",
+      "kind": "building",
+      "osm": "way/117396620"
+    },
+    {
+      "real": "Martin C. Jischke Hall of Biomedical Engineering",
+      "folk": "Jessup Hall of Biomedical Engineering",
+      "code": "JBE",
+      "kind": "building",
+      "osm": "way/117396622"
+    },
+    {
+      "real": "Dauch Alumni Center",
+      "folk": "Dutch Alumni Center",
+      "code": "DTC",
+      "kind": "building",
+      "osm": "way/117396626"
+    },
+    {
+      "real": "Agricultural and Biological Engineering (ABE)",
+      "folk": "Ag and Bio Engineering",
+      "code": "AGB",
+      "kind": "building",
+      "osm": "way/117396629"
+    },
+    {
+      "real": "Drew and Brittany Brees Student-Athletic Academic Center (BRES)",
+      "folk": "Breeze Student-Athlete Center",
+      "code": "BSC",
+      "kind": "building",
+      "osm": "way/128488702"
+    },
+    {
+      "real": "Materials Science and Electrical Engineering (MSEE)",
+      "folk": "Materials and Electrical Engineering",
+      "code": "MEE",
+      "kind": "building",
+      "osm": "way/158307858"
+    },
+    {
+      "real": "Max W & Maileen Brown Family Hall of Electrical Engineering (BHEE)",
+      "folk": "Brownlee Hall of Electrical Engineering",
+      "code": "BRL",
+      "kind": "building",
+      "osm": "way/158307860"
+    },
+    {
+      "real": "Mechanical Engineering (ME)",
+      "folk": "Mechanical Engineering Building",
+      "code": "MEB",
+      "kind": "building",
+      "osm": "way/158307862"
+    },
+    {
+      "real": "University Hall (UNIV)",
+      "folk": "University Hall",
+      "code": "UNH",
+      "kind": "building",
+      "osm": "way/158307901"
+    },
+    {
+      "real": "Smalley Center",
+      "folk": "Smallwood Center",
+      "code": "SWC",
+      "kind": "building",
+      "osm": "way/158619961",
+      "note": "Purpose unclear from OSM (tagged university, one floor)",
+      "confidence": "low"
+    },
+    {
+      "real": "Black Cultural Center (BCC)",
+      "folk": "Black Cultural Center",
+      "code": "BKC",
+      "kind": "building",
+      "osm": "way/158620074"
+    },
+    {
+      "real": "Purdue Fire Department",
+      "folk": "Folk Fire Department",
+      "code": "FFD",
+      "kind": "building",
+      "osm": "way/158620152"
+    },
+    {
+      "real": "Bindley Bioscience Center",
+      "folk": "Bentley Bioscience Center",
+      "code": "BTB",
+      "kind": "building",
+      "osm": "way/159752220"
+    },
+    {
+      "real": "Birck Nanotechnology Center",
+      "folk": "Brick Nanotechnology Center",
+      "code": "BKN",
+      "kind": "building",
+      "osm": "way/159752221"
+    },
+    {
+      "real": "Mann Hall",
+      "folk": "Manning Hall",
+      "code": "MNH",
+      "kind": "building",
+      "osm": "way/159752223"
+    },
+    {
+      "real": "Marriot Hall",
+      "folk": "Merritt Hall",
+      "code": "MRT",
+      "kind": "building",
+      "osm": "way/159752224"
+    },
+    {
+      "real": "Morgan Center for Entrepreneurship (MRGN)",
+      "folk": "Morrow Center for Entrepreneurship",
+      "code": "MRW",
+      "kind": "building",
+      "osm": "way/159752229"
+    },
+    {
+      "real": "Telecommunications Building (TEL)",
+      "folk": "Telecommunications Building",
+      "code": "TCB",
+      "kind": "building",
+      "osm": "way/159752232"
+    },
+    {
+      "real": "Purdue Police Department",
+      "folk": "Folk Police Department",
+      "code": "FPD",
+      "kind": "building",
+      "osm": "way/159752235"
+    },
+    {
+      "real": "Latino Cultural Center (LCC)",
+      "folk": "Latino Cultural Center",
+      "code": "LTC",
+      "kind": "building",
+      "osm": "way/301934126"
+    },
+    {
+      "real": "Latino Cultural Center",
+      "folk": "Latino Cultural Center (old site)",
+      "code": "LTO",
+      "kind": "building",
+      "osm": "way/184282132",
+      "note": "campus.json has two LCC footprints; this one is assumed to be an older or duplicate site",
+      "confidence": "low"
+    },
+    {
+      "real": "Hockmeyer Hall of Structural Biology (HOCK)",
+      "folk": "Hochman Hall of Structural Biology",
+      "code": "HSB",
+      "kind": "building",
+      "osm": "way/283274991"
+    },
+    {
+      "real": "Hall for Discovery and Learning Research (DLR)",
+      "folk": "Hall for Discovery and Learning Research",
+      "code": "HDL",
+      "kind": "building",
+      "osm": "way/283274992"
+    },
+    {
+      "real": "Purdue Village Administration Building",
+      "folk": "Folk Village Administration Building",
+      "code": "FVA",
+      "kind": "building",
+      "osm": "way/283274993",
+      "note": "Purdue Village family housing was largely demolished; current use unclear",
+      "confidence": "low"
+    },
+    {
+      "real": "Hanley Hall",
+      "folk": "Handley Hall",
+      "code": "HDY",
+      "kind": "building",
+      "osm": "way/283275000"
+    },
+    {
+      "real": "Northwest Chiller Plant (NWCP)",
+      "folk": "Northwest Chiller Plant",
+      "code": "CHL",
+      "kind": "building",
+      "osm": "way/283275006"
+    },
+    {
+      "real": "Veterinary Pathology Building",
+      "folk": "Veterinary Pathology Building",
+      "code": "VPA",
+      "kind": "building",
+      "osm": "way/301832118"
+    },
+    {
+      "real": "Veterinary Animal Isolation Building 2",
+      "folk": "Veterinary Animal Isolation Building 2",
+      "code": "VI2",
+      "kind": "building",
+      "osm": "way/301832119"
+    },
+    {
+      "real": "Animal Disease Diagnostic Laboratory",
+      "folk": "Animal Disease Diagnostic Laboratory",
+      "code": "ADL",
+      "kind": "building",
+      "osm": "way/301832273"
+    },
+    {
+      "real": "Veterinary Medicine Isolation Facility",
+      "folk": "Veterinary Medicine Isolation Facility",
+      "code": "VMI",
+      "kind": "building",
+      "osm": "way/301832274"
+    },
+    {
+      "real": "Animal Holding Facility",
+      "folk": "Animal Holding Facility",
+      "code": "AHO",
+      "kind": "building",
+      "osm": "way/301832276"
+    },
+    {
+      "real": "Utility Plant Office Facility",
+      "folk": "Utility Plant Office Facility",
+      "code": "UPO",
+      "kind": "building",
+      "osm": "way/301832277"
+    },
+    {
+      "real": "Wang Hall (WANG)",
+      "folk": "Wing Hall",
+      "code": "WGH",
+      "kind": "building",
+      "osm": "way/301932787"
+    },
+    {
+      "real": "Asian American and Asian Resource and Cultural Center (AACC)",
+      "folk": "Asian American Cultural Center",
+      "code": "AAR",
+      "kind": "building",
+      "osm": "way/301934124"
+    },
+    {
+      "real": "Native American Educational and Cultural Center (NACC)",
+      "folk": "Native American Cultural Center",
+      "code": "NAE",
+      "kind": "building",
+      "osm": "way/301934125"
+    },
+    {
+      "real": "Class of 1950 Lecture Hall (CL50)",
+      "folk": "Class of 1950 Lecture Hall",
+      "code": "L50",
+      "kind": "building",
+      "osm": "way/309492283"
+    },
+    {
+      "real": "Pierce Hall (PRCE)",
+      "folk": "Pearce Hall",
+      "code": "PRH",
+      "kind": "building",
+      "osm": "way/309492284"
+    },
+    {
+      "real": "Krach Leadership Center (KRCH)",
+      "folk": "Craig Leadership Center",
+      "code": "CLC",
+      "kind": "building",
+      "osm": "way/327303064"
+    },
+    {
+      "real": "Ralph & Bettye Bailey Hall",
+      "folk": "Bayley Hall",
+      "code": "BYH",
+      "kind": "building",
+      "osm": "way/332361174"
+    },
+    {
+      "real": "Purdue Drug Discovery Facility",
+      "folk": "Folk Drug Discovery Facility",
+      "code": "DDF",
+      "kind": "building",
+      "osm": "way/520127811"
+    },
+    {
+      "real": "Bechtel Innovation Design Center (BIDC)",
+      "folk": "Bechtold Design Center",
+      "code": "BDC",
+      "kind": "building",
+      "osm": "way/693623661"
+    },
+    {
+      "real": "Flex Lab (FLEX)",
+      "folk": "Flex Lab",
+      "code": "FLX",
+      "kind": "building",
+      "osm": "way/693624339"
+    },
+    {
+      "real": "Convergence Center for Innovation and Collaboration (CONV)",
+      "folk": "Convergence Center",
+      "code": "CVG",
+      "kind": "building",
+      "osm": "way/803755067"
+    },
+    {
+      "real": "Chaney-Hale Hall of Science (CHAS)",
+      "folk": "Chainey Hall of Science",
+      "code": "CNH",
+      "kind": "building",
+      "osm": "way/866802210",
+      "note": "The zone list calls this \"Cheney Hall\"; matched by closest name, owner to confirm",
+      "confidence": "low"
+    },
+    {
+      "real": "Creighton Hall of Animal Sciences (CRTN)",
+      "folk": "Crichton Hall of Animal Sciences",
+      "code": "CAS",
+      "kind": "building",
+      "osm": "way/886346925"
+    },
+    {
+      "real": "Lyles-Porter Hall (LYLE)",
+      "folk": "Lyall Hall",
+      "code": "LYH",
+      "kind": "building",
+      "osm": "way/886348186"
+    },
+    {
+      "real": "MRI Modular Facility (MRI1)",
+      "folk": "MRI Modular Facility",
+      "code": "MRF",
+      "kind": "building",
+      "osm": "way/886348187"
+    },
+    {
+      "real": "American Railway Building (RAIL)",
+      "folk": "Railway Building",
+      "code": "RWB",
+      "kind": "building",
+      "osm": "way/932253994"
+    },
+    {
+      "real": "Marc and Sharon Hagle Hall (HAGL)",
+      "folk": "Hegel Hall",
+      "code": "HEG",
+      "kind": "building",
+      "osm": "way/960201468"
+    },
+    {
+      "real": "Purdue Graduate Student Center",
+      "folk": "Folk Graduate Student Center",
+      "code": "GSC",
+      "kind": "building",
+      "osm": "way/1103303762"
+    },
+    {
+      "real": "David and Bonnie Brunner Farm Animal Hospital",
+      "folk": "Brenner Farm Animal Hospital",
+      "code": "BFA",
+      "kind": "building",
+      "osm": "way/1106726514"
+    },
+    {
+      "real": "Lambertus Hall (LMBS)",
+      "folk": "Lamberton Hall",
+      "code": "LMT",
+      "kind": "building",
+      "osm": "way/1383852532"
+    },
+    {
+      "real": "Dudley Hall (DUDL)",
+      "folk": "Dudlow Hall",
+      "code": "DDW",
+      "kind": "building",
+      "osm": "way/1383852533"
+    },
+    {
+      "real": "Duncan Annex",
+      "folk": "Duncombe Annex",
+      "code": "DCA",
+      "kind": "building",
+      "osm": null,
+      "note": "Zone target; not in OSM (candidates way/1033674918, way/1033674919)",
+      "confidence": "low"
+    },
+    {
+      "real": "ADM Agricultural Innovation Center",
+      "folk": "Ag Innovation Center",
+      "code": "AIC",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Charles J. Lynn Hall of Veterinary Medicine",
+      "folk": "Linn Hall of Veterinary Medicine",
+      "code": "LVM",
+      "kind": "building",
+      "osm": "relation/12710221"
+    },
+    {
+      "real": "Equine Health Sciences Annex",
+      "folk": "Equine Health Sciences Annex",
+      "code": "EHS",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Grounds Maintenance Facility",
+      "folk": "Grounds Maintenance Facility",
+      "code": "GRM",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Hangar 4",
+      "folk": "Hangar 4",
+      "code": "H04",
+      "kind": "building",
+      "osm": null,
+      "note": "Airport; from the building list only"
+    },
+    {
+      "real": "Hangar 5",
+      "folk": "Hangar 5",
+      "code": "H05",
+      "kind": "building",
+      "osm": null,
+      "note": "Airport; from the building list only"
+    },
+    {
+      "real": "Hangar 6",
+      "folk": "Hangar 6",
+      "code": "H06",
+      "kind": "building",
+      "osm": null,
+      "note": "Airport; from the building list only"
+    },
+    {
+      "real": "Hangar 6W",
+      "folk": "Hangar 6W",
+      "code": "H6W",
+      "kind": "building",
+      "osm": null,
+      "note": "Airport; from the building list only"
+    },
+    {
+      "real": "Hansen Hall",
+      "folk": "Hanlon Hall",
+      "code": "HNL",
+      "kind": "building",
+      "osm": "relation/12701379"
+    },
+    {
+      "real": "Holleman-Niswonger Simulator Center (SIML)",
+      "folk": "Flight Simulator Center",
+      "code": "FSC",
+      "kind": "building",
+      "osm": null,
+      "note": "Airport; from the building list only"
+    },
+    {
+      "real": "Main Terminal Building (TERM)",
+      "folk": "Airport Terminal",
+      "code": "ATB",
+      "kind": "building",
+      "osm": null,
+      "note": "Airport; from the building list only"
+    },
+    {
+      "real": "Materials Management Storage Building",
+      "folk": "Materials Management Storage Building",
+      "code": "MMS",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Materials Management and Distribution Center",
+      "folk": "Materials Management and Distribution Center",
+      "code": "MMD",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Niswonger Aviation Technology Building",
+      "folk": "Nesbitt Aviation Building",
+      "code": "NAB",
+      "kind": "building",
+      "osm": null,
+      "note": "Airport; from the building list only"
+    },
+    {
+      "real": "Printing Services Facility",
+      "folk": "Printing Services Facility",
+      "code": "PRN",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Purdue Center for Regional Development (SCHO)",
+      "folk": "Folk Center for Regional Development",
+      "code": "CRD",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Purdue Technology and Aerospace",
+      "folk": "Folk Technology and Aerospace",
+      "code": "FTA",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Purdue University Early Care and Education Center",
+      "folk": "Folk Early Care Center",
+      "code": "ECC",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Utility Plant Storage Building",
+      "folk": "Utility Plant Storage Building",
+      "code": "UPB",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Walter W. Wade Utility Plant",
+      "folk": "Wadsworth Utility Plant",
+      "code": "WUP",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "University Street Parking Garage (PGU)",
+      "folk": "University Street Garage",
+      "code": "USG",
+      "kind": "building",
+      "osm": "way/75498205",
+      "note": "Parking; street name kept"
+    },
+    {
+      "real": "Wood Street Garage (PGW)",
+      "folk": "Wood Street Garage",
+      "code": "WOD",
+      "kind": "building",
+      "osm": "way/111471105",
+      "note": "Parking; street name kept"
+    },
+    {
+      "real": "Grant Street Parking Garage (PGG)",
+      "folk": "Grant Street Garage",
+      "code": "GSG",
+      "kind": "building",
+      "osm": "way/158307997",
+      "note": "Parking; street name kept"
+    },
+    {
+      "real": "Northwestern Parking Garage",
+      "folk": "Northwestern Avenue Garage",
+      "code": "NWG",
+      "kind": "building",
+      "osm": "way/283275025",
+      "note": "Parking; street name kept"
+    },
+    {
+      "real": "Harrison Street Parking Garage",
+      "folk": "Harrison Street Garage",
+      "code": "HSG",
+      "kind": "building",
+      "osm": "way/520127810",
+      "note": "Parking; street name kept"
+    },
+    {
+      "real": "Parking Garage, McCutcheon Drive",
+      "folk": "McCutcheon Drive Garage",
+      "code": "MDG",
+      "kind": "building",
+      "osm": "relation/14483073",
+      "note": "Parking; street name kept (geography, owner decides)"
+    },
+    {
+      "real": "West Lafayette Public Library",
+      "folk": "Folktown Public Library",
+      "code": "FPL",
+      "kind": "building",
+      "osm": "way/71497515",
+      "note": "Town building"
+    },
+    {
+      "real": "Margerum City Hall",
+      "folk": "Folktown City Hall",
+      "code": "FCH",
+      "kind": "building",
+      "osm": "way/159752237",
+      "note": "Town building"
+    },
+    {
+      "real": "West Lafayette Community School Corporation",
+      "folk": "Folktown Community Schools",
+      "code": "FCS",
+      "kind": "building",
+      "osm": null,
+      "note": "Town building; from the building list only"
+    },
+    {
+      "real": "West Lafayette Junior-Senior High School",
+      "folk": "Folktown Junior-Senior High School",
+      "code": "FHS",
+      "kind": "building",
+      "osm": null,
+      "note": "Town building; from the building list only"
+    },
+    {
+      "real": "University Book Store",
+      "folk": "Campus Book Shop",
+      "code": "CBK",
+      "kind": "building",
+      "osm": "way/117396621",
+      "note": "Shop"
+    },
+    {
+      "real": "Von's",
+      "folk": "Vaughn's",
+      "code": "VNS",
+      "kind": "building",
+      "osm": "way/116427236",
+      "note": "Local shop"
+    },
+    {
+      "real": "Henni's Hair Shop",
+      "folk": "Penny's Hair Shop",
+      "code": "PHS",
+      "kind": "building",
+      "osm": "way/116427257",
+      "note": "Local shop"
+    },
+    {
+      "real": "Chase",
+      "folk": "Pursuit Bank",
+      "code": "PBK",
+      "kind": "building",
+      "osm": "way/116427263",
+      "note": "Bank branch"
+    },
+    {
+      "real": "Circle K",
+      "folk": "Circle Q",
+      "code": "CRQ",
+      "kind": "building",
+      "osm": "way/345144282",
+      "note": "Petrol station"
+    },
+    {
+      "real": "Campus Inn",
+      "folk": "Campus Lodge",
+      "code": "CLG",
+      "kind": "building",
+      "osm": "way/116427244",
+      "note": "Motel; first of two footprints"
+    },
+    {
+      "real": "Campus Inn",
+      "folk": "Campus Lodge Annex",
+      "code": "CLA",
+      "kind": "building",
+      "osm": "way/116427245",
+      "note": "Motel; second footprint"
+    },
+    {
+      "real": "The Moosehead Lounge",
+      "folk": "The Elkhorn Lounge",
+      "code": "ELK",
+      "kind": "building",
+      "osm": "way/910910470",
+      "note": "Tagged semidetached_house; possibly a nickname for a private house",
+      "confidence": "low"
+    },
+    {
+      "real": "St. Thomas Aquinas",
+      "folk": "St. Thomas Chapel",
+      "code": "STT",
+      "kind": "building",
+      "osm": "way/117396617",
+      "note": "Catholic student centre"
+    },
+    {
+      "real": "University Church",
+      "folk": "University Church",
+      "code": "UCH",
+      "kind": "building",
+      "osm": "way/300547969"
+    },
+    {
+      "real": "University Lutheran Church",
+      "folk": "University Lutheran Church",
+      "code": "LUT",
+      "kind": "building",
+      "osm": "way/301932784"
+    },
+    {
+      "real": "Our Saviour Lutheran Church",
+      "folk": "Our Saviour Lutheran Church",
+      "code": "OSL",
+      "kind": "building",
+      "osm": "way/860901797"
+    },
+    {
+      "real": "Purdue Lutheran Ministry",
+      "folk": "Folk Lutheran Ministry",
+      "code": "FLM",
+      "kind": "building",
+      "osm": "way/860901812"
+    },
+    {
+      "real": "Unitarian Universalist Church of Tippecanoe County",
+      "folk": "Unitarian Universalist Church of Folk County",
+      "code": "UUC",
+      "kind": "building",
+      "osm": "way/860918857"
+    },
+    {
+      "real": "The Church of Jesus Christ of Latter-day Saints",
+      "folk": "The Church of Jesus Christ of Latter-day Saints",
+      "code": "LDS",
+      "kind": "building",
+      "osm": "way/301838025"
+    },
+    {
+      "real": "Islamic Societyof Greater Lafayette",
+      "folk": "Islamic Society of Greater Folktown",
+      "code": "ISF",
+      "kind": "building",
+      "osm": "way/301836567"
+    },
+    {
+      "real": "Hillel",
+      "folk": "Hillel House",
+      "code": "HHS",
+      "kind": "building",
+      "osm": "way/301838026"
+    },
+    {
+      "real": "Baptist Student Foundation",
+      "folk": "Baptist Student Foundation",
+      "code": "BAP",
+      "kind": "building",
+      "osm": "way/301934831"
+    },
+    {
+      "real": "Chapel of the Good Shepherd",
+      "folk": "Chapel of the Good Shepherd",
+      "code": "SHP",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "First United Methodist Church",
+      "folk": "First United Methodist Church",
+      "code": "FUM",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Phi Delta Theta",
+      "folk": "Phi Delta Rho",
+      "code": "PDR",
+      "kind": "building",
+      "osm": "way/117396592",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Triangle Fraternity",
+      "folk": "Square Fraternity",
+      "code": "SQF",
+      "kind": "building",
+      "osm": "way/159752228",
+      "note": "Greek house"
+    },
+    {
+      "real": "Alpha Kappa Lambda",
+      "folk": "Alpha Kappa Nu",
+      "code": "AKN",
+      "kind": "building",
+      "osm": "way/301841244",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Chi Omega",
+      "folk": "Chi Upsilon",
+      "code": "CUP",
+      "kind": "building",
+      "osm": "way/301841245",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Zeta Tau Alpha",
+      "folk": "Zeta Tau Beta",
+      "code": "ZTB",
+      "kind": "building",
+      "osm": "way/301921255",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Alpha Chi Rho",
+      "folk": "Alpha Chi Psi",
+      "code": "ACX",
+      "kind": "building",
+      "osm": "way/301921258",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "FarmHouse Fraternity, Purdue Chapter",
+      "folk": "Barnhouse Fraternity",
+      "code": "BHF",
+      "kind": "building",
+      "osm": "way/301923755",
+      "note": "Greek house"
+    },
+    {
+      "real": "Alpha Chi Sigma - Beta Nu chapter",
+      "folk": "Alpha Chi Theta",
+      "code": "ACT",
+      "kind": "building",
+      "osm": "way/558268041",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Kappa Sigma",
+      "folk": "Kappa Psi",
+      "code": "KPS",
+      "kind": "building",
+      "osm": "way/671108496",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Pi Kappa Phi",
+      "folk": "Pi Kappa Xi",
+      "code": "PKX",
+      "kind": "building",
+      "osm": "way/860826643",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Delta Tau Delta",
+      "folk": "Delta Tau Gamma",
+      "code": "DTG",
+      "kind": "building",
+      "osm": "way/860901808",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Phi Kappa Tau",
+      "folk": "Phi Kappa Omega",
+      "code": "PKO",
+      "kind": "building",
+      "osm": "way/860903228",
+      "note": "Greek house; letters changed"
+    },
+    {
+      "real": "Fairway Cooperative",
+      "folk": "Fairview Cooperative",
+      "code": "FVC",
+      "kind": "building",
+      "osm": "way/220568267",
+      "note": "Student co-op house"
+    },
+    {
+      "real": "Twin Pines Cooperative",
+      "folk": "Twin Oaks Cooperative",
+      "code": "TOC",
+      "kind": "building",
+      "osm": "way/301934836",
+      "note": "Student co-op house"
+    },
+    {
+      "real": "Shoemaker Cooperative",
+      "folk": "Cobbler Cooperative",
+      "code": "CBC",
+      "kind": "building",
+      "osm": "way/860826642",
+      "note": "Student co-op house"
+    },
+    {
+      "real": "River Market Apartments",
+      "folk": "River Mart Apartments",
+      "code": "RVM",
+      "kind": "building",
+      "osm": "way/116427242",
+      "note": "Private apartments"
+    },
+    {
+      "real": "State Street Towers",
+      "folk": "State Street Heights",
+      "code": "SSH",
+      "kind": "building",
+      "osm": "way/116427251",
+      "note": "Private apartments"
+    },
+    {
+      "real": "FUSE",
+      "folk": "Spark Apartments",
+      "code": "SPK",
+      "kind": "building",
+      "osm": "way/256639574",
+      "note": "Private apartments (tagged residential)",
+      "confidence": "low"
+    },
+    {
+      "real": "Riverbend Apartments",
+      "folk": "River Bend Flats",
+      "code": "RBF",
+      "kind": "building",
+      "osm": "way/283273591",
+      "note": "Private apartments"
+    },
+    {
+      "real": "Marstellar",
+      "folk": "The Marstell",
+      "code": "MST",
+      "kind": "building",
+      "osm": "way/301831857",
+      "note": "Private apartments on Marsteller Street",
+      "confidence": "low"
+    },
+    {
+      "real": "Granite Student Living",
+      "folk": "Basalt Student Living",
+      "code": "BSL",
+      "kind": "building",
+      "osm": "way/301838019",
+      "note": "Private apartments"
+    },
+    {
+      "real": "University Terrace",
+      "folk": "College Terrace",
+      "code": "CTR",
+      "kind": "building",
+      "osm": "way/301931864",
+      "note": "Private apartments"
+    },
+    {
+      "real": "Rise on Chauncey",
+      "folk": "Ascent on Chauncey",
+      "code": "AOC",
+      "kind": "building",
+      "osm": "way/604071163",
+      "note": "Private apartments; street name kept"
+    },
+    {
+      "real": "hub",
+      "folk": "Nexus Apartments",
+      "code": "NXA",
+      "kind": "building",
+      "osm": "way/843163261",
+      "note": "Private apartments (Hub on Campus)"
+    },
+    {
+      "real": "Hi Vine",
+      "folk": "High Ivy Apartments",
+      "code": "HIA",
+      "kind": "building",
+      "osm": "way/860826644",
+      "note": "Private apartments"
+    },
+    {
+      "real": "Campus Edge",
+      "folk": "Campus Rim",
+      "code": "CRM",
+      "kind": "building",
+      "osm": "way/886359911",
+      "note": "Private apartments"
+    },
+    {
+      "real": "Crossing At Chauncey Hill",
+      "folk": "Chauncey Hill Crossing",
+      "code": "CHC",
+      "kind": "building",
+      "osm": "way/886359912",
+      "note": "Private apartments; street name kept"
+    },
+    {
+      "real": "The Arches",
+      "folk": "The Vaults",
+      "code": "VLT",
+      "kind": "building",
+      "osm": "way/886359913",
+      "note": "Private apartments"
+    },
+    {
+      "real": "The Arches II",
+      "folk": "The Vaults II",
+      "code": "VL2",
+      "kind": "building",
+      "osm": "way/886359914",
+      "note": "Private apartments"
+    },
+    {
+      "real": "Verve",
+      "folk": "Vibe Apartments",
+      "code": "VIB",
+      "kind": "building",
+      "osm": "way/1424680532",
+      "note": "Private apartments"
+    },
+    {
+      "real": "Aspire at Discovery Park",
+      "folk": "Aspen at Innovation Park",
+      "code": "AIP",
+      "kind": "building",
+      "osm": "relation/12037636",
+      "note": "Private apartments; OSM has a second part, relation/12037689"
+    },
+    {
+      "real": "Continuum Apartments",
+      "folk": "Spectrum Apartments",
+      "code": "SPA",
+      "kind": "building",
+      "osm": "relation/14669620",
+      "note": "Private apartments"
+    },
+    {
+      "real": "Crosswalk Commons",
+      "folk": "Crossway Commons",
+      "code": "CWC",
+      "kind": "building",
+      "osm": null,
+      "note": "From the building list only"
+    },
+    {
+      "real": "Provenance Apartments",
+      "folk": "Providence Apartments",
+      "code": "PVA",
+      "kind": "building",
+      "osm": null,
+      "note": "Private apartments; from the building list only"
+    },
+    {
+      "real": "Purdue / Purdue University",
+      "folk": "Folk University",
+      "code": null,
+      "kind": "other",
+      "osm": null
+    },
+    {
+      "real": "West Lafayette",
+      "folk": "Folktown",
+      "code": null,
+      "kind": "other",
+      "osm": null
+    },
+    {
+      "real": "Boilermakers",
+      "folk": "The Riveters",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Team / student nickname"
+    },
+    {
+      "real": "Purdue Pete",
+      "folk": "Rusty the Riveter",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Original mascot: a riveter in black and old gold with an oversized rivet gun"
+    },
+    {
+      "real": "Boilermaker Special",
+      "folk": "The Folk Express",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Mascot vehicle"
+    },
+    {
+      "real": "Indiana University (Bloomington)",
+      "folk": "Crimson State University (Bloomville)",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Rival school and its town"
+    },
+    {
+      "real": "Old Oaken Bucket",
+      "folk": "The Old Tin Pail",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Rivalry trophy"
+    },
+    {
+      "real": "Boiler Up!",
+      "folk": "Rivet Up!",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Slogan"
+    },
+    {
+      "real": "Hammer Down",
+      "folk": "Full Steam!",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Slogan"
+    },
+    {
+      "real": "Hail Purdue",
+      "folk": "Forge Ahead, Folk!",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Original fight song title"
+    },
+    {
+      "real": "\"All-American\" Marching Band",
+      "folk": "The Marching Riveters",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Band name"
+    },
+    {
+      "real": "Starship delivery robots",
+      "folk": "Moonships",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Sidewalk delivery robots"
+    },
+    {
+      "real": "Purdue Grand Prix",
+      "folk": "Folk Grand Prix",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Go-kart race"
+    },
+    {
+      "real": "Breakfast Club",
+      "folk": "Breakfast Bunch",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Game-day costumed bar crawl"
+    },
+    {
+      "real": "Bug Bowl",
+      "folk": "Bug Bash",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "Insect festival"
+    },
+    {
+      "real": "Wabash River",
+      "folk": "Wabash River",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Lafayette",
+      "folk": "Lafayette",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "geography, owner decides (city across the river)"
+    },
+    {
+      "real": "Tippecanoe County",
+      "folk": "Tippecanoe County",
+      "code": null,
+      "kind": "other",
+      "osm": null,
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "1st Street",
+      "folk": "1st Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332639",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "2nd Street",
+      "folk": "2nd Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331357",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "3rd Street",
+      "folk": "3rd Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5327896",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "3rd Street Bike Path",
+      "folk": "3rd Street Bike Path",
+      "code": null,
+      "kind": "street",
+      "osm": "way/1085151754",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "4th Street",
+      "folk": "4th Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333766",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "5th Street",
+      "folk": "5th Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331924",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "6th Street",
+      "folk": "6th Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329935",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Allen Street",
+      "folk": "Allen Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332440",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Andrew Place",
+      "folk": "Andrew Place",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331881",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Arnold Drive",
+      "folk": "Arnold Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333697",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Brown Street",
+      "folk": "Brown Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/344910825",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Cary Drive",
+      "folk": "Cary Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333331",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Cattail Trail",
+      "folk": "Cattail Trail",
+      "code": null,
+      "kind": "street",
+      "osm": "way/50979086",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Central Drive",
+      "folk": "Central Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335155",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Chauncey Avenue",
+      "folk": "Chauncey Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330471",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Clinic Drive",
+      "folk": "Clinic Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/435713406",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Connolly Street",
+      "folk": "Connolly Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329644",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Crum Court",
+      "folk": "Crum Court",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330698",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "David Ross Road",
+      "folk": "David Ross Road",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331579",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Dehart Street",
+      "folk": "Dehart Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329946",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "District Blvd",
+      "folk": "District Blvd",
+      "code": null,
+      "kind": "street",
+      "osm": "way/837002797",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Dodge Street",
+      "folk": "Dodge Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334246",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "East Columbia Street",
+      "folk": "East Columbia Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330966",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "East Lutz Avenue",
+      "folk": "East Lutz Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334458",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "East Oak Street",
+      "folk": "East Oak Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335295",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "East Stadium Avenue",
+      "folk": "East Stadium Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331501",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "East State Street",
+      "folk": "East State Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/860684572",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "East Wood Street",
+      "folk": "East Wood Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332682",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Evergreen Street",
+      "folk": "Evergreen Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334170",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Foundry Drive",
+      "folk": "Foundry Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/837002798",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Fowler Avenue",
+      "folk": "Fowler Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5327052",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Garfield Street",
+      "folk": "Garfield Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330300",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Gates Road",
+      "folk": "Gates Road",
+      "code": null,
+      "kind": "street",
+      "osm": "way/51758181",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Halsey Drive",
+      "folk": "Halsey Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/895573873",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Harrison Street",
+      "folk": "Harrison Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/302407380",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Hayes Street",
+      "folk": "Hayes Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/283274986",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Hilltop Drive",
+      "folk": "Hilltop Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334849",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Hort Drive",
+      "folk": "Hort Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331462",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Howard Avenue",
+      "folk": "Howard Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330564",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "John R. Wooden Drive",
+      "folk": "John R. Wooden Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330616",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Lawn Avenue",
+      "folk": "Lawn Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333609",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Littleton Street",
+      "folk": "Littleton Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/52040054",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "MacArthur Drive",
+      "folk": "MacArthur Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334709",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Maple Street",
+      "folk": "Maple Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330969",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Marsteller Street",
+      "folk": "Marsteller Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330438",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Martin Jischke Drive",
+      "folk": "Martin Jischke Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/319797214",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Mc Cutcheon Drive",
+      "folk": "Mc Cutcheon Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332202",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Memorial Mall Drive",
+      "folk": "Memorial Mall Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/1193683624",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Mitch Daniels Boulevard",
+      "folk": "Mitch Daniels Boulevard",
+      "code": null,
+      "kind": "street",
+      "osm": "way/333094489",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Nimitz Drive",
+      "folk": "Nimitz Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/319797209",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "North Grant Street",
+      "folk": "North Grant Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/302409381",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "North Martin Jischke Drive",
+      "folk": "North Martin Jischke Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/333094484",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "North River Road",
+      "folk": "North River Road",
+      "code": null,
+      "kind": "street",
+      "osm": "way/52040059",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "North Russell Street",
+      "folk": "North Russell Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330097",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "North Salisbury Street",
+      "folk": "North Salisbury Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329597",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "North Steven Beering Drive",
+      "folk": "North Steven Beering Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330360",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "North Street",
+      "folk": "North Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334243",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "North University Street",
+      "folk": "North University Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335106",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Northwestern Avenue",
+      "folk": "Northwestern Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329784",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Oak Lane",
+      "folk": "Oak Lane",
+      "code": null,
+      "kind": "street",
+      "osm": "way/347382089",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Oval Drive",
+      "folk": "Oval Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334872",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Pearl Street",
+      "folk": "Pearl Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329888",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Pierce Street",
+      "folk": "Pierce Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334150",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Quincy Street",
+      "folk": "Quincy Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332081",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Robinson Street",
+      "folk": "Robinson Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/860925388",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Ross Ade Drive",
+      "folk": "Ross Ade Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335639",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Rusk Street",
+      "folk": "Rusk Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333305",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Sheetz Street",
+      "folk": "Sheetz Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/74552821",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Smiley Street",
+      "folk": "Smiley Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333265",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South Chauncey Avenue",
+      "folk": "South Chauncey Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329931",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South Grant Street",
+      "folk": "South Grant Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331094",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South Martin Jischke Drive",
+      "folk": "South Martin Jischke Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333801",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "South River Road",
+      "folk": "South River Road",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5334628",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South Russell Street",
+      "folk": "South Russell Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5327316",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South Salisbury Street",
+      "folk": "South Salisbury Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330513",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South Street",
+      "folk": "South Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5329593",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South University Drive",
+      "folk": "South University Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/709199746",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "South University Street",
+      "folk": "South University Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332001",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Stadium Mall Drive",
+      "folk": "Stadium Mall Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/932656611",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Steely Street",
+      "folk": "Steely Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332958",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Sylvia Street",
+      "folk": "Sylvia Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331800",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Tapawingo Drive",
+      "folk": "Tapawingo Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/470281362",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Tarkington Drive",
+      "folk": "Tarkington Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335638",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Tower Drive",
+      "folk": "Tower Drive",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335062",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Vine Street",
+      "folk": "Vine Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331058",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Waldron Street",
+      "folk": "Waldron Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331816",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "West Columbia Street",
+      "folk": "West Columbia Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5330367",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "West Lutz Avenue",
+      "folk": "West Lutz Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5331034",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "West Oak Street",
+      "folk": "West Oak Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335468",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "West Stadium Avenue",
+      "folk": "West Stadium Avenue",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5333266",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "West State Street",
+      "folk": "West State Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/895558625",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "West Wood Street",
+      "folk": "West Wood Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332328",
+      "note": "geography, owner decides"
+    },
+    {
+      "real": "Wiggins Street",
+      "folk": "Wiggins Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5332650",
+      "note": "geography, owner decides; named after a real person"
+    },
+    {
+      "real": "Williams Street",
+      "folk": "Williams Street",
+      "code": null,
+      "kind": "street",
+      "osm": "way/5335032",
+      "note": "geography, owner decides"
+    }
+  ]
+}

@@ -3,6 +3,9 @@ import * as ut from 'three';
 import { Ey, di, Cu, l0, T1, t0, Eh, nn, xs, jl, er, mn, vs, ly, M5, tn, LE, d0, Kl, Th, P1, cy, Fr, Jl, qE, My, _h, Un, vy, Za, FE, tr, Sh, h5, ra, z1, wn, Ot, tc, TE, M1, ME, l5, Au, ft, Tu, bh, dn, Ru, yh, h0, oy, kn, sy, Eu, Nn, Mt, b0, Q0, m0, Su, $a, Fs, Zl, wh, It, _E, pn, iy, Xn, oa, CE, en, sa, ry } from './weapon.js';
 import { ar } from './ns.js';
 import { attachModel } from '../weapons/models.js';
+import { makeHammer } from '../weapons/hammer.js';
+import { createSkins, bindSkinUI } from '../weapons/skins.js';
+import { sightReport } from '../weapons/sights.js';
 import { ik, ao } from './render.js';
 import { Ro, Ia, u0, ev, Is, j0, Hn } from './common.js';
 import { st, at, jP } from './fx.js';
@@ -3149,9 +3152,14 @@ __late_props.sl(sl);
       d = { G: n, S: a, mats: o, mk: i, rng: r, ev: f, arms: p },
       m = wS(d),
       x = zS(d),
-      v = { rifle: m, pistol: x },
-      y = [m, x];
-    for (let B of y) attachModel(B, B.id, Ro);
+      __hammer = makeHammer(d, { holds: x.holds, ol, di, tn, Ot, Un, motion: bh.pistol }),
+      v = { rifle: m, pistol: x, hammer: __hammer },
+      y = [m, x, __hammer],
+      __skins = createSkins(n, v),
+      __qm = { pending: !1, back: !1, prev: "rifle" };
+    Promise.all(y.map((B) => attachModel(B, B.id, Ro))).then(() => __skins.refresh());
+    bindSkinUI(n, __skins);
+    typeof window < "u" && (window.__sightReport = () => sightReport(n, m));
     for (let B of y)
       (B.root.traverse((X) => {
         X.layers.set(Ro);
@@ -3167,7 +3175,9 @@ __late_props.sl(sl);
         ads: 0,
         spread: 0.0125,
         debug: l,
-        slots: [m.slot, x.slot],
+        slots: [m.slot, x.slot, __hammer.slot],
+        skins: __skins,
+        hammer: { rig: __hammer, swing: () => __quickMelee(), debugSwing: (B) => __hammer.debugSwing(B) },
         rigs: v,
         pending: null,
         arms: p,
@@ -3252,6 +3262,7 @@ __late_props.sl(sl);
       damage: { enumerable: !0, get: () => b.def.damage },
       rpm: { enumerable: !0, get: () => b.def.rpm },
       current: { enumerable: !0, get: () => b.id },
+      melee: { enumerable: !0, get: () => !!b.def.melee },
       root: { enumerable: !0, get: () => b.root },
     });
     function _(B) {
@@ -3378,6 +3389,17 @@ __late_props.sl(sl);
             ? !1
             : (L(b, X, 0), !0)
         : !1;
+    }
+    // quick melee (F / V / middle mouse): swing the rivet hammer, then go back to the previous weapon
+    function __quickMelee() {
+      if ((I(), b === __hammer && !u.active)) return (__hammer.swing(), void 0);
+      (u.active && u.to === __hammer) || ((__qm.prev = (u.active ? u.to : b).id), U("hammer"), (__qm.back = !0));
+      __qm.pending = !0;
+    }
+    function __qmTick() {
+      (__qm.pending && b === __hammer && (!u.active || u.phase === "draw") && ((__qm.pending = !1), __hammer.swing()),
+        b !== __hammer && !u.active && (__qm.back = !1),
+        __qm.back && b === __hammer && !u.active && !__qm.pending && !__hammer.swinging && ((__qm.back = !1), U(__qm.prev)));
     }
     function k(B) {
       if ((u.fresh ? (u.fresh = !1) : (u.t += B), u.phase === "holster"))
@@ -3565,8 +3587,10 @@ __late_props.sl(sl);
       }
       if (l.pause) return;
       ((a.t += B),
-        re.pressed && (re.pressed("swap") ? E.swap() : re.pressed("weapon1") ? U("rifle") : re.pressed("weapon2") && U("pistol")),
-        u.active && k(B));
+        re.pressed && (re.pressed("swap") ? E.swap() : re.pressed("weapon1") ? U("rifle") : re.pressed("weapon2") ? U("pistol") : re.pressed("weapon3") && U("hammer")),
+        re.pressed && re.pressed("melee") && __quickMelee(),
+        u.active && k(B),
+        __qmTick());
       let Y = b,
         he = Y.def,
         V = Y.slot,
@@ -3599,7 +3623,8 @@ __late_props.sl(sl);
       } else ((a.reloadW = 0), (a.rackW = 0), (a.antYT = 0), (a.antRT = 0));
       a.cooldown -= B;
       let Ue = !a.reload && !ne && a.sprintT < 0.45;
-      if (he.auto) {
+      if (he.melee) ye && Ue && Y.swing();
+      else if (he.auto) {
         if (ye && Ue)
           if (V.ammo > 0) {
             let $e = 0;
@@ -3631,7 +3656,7 @@ __late_props.sl(sl);
             n.fx.smoke &&
             ((a.smokeTick = 0.085), S(A), n.fx.smoke(A, { size: 0.1 + a.smoke * 0.06, life: 1.3, rise: 0.5, count: 1, alpha: 0.22 }))),
         (a.heat = Math.max(0, a.heat - B * 0.2)));
-      let Ve = (!!re.ads || l.ads) && !a.reload && !ne && a.sprintT < 0.35;
+      let Ve = (!!re.ads || l.ads) && !a.reload && !ne && a.sprintT < 0.35 && !he.melee;
       ((a.adsLin = Hn(a.adsLin + (Ve ? B : -B) / he.adsTime, 0, 1)), (a.adsE = Ot(a.adsLin)), (E.ads = a.adsE), (a.adsWant = Ve));
       let ze = X.speed || 0,
         Ge = Is(ze / 6),

@@ -2,6 +2,7 @@
 import { Box3, Vector3, TextureLoader, SRGBColorSpace } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import manifest from './weapons.json';
+import { addIronSights } from './sights.js';
 
 const base = import.meta.env.BASE_URL;
 
@@ -62,6 +63,7 @@ export async function attachModel(rig, id, layer) {
     // procedural meshes go only now that the model is ready
     for (const ch of [...rig.root.children]) if (ch !== rig.flash && ch !== rig.magGroup) rig.root.remove(ch);
     rig.root.add(model);
+    if (d.sights) addIronSights(rig, model, d.sights, layer);
     rig.root.updateMatrixWorld(true);
     if (rig.magGroup) {
       rig.magGroup.clear();

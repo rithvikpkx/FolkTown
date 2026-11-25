@@ -109,3 +109,12 @@ Both are gitignored and not part of any shipped build until cleared.
 | data/raw/purdue-historic-buildings.geojson | Names/years cross-check only (not shipped) | Purdue ArcGIS layer, via research folder | Unknown; Purdue says 3DEP viewer is unrestricted, this layer not stated | needs-clearance |
 
 - reference/purdue-photos/memorial-union-3d-model-screenshot.png: owner-supplied screenshot of the Purdue Memorial Union SketchUp/3D Warehouse model (https://3dwarehouse.sketchup.com/model/1982888bb4c06bc2b4250b90e6223188). Reference only; licence needs-clearance.
+
+## personalize-game (Saltline game details)
+
+| Asset | Used for | Source URL | Licence | Credit needed |
+|---|---|---|---|---|
+| DiceBear Notionists avatar style (`@dicebear/notionists` 9.4.2, generated offline from a seed; library `@dicebear/core` 9.4.2) | Random avatar on the Folk University ID card, `packages/saltline/src/ui/idcard.js` | https://heyzoish.gumroad.com/l/notionists (design, Zoish); https://www.dicebear.com/styles/notionists/ (code, Florian Körner) | Design CC0 1.0; code MIT | No |
+| Moonship robot (model, wheels, antenna flag, MOONSHIP decal) and its whir/chirp/zap/bump sounds | Enemy that replaces the robot dog, `packages/saltline/src/moonship/` | Generated in code (no suitable free delivery-robot model fitted Saltline's procedural style and draw-call budget) | Own work | No |
+| Rivet hammer (steel head, black and gold wrapped handle) | Melee weapon, `packages/saltline/src/weapons/hammer.js` | Generated in code | Own work | No |
+| Iron-sight overlay (front post with gold dot, rear aperture ring) and weapon skins (Default, Old Gold, Black & Gold) | Rifle ADS and weapon skins, `packages/saltline/src/weapons/sights.js`, `skins.js` | Generated in code | Own work | No |

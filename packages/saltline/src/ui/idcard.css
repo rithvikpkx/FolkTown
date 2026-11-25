@@ -1,0 +1,95 @@
+/* Folk University student ID card (src/ui/idcard.js). Credit-card ratio 86:54, black and old gold.
+   Uses the page tokens from index.html (--f-display, --f-label, --f-mono, --bone, --steel). */
+.idc-wrap { --gold: #CFB991; --gold-d: #9a8559; pointer-events: auto; }
+.idc-card { position: relative; width: 100%; aspect-ratio: 86 / 54; display: flex; flex-direction: column; overflow: hidden; container-type: inline-size;
+  border-radius: 14px; color: var(--bone, #e8e4da); text-shadow: none; text-align: left;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(207, 185, 145, .16) 0%, rgba(207, 185, 145, 0) 55%),
+    repeating-linear-gradient(135deg, rgba(207, 185, 145, .045) 0 2px, transparent 2px 9px),
+    linear-gradient(160deg, #1b1813 0%, #0b0a08 70%);
+  border: 1px solid rgba(207, 185, 145, .55); box-shadow: 0 18px 50px rgba(0, 0, 0, .55), 0 2px 6px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .06); }
+.idc-head { display: flex; align-items: center; gap: 2.6cqw; padding: 3.2cqw 4.4cqw 2.4cqw; background: #0a0908; border-bottom: .7cqw solid var(--gold); }
+.idc-emblem { width: 7.6cqw; height: auto; flex: none; }
+.idc-uni { flex: 1 1 auto; min-width: 0; line-height: 1; }
+.idc-uni b { display: block; font: 900 6.6cqw/0.9 var(--f-display); letter-spacing: .12em; color: var(--gold); white-space: nowrap; }
+.idc-uni span { display: block; margin-top: .9cqw; font: 500 2.7cqw/1 var(--f-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--steel, #a39a86); }
+.idc-kind { font: 700 2.9cqw/1 var(--f-label); letter-spacing: .3em; margin-right: -.3em; text-transform: uppercase; color: #0a0908; background: var(--gold); padding: 1.1cqw 1.8cqw .9cqw; }
+.idc-body { flex: 1 1 auto; min-height: 0; display: flex; gap: 4cqw; padding: 3.4cqw 4.4cqw 2.4cqw; }
+.idc-photo { flex: none; width: 25cqw; aspect-ratio: 4 / 5; align-self: flex-start; border: .7cqw solid var(--gold); border-radius: 1.4cqw; overflow: hidden; background: #e8e4da; }
+.idc-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.idc-fields { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.idc-name { font: 700 6.4cqw/1 var(--f-display); letter-spacing: .05em; text-transform: uppercase; color: var(--bone, #e8e4da); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 1.6cqw; }
+.idc-fields dl { margin: 0; padding: 0; display: grid; gap: 1.1cqw; }
+.idc-fields dl > div { display: grid; grid-template-columns: 15cqw 1fr; align-items: baseline; gap: 1.6cqw; }
+.idc-fields dt { margin: 0; font: 600 2.35cqw/1.1 var(--f-label); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+.idc-fields dd { margin: 0; font: 500 3.35cqw/1.12 var(--f-label); letter-spacing: .03em; color: var(--bone, #e8e4da); overflow-wrap: anywhere; }
+.idc-mono { font-family: var(--f-mono) !important; letter-spacing: .06em !important; }
+.idc-strip { flex: none; display: flex; align-items: center; gap: 3cqw; height: 9.4cqw; padding: 0 4.4cqw; background: #e8e4da; }
+.idc-bars { flex: 1 1 auto; height: 5.6cqw; min-width: 0; }
+.idc-strip span { flex: none; font-size: 2.7cqw; color: #0a0908; }
+
+/* title screen: right-hand side, the character you are about to play */
+.idc-title { position: absolute; z-index: 1; right: max(var(--gr), 4.5vw); top: 50%; transform: translateY(-58%); width: clamp(300px, 25vw, 420px);
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.idc-title::before { content: 'Your student ID'; align-self: flex-start; font: 600 11px/1 var(--f-label); letter-spacing: .28em; text-transform: uppercase; color: var(--bone-dim, rgba(232, 228, 218, .64)); text-shadow: var(--shadow); }
+.idc-title .idc-card { order: 1; }
+.idc-title .idc-reroll { order: 2; min-height: 34px; }
+.idc-reroll::before { content: '\21BB'; margin-right: 8px; color: var(--gold); letter-spacing: 0; }
+/* make room on the left: the wordmark shrinks a little so it never runs under the card */
+.m-title-main.has-idc .m-word { font-size: clamp(52px, 11vw, 176px) !important; }
+
+/* pause card */
+.idc-paused { margin: 14px 0 4px; }
+
+/* HUD badge: top right, clear of the objective (top left), compass and kill feed */
+.idc-badge { position: absolute; top: calc(14px + var(--sat, 0px)); right: var(--gr, 16px); display: flex; align-items: center; gap: 9px; padding: 4px 10px 4px 4px;
+  background: rgba(10, 9, 8, .5); border-left: 2px solid #CFB991; pointer-events: none; }
+.idc-badge img { width: 30px; height: 30px; display: block; border: 1px solid #CFB991; }
+.idc-badge b { display: block; font: 600 13px/1 var(--f-label); letter-spacing: .14em; text-transform: uppercase; color: var(--bone, #e8e4da); }
+.idc-badge i { display: block; margin-top: 4px; font: 400 10px/1 var(--f-mono); font-style: normal; letter-spacing: .08em; text-transform: uppercase; color: var(--bone-dim, rgba(232, 228, 218, .64)); }
+.is-touch .idc-badge { display: none; }
+
+/* below the wide layout (or on short screens) the title shows a compact one-row ID above the Play button,
+   and the pause card a compact one on short screens: photo, name, major, residence, class */
+@media (max-width: 1099px), (max-height: 640px) {
+  .idc-title { position: static; transform: none; width: auto; flex-direction: row; align-items: center; gap: 10px; margin-top: clamp(10px, 2vh, 18px); }
+  .idc-title::before { display: none; }
+  .idc-title .idc-reroll { white-space: nowrap; }
+  .m-title-main.has-idc .m-word { font-size: clamp(44px, min(13vw, 11vh), 208px) !important; }
+}
+/* short screens (landscape phones) with room on the right: the compact ID floats top right instead */
+@media (max-height: 640px) and (min-width: 700px) {
+  .idc-title { position: absolute; top: calc(clamp(14px, 5.5vh, 52px) + var(--sat) + 10px); right: max(var(--gr), 4.5vw); width: min(300px, 40vw);
+    margin: 0; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .idc-title .idc-card { width: 100%; }
+  .idc-title .idc-reroll { min-height: 30px; }
+  .m-title-main.has-idc .m-word { font-size: clamp(40px, 16vh, 120px) !important; }
+  .m-title-main.has-idc { padding-right: calc(min(300px, 40vw) + 20px); } /* nothing runs under the floating ID */
+}
+@media (max-width: 1099px), (max-height: 640px) {
+  .idc-title .idc-card { width: min(360px, 100%); flex: 0 1 auto; }
+}
+@media (max-height: 640px) { .idc-paused .idc-card { width: 100%; } .idc-paused { margin: 10px 0 0; } }
+@media (max-width: 1099px), (max-height: 640px) {
+  .idc-title .idc-card { aspect-ratio: auto; border-radius: 8px; border-left: 3px solid #CFB991; }
+  .idc-title .idc-head, .idc-title .idc-strip, .idc-title dl > div:first-child { display: none; }
+  .idc-title .idc-body { padding: 2.2cqw 3cqw; gap: 3cqw; align-items: center; }
+  .idc-title .idc-photo { width: 15cqw; border-width: 2px; border-radius: 4px; align-self: center; }
+  .idc-title .idc-name { font-size: 5.4cqw; padding-bottom: 1cqw; }
+  .idc-title .idc-fields dl { gap: .6cqw; }
+  .idc-title .idc-fields dl > div { grid-template-columns: 17cqw 1fr; }
+  .idc-title .idc-fields dt { font-size: 2.6cqw; }
+  .idc-title .idc-fields dd { font-size: 3.5cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+@media (max-height: 640px) {
+  .idc-paused .idc-card { aspect-ratio: auto; border-radius: 8px; border-left: 3px solid #CFB991; }
+  .idc-paused .idc-head, .idc-paused .idc-strip, .idc-paused dl > div:first-child { display: none; }
+  .idc-paused .idc-body { padding: 2.2cqw 3cqw; gap: 3cqw; align-items: center; }
+  .idc-paused .idc-photo { width: 15cqw; border-width: 2px; border-radius: 4px; align-self: center; }
+  .idc-paused .idc-name { font-size: 5.4cqw; padding-bottom: 1cqw; }
+  .idc-paused .idc-fields dl { gap: .6cqw; }
+  .idc-paused .idc-fields dl > div { grid-template-columns: 17cqw 1fr; }
+  .idc-paused .idc-fields dt { font-size: 2.6cqw; }
+  .idc-paused .idc-fields dd { font-size: 3.5cqw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+@media (max-width: 760px) { .idc-badge { display: none; } }

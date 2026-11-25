@@ -543,6 +543,7 @@ void main(){
     vec2 c = uv - 0.5;
     float w = 1.0 - 0.75 * smoothstep(0.1, 0.55, length(c));       // centre-weighted metering
     float l = luma(texture2D(tLum, uv).rgb);
+    w *= texture2D(tDepth, uv).r < ${sg} ? 0.08 : 1.0;                 // the viewmodel must not drive exposure (ADS)
     ls += log(max(l, 1e-4)) * w; ws += w;
   }
   float avg = clamp(exp(ls / ws), 0.002, 40.0);
@@ -648,7 +649,7 @@ void main(){
   vec3 col = vec3(texture2D(tScene, vUv + off).r, texture2D(tScene, vUv).g, texture2D(tScene, vUv - off).b);
   // ADS: soften the periphery
   vec3 soft = texture2D(tBlur, vUv).rgb;
-  col = mix(col, soft, uAds * 0.75 * smoothstep(0.22, 0.85, r2));
+  col = mix(col, soft, uAds * 0.2 * smoothstep(0.55, 1.0, r2));   // FolkTown: keep sights + target crisp
   // bloom (energy conserving mix), lens dirt, anamorphic streak
   vec3 bloom = texture2D(tBloom, vUv).rgb;
   vec3 dirt = texture2D(tDirt, vUv).rgb;
@@ -678,8 +679,8 @@ void main(){
   l = luma(col);
   col = mix(vec3(l), col, sat);
   // vignette: base + low health + ADS tightening
-  float vig = uVignette + uLowHealth * 0.55 + uAds * 0.22;
-  float vr = smoothstep(0.15 - uAds * 0.08, 1.05, r2);
+  float vig = uVignette + uLowHealth * 0.55 + uAds * 0.04;
+  float vr = smoothstep(0.15 + uAds * 0.15, 1.05, r2);
   col *= 1.0 - vig * vr * vr * (3.0 - 2.0 * vr) ;
   // damage: red-edged pulse
   float edge = smoothstep(0.18, 1.0, r2);
@@ -1103,7 +1104,7 @@ ${ge}`,
         ((Oe.tDepth.value = Re),
           Oe.uInvViewProj.value.copy(G.copy(W).invert()),
           Oe.uPrevViewProj.value.copy(J),
-          (Oe.uShutter.value = Math.min(0.5, 1 / 190 / Math.max(P, 0.001))),
+          (Oe.uShutter.value = Math.min(0.5, 1 / 190 / Math.max(P, 0.001)) * (1 - 0.85 * ue(D.ads || 0))),
           Oe.uRes.value.set(_.w, _.h),
           l(k, y.motion),
           (_e = y.motion.texture));

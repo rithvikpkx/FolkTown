@@ -1,5 +1,6 @@
 import { DataTexture as li, RGBAFormat as $0, UnsignedByteType as wi, LinearFilter as x0, LinearMipmapLinearFilter as yn, ClampToEdgeWrapping as Vi, NoColorSpace as ci, CanvasTexture as Rs, SRGBColorSpace as In, Vector2 as We, InstancedBufferGeometry as Ra, BufferAttribute as nt, InstancedBufferAttribute as Xs, DynamicDrawUsage as Ao, ShaderMaterial as vn, DoubleSide as ln, CustomBlending as cp, AddEquation as pr, OneFactor as qc, OneMinusSrcAlphaFactor as Sc, ZeroFactor as up, Mesh as ht, LoopRepeat as px, TriangleFanDrawMode as vx, Matrix4 as Je, Quaternion as St, Vector3 as K, BoxGeometry as R0, MeshStandardMaterial as L0, InstancedMesh as Wo, Euler as _0, LatheGeometry as yr, BufferGeometry as pt, Color as Qe, Group as At, LessDepth as hp, PCFSoftShadowMap as lp, UnsignedShort5551Type as bp } from 'three';
 import { ar } from './ns.js';
+import { msWhir, msChirp, msZap, msBump } from '../moonship/sounds.js';
 import { uv } from './props.js';
 import { Z0, T0, Ei } from './common.js';
 import { f0, lo } from './mats.js';
@@ -4692,49 +4693,9 @@ __late_mats.ms(ms);
     );
   }
   export function L6(n, e, t) {
-    let i = it(n, 0.42),
-      s = [1, 0.94, 1.06][t % 3],
-      o = 5e-4,
-      r = 0,
-      a = 0;
-    Se(i, xt(n, e, 0.008, 0.0013, { hp: 2800 }), o, 0.8, n);
-    let l = it(n, 0.17);
-    for (let u = 0; u < l.length; u++) {
-      let f = u / n,
-        h = (150 + 760 * Math.exp(-f / 0.028)) * s;
-      ((r += h / n), (a += (h * 2.76 + 90) / n));
-      let p = 2 * (r - Math.floor(r)) - 1;
-      l[u] = (p * 0.8 + Math.sin(at * r) * Math.sin(at * a) * 0.9) * Math.exp(-f / 0.04) * (1 - Math.exp(-f / 6e-4));
-    }
-    (kt(l, "hp", 170, 0.8, n),
-      kt(l, "lp", 3600, 0.8, n),
-      Se(i, C0(l), o, 1, n),
-      Se(i, Gn(n, 0.09, 210 * s, 92 * s, 0.016, 0.024, 8e-4), o, 0.6, n),
-      Se(i, xt(n, e, 0.07, 0.014, { bp: 640 * s, q: 1.8 }), o, 0.55, n));
-    let c = e0(n, 0.3, e);
-    return (
-      y0(c, "bp", ei(3800, 1500), 0.9, n),
-      Mn(c, n, ms(0.065, 0.012)),
-      Se(i, C0(c), o + 0.03, 0.34, n),
-      Se(
-        i,
-        Fn(
-          n,
-          e,
-          [
-            [1380 * s, 0.012, 1],
-            [2260 * s, 0.009, 0.7],
-            [3540, 0.006, 0.45],
-          ],
-          { hp: 1800, tick: 0.6 },
-        ),
-        o + 0.062,
-        0.26,
-        n,
-      ),
-      hi(fi(C0(i), 1.7), n, 80)
-    );
+    return msZap(n, e, t); // Moonship zap (was the hound gun)
   }
+
   export function F6(n, e, t) {
     let i = it(n, 0.32),
       s = e0(n, 0.3, e),
@@ -6381,29 +6342,9 @@ __late_mats.ms(ms);
     return s;
   }
   export function QI(n, e) {
-    let i = n * 2,
-      s = new Float32Array(i);
-    for (let r = 0; r < i; r++) {
-      let a = r / n,
-        l = 1.1 * Math.sin(at * 0.5 * a) + 0.5 * Math.sin(at * 1.5 * a + 1),
-        c = at * 310 * a + l,
-        u = 0.7 + 0.3 * Math.sin(at * 1.5 * a),
-        f = (Math.sin(c) + 0.45 * Math.sin(2 * c + l) + 0.2 * Math.sin(4 * c + 0.5)) * 0.3 * u,
-        h = at * 62 * a;
-      ((f += (Math.sin(h) + 0.5 * Math.sin(2 * h) + 0.33 * Math.sin(3 * h) + 0.2 * Math.sin(5 * h)) * 0.28), (s[r] = f));
-    }
-    let o = gu(
-      n,
-      2,
-      e,
-      (r) => {
-        (kt(r, "hp", 2800, 0.7, n), kt(r, "lp", 7e3, 0.7, n));
-      },
-      0.25,
-    );
-    for (let r = 0; r < i; r++) s[r] += o[r] * 0.12 * (0.6 + 0.4 * Math.sin((at * 1.5 * r) / n + 2));
-    return s;
+    return msWhir(n, e); // Moonship electric whir loop (was servo)
   }
+
   export function ez(n, e) {
     let i = n * 2,
       s = new Float32Array(i);
@@ -6427,35 +6368,9 @@ __late_mats.ms(ms);
     return s;
   }
   export function tz(n, e, t) {
-    let i = it(n, 0.42),
-      s = [1, 1.07, 0.93][t % 3];
-    Se(i, Va(n, 0.035, 920 * s, 610 * s), 0, 0.06, n);
-    let o = 0.03;
-    return (
-      Se(i, Gn(n, 0.2, 84 * s, 41, 0.03, 0.05, 0.002), o, 1.1, n),
-      Se(i, xt(n, e, 0.12, 0.03, { lp: 360 }), o, 1.1, n),
-      Se(i, xt(n, e, 0.03, 0.006, { lp: 2600, hp: 500 }), o, 0.4, n),
-      Se(
-        i,
-        Xt(
-          n,
-          0.12,
-          [
-            [522 * s, 0.026, 1],
-            [1133 * s, 0.02, 0.7],
-            [1871 * s, 0.014, 0.5],
-            [3040 * s, 0.008, 0.3],
-          ],
-          e,
-        ),
-        o,
-        0.2,
-        n,
-      ),
-      Se(i, xt(n, e, 0.14, 0.04, { hp: 3e3, att: 0.006 }), o + 0.01, 0.06, n),
-      fi(i, 1.5)
-    );
+    return msBump(n, e, t); // Moonship wheel bump (was paw step)
   }
+
   export function nz(n, e) {
     let t = it(n, 1.5),
       i = [0, 0, 0, 0];
@@ -6556,6 +6471,7 @@ __late_mats.ms(ms);
     return (Se(t, Wa(n, e, 1, 22, { from: 0, fall: 1.2, hp: 1800, ampFall: 0.4, maxLen: 0.007 }), 0.62, 0.3, n), fi(ls(t, 0.55), 1.5));
   }
   export function sz(n, e, t) {
+    if (t) return msChirp(n); // Moonship spot chirp (variant 1 was the hound)
     let i = it(n, 0.52),
       s = t ? 622 : 1320,
       o = s * 1.4142,

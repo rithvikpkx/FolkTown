@@ -3,7 +3,7 @@
 Saltline, a single-file procedural FPS (everything generated in code, no downloads), split into ES modules. The code is unchanged (still minified names); only the layout moved. FolkTown's own client in `packages/client` is untouched.
 
 - Run: `pnpm saltline` (Vite dev server). Build: `pnpm --filter @folktown/saltline build`. Check: `node tools/saltline-check.mjs` (headless Chrome, waits for `window.__ready`, saves `tools/shots/saltline.png`).
-- Controls: WASD move, mouse look, LMB fire, RMB aim, R reload, Q sidearm, E cut relay, Space jump, Shift sprint, C crouch, Esc pause. Gamepad and touch also work.
+- Controls: WASD move, mouse look, LMB fire, RMB aim, R reload, Q sidearm, 1 / 2 / 3 rifle / pistol / rivet hammer, F, V or middle mouse quick melee (hammer swing), B cycle weapon skin (Default, Old Gold, Black & Gold; also `?skin=old-gold` or `?skin=black-gold`, saved in localStorage), E cut relay, Space jump, Shift sprint, C crouch, Esc pause. Gamepad and touch also work.
 - Three.js is pinned to r180 (the version the original bundled) via `import ... from 'three'`; the original's inlined copy, the claude.ai frame preamble and the unused `legacy-v8` fallback blob were dropped.
 
 ## Files (line ranges are in the prettier-beautified single-file bundle `game.pretty.js`, not in the repo)
